@@ -129,10 +129,7 @@
     <string name="show_heights_and_distances_in_imperial_units">Show heights and distances in imperial units</string>
     <string name="show_maybe_visible_peaks">Show maybe-visible peaks</string>
     <string name="include_peaks_that_terrain_might_hide">Include peaks that terrain might hide</string>
-    <string name="viewing">Viewing</string>
-    <string name="phone_height">Phone height</string>
-    <string name="look_up_or_down">Look up or down</string>
-    <string name="level">Level</string>
+    <string name="phone_height">Standing height</string>
     <string name="demo">Demo</string>
     <string name="demo_mode">Demo mode</string>
     <string name="adds_a_made_up_landscape_so_you_can_try_peakbud_without_downloading">Adds a made-up landscape so you can try PeakBud without downloading</string>
@@ -294,4 +291,6 @@
     <string name="tutorial_example_nearby_detail">You\'re here · 32 MB · peaks up to 30 km away</string>
     <string name="tutorial_example_area">Silver Crown Lookout</string>
     <string name="tutorial_example_area_detail">12 km away · 18 MB · peaks up to 25 km away</string>
+    <string name="advanced">Advanced</string>
+    <string name="standing_height_detail">How high your phone is above the ground. Raise it if you\'re on a viewing tower or rooftop; it can change which nearby peaks count as in view.</string>
 </resources>

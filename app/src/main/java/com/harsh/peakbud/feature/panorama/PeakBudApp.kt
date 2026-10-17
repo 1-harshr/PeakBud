@@ -981,14 +981,6 @@ private fun SettingsDialog(state: PanoramaState, model: PanoramaViewModel, onTut
                 HorizontalDivider(Modifier.padding(horizontal = TrailSpace.lg), color = MaterialTheme.colorScheme.outlineVariant)
                 SettingSwitch(strings(R.string.show_maybe_visible_peaks), strings(R.string.include_peaks_that_terrain_might_hide), prefs.showUncertain) { model.updatePreferences(prefs.copy(showUncertain = it)) }
             }
-            SectionLabel(strings(R.string.viewing))
-            SettingsGroup {
-                SettingSlider(strings(R.string.phone_height), strings(R.string.phone_height_value, phoneHeight), phoneHeight, .5f..3f, { phoneHeight = it }) {
-                    model.updatePreferences(prefs.copy(phoneHeightM = phoneHeight.toDouble()))
-                }
-                HorizontalDivider(Modifier.padding(horizontal = TrailSpace.lg), color = MaterialTheme.colorScheme.outlineVariant)
-                SettingSlider(strings(R.string.look_up_or_down), if (state.pitch.toInt() == 0) strings(R.string.level) else angleText(state.pitch, strings), state.pitch.toFloat(), -20f..20f, { model.setPitch(it.toDouble()) })
-            }
             SectionLabel(strings(R.string.help))
             SettingsGroup {
                 Row(Modifier.fillMaxWidth().clickable(onClick = onTutorial).padding(horizontal = TrailSpace.lg, vertical = TrailSpace.md), verticalAlignment = Alignment.CenterVertically) {
@@ -1006,6 +998,23 @@ private fun SettingsDialog(state: PanoramaState, model: PanoramaViewModel, onTut
             SectionLabel(strings(R.string.privacy))
             SettingsGroup {
                 SettingSwitch(strings(R.string.send_crash_reports_and_usage), strings(R.string.helps_fix_problems_your_location_is_never_sent), prefs.shareDiagnostics) { model.updatePreferences(prefs.copy(shareDiagnostics = it)) }
+            }
+            // Rarely needed: folded away so it doesn't sit beside everyday settings.
+            var advanced by rememberSaveable { mutableStateOf(false) }
+            Row(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small).clickable { advanced = !advanced }.padding(top = TrailSpace.sm),
+                verticalAlignment = Alignment.CenterVertically) {
+                SectionLabel(strings(R.string.advanced), Modifier.weight(1f))
+                Icon(painterResource(if (advanced) R.drawable.ic_expand_less else R.drawable.ic_expand_more),
+                    contentDescription = strings(if (advanced) R.string.hide_details else R.string.show_details), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            AnimatedVisibility(advanced) {
+                SettingsGroup {
+                    SettingSlider(strings(R.string.phone_height), strings(R.string.phone_height_value, phoneHeight), phoneHeight, .5f..3f, { phoneHeight = it }) {
+                        model.updatePreferences(prefs.copy(phoneHeightM = phoneHeight.toDouble()))
+                    }
+                    Text(strings(R.string.standing_height_detail), Modifier.padding(start = TrailSpace.lg, end = TrailSpace.lg, bottom = TrailSpace.lg),
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
             Text(strings(R.string.peak_visibility_is_worked_out_from_maps_clouds_trees_location_errors_and_nea),
                 Modifier.padding(start = TrailSpace.xs, top = TrailSpace.sm), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
