@@ -4,6 +4,13 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+// Firebase is configured by dropping app/google-services.json in place (see docs/firebase.md).
+// Without it the app still builds and logs to Logcat only.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+}
+
 android {
     namespace = "com.harsh.peakbud"
     compileSdk {
@@ -34,6 +41,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -52,6 +60,11 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
+
+    // Crash reports and usage logging. Inactive until google-services.json is added.
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

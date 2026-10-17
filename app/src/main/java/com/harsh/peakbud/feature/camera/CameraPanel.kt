@@ -47,6 +47,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.harsh.peakbud.core.model.*
 import com.harsh.peakbud.core.projection.*
 import com.harsh.peakbud.feature.panorama.*
+import com.harsh.peakbud.telemetry.Telemetry
 import kotlinx.coroutines.delay
 import kotlin.math.hypot
 
@@ -175,10 +176,11 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
                         active.exactCenterX() to active.exactCenterY()) else null
                 camera.cameraInfo.cameraState.observe(owner, object : Observer<androidx.camera.core.CameraState> {
                     override fun onChanged(value: androidx.camera.core.CameraState) {
-                        if (!disposed && value.error != null) { streaming = false; statusCallback("The camera stopped. Switch to Home and back to restart it.") }
+                        if (!disposed && value.error != null) { Telemetry.log("camera error ${value.error?.code}"); streaming = false; statusCallback("The camera stopped. Switch to Home and back to restart it.") }
                     }
                 }.also { cameraObserver = it; observedCamera = camera })
             } catch (error: Exception) {
+                Telemetry.error("camera start", error)
                 statusCallback(error.message ?: "Couldn't start the camera. Check camera access in Android settings, or use Home.")
             }
         }, ContextCompat.getMainExecutor(context))

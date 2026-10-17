@@ -37,6 +37,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import com.harsh.peakbud.R
+import com.harsh.peakbud.telemetry.Telemetry
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -65,7 +66,10 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
     val cameraTab = tab == 0
     // Tapping the empty camera view hides every control; leaving the tab or pressing back brings them back.
     var immersive by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(tab) { immersive = false }
+    LaunchedEffect(tab) {
+        immersive = false
+        Telemetry.screen(listOf("camera", "home", "peaks", "regions")[tab])
+    }
     BackHandler(enabled = immersive) { immersive = false }
     BackHandler(enabled = !immersive && tab != 1) { tab = 1 }
     var cameraFov by remember { mutableStateOf<Pair<Double, Double>?>(null) }
@@ -113,6 +117,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
         }
     }
     LaunchedEffect(state.scene) { selectedPeak = null }
+    LaunchedEffect(selectedPeak?.peak?.id) { selectedPeak?.let { Telemetry.event("peak_open", "visibility" to it.visibility.name.lowercase(), "from" to listOf("camera", "home", "peaks", "regions")[tab]) } }
     fun gps() {
         if (state.followingGps) { model.stopGps(); return }
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -714,6 +719,10 @@ private fun SettingsDialog(state: PanoramaState, model: PanoramaViewModel, onDis
             SectionLabel("Demo")
             SettingsGroup {
                 SettingSwitch("Demo mode", "Adds a made-up landscape so you can try PeakBud without downloading", prefs.demoMode) { model.updatePreferences(prefs.copy(demoMode = it)) }
+            }
+            SectionLabel("Privacy")
+            SettingsGroup {
+                SettingSwitch("Send crash reports and usage", "Helps fix problems. Your location is never sent.", prefs.shareDiagnostics) { model.updatePreferences(prefs.copy(shareDiagnostics = it)) }
             }
             Text("Peak visibility is worked out from maps. Clouds, trees, location errors and nearby metal can change what you actually see.",
                 Modifier.padding(start = 4.dp, top = 8.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

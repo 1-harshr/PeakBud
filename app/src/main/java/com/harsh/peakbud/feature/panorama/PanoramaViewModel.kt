@@ -16,6 +16,7 @@ import com.harsh.peakbud.data.terrain.*
 import com.harsh.peakbud.data.download.RegionDownloader
 import com.harsh.peakbud.data.download.PendingDownload
 import com.harsh.peakbud.device.*
+import com.harsh.peakbud.telemetry.Telemetry
 import java.io.File
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -74,9 +75,11 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
 
     init {
         viewModelScope.launch {
-            settings.preferences.catch { mutable.update { it.copy(message = "Couldn't load your settings, so the defaults are in use.") }; emit(Preferences()) }
+            settings.preferences.catch { e -> Telemetry.error("settings read", e); mutable.update { it.copy(message = "Couldn't load your settings, so the defaults are in use.") }; emit(Preferences()) }
                 .collect { value ->
                     val previous = mutable.value.preferences
+                    if (!mutable.value.initialized || previous.shareDiagnostics != value.shareDiagnostics) Telemetry.setEnabled(value.shareDiagnostics)
+                    Telemetry.key("demo_mode", value.demoMode.toString())
                     mutable.update { it.copy(preferences = value) }
                     if (previous.phoneHeightM != value.phoneHeightM || previous.demoMode != value.demoMode) recalculate()
                 }
@@ -131,6 +134,9 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) {
                 ensureActive() // A cancelled observer/region must not publish a stale failure.
+                // Outside-area and no-data cases are expected (require/error); anything else is a bug worth reporting.
+                if (error is IllegalArgumentException || error is IllegalStateException) Telemetry.log("view not calculated: ${error.message}")
+                else Telemetry.error("calculate view", error)
                 mutable.update { it.copy(calculating = false, scene = null, message = error.message ?: "Couldn't work out the view from here. Please try again.") }
             }
         }
@@ -145,6 +151,8 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         yawTrim = 0.0
         lastSmoothedHeading = null
         lastGpsPoint = null
+        Telemetry.event("region_open", "region" to (pack?.id ?: "demo"))
+        Telemetry.key("region", pack?.id ?: "none")
         mutable.update { it.copy(activePack = pack, point = pack?.viewpoint ?: DemoTerrain.VIEWPOINT,
             heading = pack?.headingDeg ?: 350.0, groundOverrideM = null, followingGps = false, followingCompass = false,
             gpsStatus = null, gpsFresh = false, cameraPose = null, compassStatus = null, message = null, labelTrim = 0.0) }
@@ -158,6 +166,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     fun setFov(value: Double) { mutable.update { it.copy(fov = value.coerceIn(35.0, 120.0)) } }
     fun toggleCompass() { lastSmoothedHeading = null; mutable.update { it.copy(followingCompass = !it.followingCompass, cameraPose = null, compassStatus = null) } }
     fun trimCompass(degrees: Double) {
+        Telemetry.log("label nudge $degrees")
         yawTrim = Geography.wrap180(yawTrim + degrees)
         lastSmoothedHeading = lastSmoothedHeading?.let { Geography.wrap360(it + degrees) }
         mutable.update { it.copy(labelTrim = yawTrim, heading = Geography.wrap360(it.heading + degrees), cameraPose = it.cameraPose?.let { p -> p.copy(heading = Geography.wrap360(p.heading + degrees)) }) }
@@ -208,7 +217,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     fun gps(status: LocationStatus) {
         if (!mutable.value.followingGps) return
         when (status) {
-            is LocationStatus.Message -> mutable.update { it.copy(gpsFresh = false, gpsStatus = status.text) }
+            is LocationStatus.Message -> { Telemetry.log("location: ${status.text}"); mutable.update { it.copy(gpsFresh = false, gpsStatus = status.text) } }
             is LocationStatus.Fix -> {
                 val fix = status.value
                 if (fix.ageSeconds > 30) { mutable.update { it.copy(gpsFresh = false, gpsStatus = "Location is out of date · updating…") }; return }
@@ -225,7 +234,13 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
             }
         }
     }
-    fun updatePreferences(value: Preferences) { viewModelScope.launch { runCatching { settings.update(value) }.onFailure { mutable.update { s -> s.copy(message = "Couldn't save your settings. Please try again.") } } } }
+    fun updatePreferences(value: Preferences) {
+        val old = mutable.value.preferences
+        if (old.demoMode != value.demoMode) Telemetry.event("demo_mode", "enabled" to value.demoMode)
+        if (old.useFeet != value.useFeet) Telemetry.event("units", "imperial" to value.useFeet)
+        if (old.shareDiagnostics && !value.shareDiagnostics) Telemetry.event("diagnostics_off")  // last event before collection stops
+        viewModelScope.launch { runCatching { settings.update(value) }.onFailure { e -> Telemetry.error("settings write", e); mutable.update { s -> s.copy(message = "Couldn't save your settings. Please try again.") } } }
+    }
     fun clearMessage() { mutable.update { it.copy(message = null) } }
 
     fun downloadRegion(region: CatalogRegion) {
@@ -233,6 +248,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         val trusted = mutable.value.catalog.firstOrNull { it.id == region.id } ?: return
         importJob = viewModelScope.launch {
             mutable.update { it.copy(importing = "Starting download of ${trusted.name}…", downloadingRegionId = trusted.id, message = null) }
+            Telemetry.event("region_download_start", "region" to trusted.id, "size_mb" to trusted.downloadBytes / 1_048_576)
             try {
                 val pack = withContext(Dispatchers.IO) {
                     val context = currentCoroutineContext()
@@ -240,11 +256,15 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                         getApplication<Application>().assets.open(it)
                     }.install(trusted, { context.ensureActive() }) { progress -> mutable.update { it.copy(importing = progress) } }
                 }
+                Telemetry.event("region_download_complete", "region" to trusted.id)
                 mutable.update { it.copy(packs = (it.packs + pack).sortedBy { p -> p.name }, importing = null, downloadingRegionId = null) }
                 refreshDownloads()
                 selectRegion(pack)
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) {
+                Telemetry.event("region_download_failed", "region" to trusted.id, "reason" to error.javaClass.simpleName)
+                // Network drops and full storage are normal on the trail; only unexpected failures become non-fatal reports.
+                if (error !is java.io.IOException) Telemetry.error("download ${trusted.id}", error)
                 mutable.update { it.copy(importing = null, downloadingRegionId = null, message = error.message ?: "The download didn't finish. Tap Resume to try again.") }
                 refreshDownloads()
             }
@@ -260,6 +280,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         job.cancel()
     }
     fun deleteRegion(pack: RegionPack) {
+        Telemetry.event("region_delete", "region" to pack.id)
         if (mutable.value.activePack?.key == pack.key) selectRegion(null)
         viewModelScope.launch {
             try {
@@ -268,7 +289,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                     database.withTransaction { database.peaks().deletePeaks(pack.key); database.peaks().deleteRegion(pack.key) }
                 }
                 mutable.update { it.copy(packs = it.packs.filterNot { p -> p.key == pack.key }) }
-            } catch (error: Exception) { mutable.update { it.copy(message = error.message ?: "Couldn't delete this hiking area. Please try again.") } }
+            } catch (error: Exception) { Telemetry.error("delete ${pack.id}", error); mutable.update { it.copy(message = error.message ?: "Couldn't delete this hiking area. Please try again.") } }
         }
     }
     suspend fun attribution(pack: RegionPack): String = withContext(Dispatchers.IO) { store.attribution(pack) }
@@ -284,7 +305,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                 withContext(Dispatchers.IO) { region.tiles.forEach { downloader.discard(it.url) } }
                 refreshDownloads()
             } catch (cancelled: CancellationException) { throw cancelled }
-            catch (error: Exception) { mutable.update { it.copy(message = error.message ?: "Couldn't remove the paused download. Please try again.") } }
+            catch (error: Exception) { Telemetry.error("discard ${region.id}", error); mutable.update { it.copy(message = error.message ?: "Couldn't remove the paused download. Please try again.") } }
             finally { mutable.update { it.copy(importing = null) } }
         }
     }
