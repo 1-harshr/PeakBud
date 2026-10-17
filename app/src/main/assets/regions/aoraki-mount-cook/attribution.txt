@@ -1,0 +1,20 @@
+PeakBud Aoraki · Mount Cook · catalog version 1
+Terrain: Mapzen/Tilezen Skadi, 1 arc-second HGT, WGS84 / EGM96.
+Global SRTM and GMTED2010 terrain data courtesy of the U.S. Geological Survey.
+Mapzen / Tilezen: https://github.com/tilezen/joerd
+Source and attribution: https://github.com/tilezen/joerd/blob/master/docs/attribution.md
+Format: https://github.com/tilezen/joerd/blob/master/docs/formats.md
+Terrain tiles may combine SRTM and other source data; not labelled NASA SRTMGL1 v003.
+Verified tile downloads: 2026-10-17. Source bytes are pinned by SHA-256 in this app.
+Peak names/coordinates: GeoNames, https://www.geonames.org/ (CC BY 4.0).
+License: https://creativecommons.org/licenses/by/4.0/
+Country dumps retrieved 2026-10-17:
+https://download.geonames.org/export/dump/NZ.zip  SHA-256 fdddad63ef5529d205a520bcc170800d5512cad4bacf7bbfa0392c55035fbada
+
+Changes: selected single-mountain/peak records (MT/PK), clipped to terrain bounds,
+normalized fields, retained IDs/source links/modification dates; absent elevation stays null.
+The GeoNames DEM column is not used as a published summit elevation.
+Data is provided as is. Coverage and summit positions require field validation.
+Tile source URLs:
+https://s3.amazonaws.com/elevation-tiles-prod/skadi/S44/S44E169.hgt.gz
+https://s3.amazonaws.com/elevation-tiles-prod/skadi/S44/S44E170.hgt.gz

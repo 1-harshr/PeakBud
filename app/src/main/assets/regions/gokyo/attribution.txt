@@ -8,8 +8,9 @@ Terrain tiles may combine SRTM and other source data; not labelled NASA SRTMGL1 
 Verified tile downloads: 2026-10-17. Source bytes are pinned by SHA-256 in this app.
 Peak names/coordinates: GeoNames, https://www.geonames.org/ (CC BY 4.0).
 License: https://creativecommons.org/licenses/by/4.0/
-Country dump: https://download.geonames.org/export/dump/NP.zip
-Country dump retrieved 2026-10-17; SHA-256 e34491a77b4bd613b96d8264872c5e5f7db237720405a0cde27f6a5ce3dd7f1c.
+Country dumps retrieved 2026-10-17:
+https://download.geonames.org/export/dump/NP.zip  SHA-256 e34491a77b4bd613b96d8264872c5e5f7db237720405a0cde27f6a5ce3dd7f1c
+
 Changes: selected single-mountain/peak records (MT/PK), clipped to terrain bounds,
 normalized fields, retained IDs/source links/modification dates; absent elevation stays null.
 The GeoNames DEM column is not used as a published summit elevation.

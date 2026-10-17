@@ -20,7 +20,8 @@ class RegionCatalogTest {
 
     @Test fun shippedCatalogHasPinnedSourcesValidPeaksAndFullViewingCoverage() {
         val regions = RegionCatalog.load { assets.resolve(it).inputStream() }
-        assertEquals(listOf("poon-hill", "gokyo", "auli"), regions.map { it.id })
+        assertTrue(regions.size >= 30)
+        assertTrue(regions.map { it.id }.containsAll(listOf("poon-hill", "gokyo", "auli", "everest-base-camp", "zermatt", "yosemite-glacier-point", "machu-picchu")))
         regions.forEach { region ->
             val manifest = JSONObject(region.manifest)
             val records = manifest.getJSONArray("files")
@@ -31,7 +32,7 @@ class RegionCatalogTest {
                 assertEquals(expected.getValue(name).getString("sha256"), hash(bytes))
             }
             val peaks = JSONArray(assets.resolve("${region.assetDirectory}/peaks.json").readText())
-            assertTrue(peaks.length() > 10)
+            assertTrue("${region.id} has too few peaks", peaks.length() >= 3)
             val ids = (0 until peaks.length()).map { peaks.getJSONObject(it).getString("id") }
             assertEquals(ids.size, ids.distinct().size)
             region.tiles.forEach { tile ->

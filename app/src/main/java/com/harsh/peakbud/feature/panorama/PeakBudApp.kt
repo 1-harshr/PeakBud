@@ -351,7 +351,20 @@ private fun PeakList(state: PanoramaState, modifier: Modifier, onPeak: (PeakView
 @Composable
 private fun Regions(state: PanoramaState, modifier: Modifier, onDownload: (CatalogRegion) -> Unit, onSelect: (RegionPack?) -> Unit, onDelete: (RegionPack) -> Unit, onAttribution: (RegionPack) -> Unit, onCancel: () -> Unit,
                     onDiscard: (CatalogRegion) -> Unit) {
-    LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(bottom = 16.dp)) {
+    var query by rememberSaveable { mutableStateOf("") }
+    val words = query.trim().lowercase().split(Regex("\\s+")).filter { it.isNotEmpty() }
+    fun matches(vararg fields: String?) = words.all { word -> fields.any { it?.lowercase()?.contains(word) == true } }
+    val catalog = state.catalog.filter { matches(it.name, it.country, it.description) }
+    val installedOnly = state.packs.filter { pack -> state.catalog.none { it.id == pack.id && it.version == pack.version } && matches(pack.name) }
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(14.dp),
+        placeholder = { Text("Search by place or country") },
+        leadingIcon = { Icon(painterResource(R.drawable.ic_search), null) },
+        trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(painterResource(R.drawable.ic_close), contentDescription = "Clear search") } })
+    LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(bottom = 16.dp)) {
+        if (catalog.isEmpty() && installedOnly.isEmpty()) item {
+            Text("No hiking areas match \"$query\".", Modifier.padding(vertical = 24.dp), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
         state.importing?.let {
             item {
                 Surface(shape = RoundedCornerShape(14.dp), color = MaterialTheme.colorScheme.primaryContainer) {
@@ -365,7 +378,7 @@ private fun Regions(state: PanoramaState, modifier: Modifier, onDownload: (Catal
                 }
             }
         }
-        items(state.catalog, key = { it.id }) { region ->
+        items(catalog, key = { it.id }) { region ->
             val installed = state.packs.lastOrNull { it.id == region.id && it.version == region.version }
             val saved = state.pendingDownloads.any { transfer -> region.tiles.any { it.url == transfer.address } }
             val active = installed != null && installed.key == state.activePack?.key
@@ -393,7 +406,7 @@ private fun Regions(state: PanoramaState, modifier: Modifier, onDownload: (Catal
             }
         }
         // Previously installed custom packs remain usable after upgrading, without exposing import tools.
-        items(state.packs.filter { pack -> state.catalog.none { it.id == pack.id && it.version == pack.version } }, key = { it.key }) { pack ->
+        items(installedOnly, key = { it.key }) { pack ->
             RegionCard(name = pack.name, subtitle = null, meta = null, status = "Ready offline", statusTone = MaterialTheme.colorScheme.primary) {
                 Button(onClick = { onSelect(pack) }, contentPadding = PaddingValues(horizontal = 18.dp)) { Text("Open") }
                 Spacer(Modifier.weight(1f))
@@ -411,6 +424,7 @@ private fun Regions(state: PanoramaState, modifier: Modifier, onDownload: (Catal
                 Text(if (state.isDemo) "In use" else "Try", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             }
         }
+    }
     }
 }
 

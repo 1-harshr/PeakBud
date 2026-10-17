@@ -4,7 +4,7 @@
     {
       "id": "poon-hill",
       "country": "Nepal",
-      "description": "Poon Hill and Ghorepani viewpoints",
+      "description": "Poon Hill and Ghorepani viewpoints · Annapurna Himalaya",
       "assetDirectory": "regions/poon-hill",
       "tiles": [
         {
@@ -65,8 +65,8 @@
           },
           {
             "path": "attribution.txt",
-            "size": 1360,
-            "sha256": "f3dc03a0194678baa465b6d593d920295ca6748571530f2db717f039bccfb206"
+            "size": 1348,
+            "sha256": "b58cb9538f9f8a36faebfc6fb3dd948de47e0cb0b7c3bf00e1f7b0963e7fe628"
           }
         ]
       }
@@ -74,7 +74,7 @@
     {
       "id": "gokyo",
       "country": "Nepal",
-      "description": "Gokyo valley viewpoints",
+      "description": "Gokyo valley viewpoints · Khumbu Himalaya",
       "assetDirectory": "regions/gokyo",
       "tiles": [
         {
@@ -135,8 +135,277 @@
           },
           {
             "path": "attribution.txt",
-            "size": 1354,
-            "sha256": "2e221228ff7637528ff178dc7d341683b695817732108ebe47d40f3fd3796fea"
+            "size": 1342,
+            "sha256": "bfcac76bfd64ec71d5d6420cf11fda29d2b5f41f4cb56802febf8d062d6ae5bd"
+          }
+        ]
+      }
+    },
+    {
+      "id": "everest-base-camp",
+      "country": "Nepal",
+      "description": "Gorak Shep, Kala Patthar and Everest Base Camp · Khumbu Himalaya",
+      "assetDirectory": "regions/everest-base-camp",
+      "tiles": [
+        {
+          "path": "terrain/N27E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E086.hgt.gz",
+          "downloadBytes": 18934204,
+          "downloadSha256": "0e95b43508321ee2b3d9454797130bf1c972737377eff4cb07b4cf912138aad1"
+        },
+        {
+          "path": "terrain/N28E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E086.hgt.gz",
+          "downloadBytes": 16133363,
+          "downloadSha256": "492bbef252dc022aa91d7a80d0f1bd913c69b86cc57157e251f77549f1260f0c"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "everest-base-camp",
+        "name": "Kala Patthar · Everest",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.96,
+          "west": 86.8,
+          "north": 27.995,
+          "east": 86.84
+        },
+        "terrainBounds": {
+          "south": 27,
+          "west": 86,
+          "north": 29,
+          "east": 87
+        },
+        "radiusM": 15000,
+        "viewpoint": {
+          "latitude": 27.9958,
+          "longitude": 86.8285,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N27E086.hgt",
+            "size": 25934402,
+            "sha256": "150d99a7cee9472de347cf7c5d2baf95b70b8c87d0f9ac992976774d94c8e717"
+          },
+          {
+            "path": "terrain/N28E086.hgt",
+            "size": 25934402,
+            "sha256": "4064c147cdcab39bd992757443f359a12f2385499f43bf7a0c90df0ca8f07249"
+          },
+          {
+            "path": "peaks.json",
+            "size": 22094,
+            "sha256": "cc50e47d8d9a92cd87479b68e5bd83d025c713c2e6ff1854b43cce3661f4c83a"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1349,
+            "sha256": "2ca85df4983dff82218d51dab2bbad22ae2f19b6eab8c70fdcbf9dbba27c1b28"
+          }
+        ]
+      }
+    },
+    {
+      "id": "annapurna-base-camp",
+      "country": "Nepal",
+      "description": "Annapurna Sanctuary trek · Himalaya",
+      "assetDirectory": "regions/annapurna-base-camp",
+      "tiles": [
+        {
+          "path": "terrain/N28E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E083.hgt.gz",
+          "downloadBytes": 18840942,
+          "downloadSha256": "81ffb7c4ba700610523c260376eaf7cbbcba39dcd925c6fc0ae00d75d99c6fbc"
+        },
+        {
+          "path": "terrain/N28E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E084.hgt.gz",
+          "downloadBytes": 18407524,
+          "downloadSha256": "83f19d50f954ea7e277bc28cdbe5310f2bd701cae066be3408d6bd2d2acdcce6"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "annapurna-base-camp",
+        "name": "Annapurna Base Camp",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 28.5,
+          "west": 83.85,
+          "north": 28.55,
+          "east": 83.9
+        },
+        "terrainBounds": {
+          "south": 28,
+          "west": 83,
+          "north": 29,
+          "east": 85
+        },
+        "radiusM": 25000,
+        "viewpoint": {
+          "latitude": 28.5306,
+          "longitude": 83.8788,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N28E083.hgt",
+            "size": 25934402,
+            "sha256": "e844c5cc8cd1d2251b958c1ad7a75329f4e4732aa79f9f84f7e1c0c8ee2e279c"
+          },
+          {
+            "path": "terrain/N28E084.hgt",
+            "size": 25934402,
+            "sha256": "3f74ed8dfadee1039306f43bdf5c8f8f2ec80f8016e5d7bb9ed999e120dacf2f"
+          },
+          {
+            "path": "peaks.json",
+            "size": 41355,
+            "sha256": "467b8426ebb278ed8f68e9147fb8eec8c4aada9e95b822e840da10659ada6e11"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1345,
+            "sha256": "b14bb5bcf1126b0c48830a1a3b24e9b381e403ce690e8019e842d7bdcdffd5a3"
+          }
+        ]
+      }
+    },
+    {
+      "id": "langtang",
+      "country": "Nepal",
+      "description": "Kyanjin Gompa and Kyanjin Ri · Langtang Himalaya",
+      "assetDirectory": "regions/langtang",
+      "tiles": [
+        {
+          "path": "terrain/N28E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E085.hgt.gz",
+          "downloadBytes": 17399423,
+          "downloadSha256": "0430900f931bfbd53b5f2cd84ecfc4b23150df5ede14120d28368a63025c0120"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "langtang",
+        "name": "Langtang · Kyanjin Gompa",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 28.19,
+          "west": 85.52,
+          "north": 28.23,
+          "east": 85.6
+        },
+        "terrainBounds": {
+          "south": 28,
+          "west": 85,
+          "north": 29,
+          "east": 86
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 28.2115,
+          "longitude": 85.5675,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N28E085.hgt",
+            "size": 25934402,
+            "sha256": "dd37e0c91794b8e663acfc1aa8a17b09c5bc43436b9ae6feef5288ad8ea17af2"
+          },
+          {
+            "path": "peaks.json",
+            "size": 13219,
+            "sha256": "bfbb9af8b44e6e1d9e2671c58a67ab5462c2480468ed95aa69e6627f208e0c20"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1280,
+            "sha256": "cae9a56d51c48d219031a82d89de80d68d099fe62e63b73b46d6300fd1cdd84c"
+          }
+        ]
+      }
+    },
+    {
+      "id": "nagarkot",
+      "country": "Nepal",
+      "description": "Himalaya sunrise viewpoint near Kathmandu",
+      "assetDirectory": "regions/nagarkot",
+      "tiles": [
+        {
+          "path": "terrain/N27E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E085.hgt.gz",
+          "downloadBytes": 15740650,
+          "downloadSha256": "a0db33f173a26e557fdc9393637118989cea02faeebaab5d287cf6460b40a9dc"
+        },
+        {
+          "path": "terrain/N28E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E085.hgt.gz",
+          "downloadBytes": 17399423,
+          "downloadSha256": "0430900f931bfbd53b5f2cd84ecfc4b23150df5ede14120d28368a63025c0120"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "nagarkot",
+        "name": "Nagarkot",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.7,
+          "west": 85.5,
+          "north": 27.73,
+          "east": 85.54
+        },
+        "terrainBounds": {
+          "south": 27,
+          "west": 85,
+          "north": 29,
+          "east": 86
+        },
+        "radiusM": 40000,
+        "viewpoint": {
+          "latitude": 27.715,
+          "longitude": 85.52,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N27E085.hgt",
+            "size": 25934402,
+            "sha256": "013c3863b612f870d60083b0c1521da7376309a293c832eba2f5152eb18fb3b0"
+          },
+          {
+            "path": "terrain/N28E085.hgt",
+            "size": 25934402,
+            "sha256": "dd37e0c91794b8e663acfc1aa8a17b09c5bc43436b9ae6feef5288ad8ea17af2"
+          },
+          {
+            "path": "peaks.json",
+            "size": 15288,
+            "sha256": "d540e9ace6c3822bd6b54c09f984527feaefced8697a8571c5717cfcd02b6318"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1334,
+            "sha256": "9ef1d47e95cbbb551801d56efb8ca87e7011dfd2b6f32b91c073ee9107743649"
           }
         ]
       }
@@ -144,7 +413,7 @@
     {
       "id": "auli",
       "country": "India",
-      "description": "Auli and Gorson viewpoints",
+      "description": "Auli and Gorson viewpoints · Garhwal Himalaya",
       "assetDirectory": "regions/auli",
       "tiles": [
         {
@@ -194,8 +463,2061 @@
           },
           {
             "path": "attribution.txt",
+            "size": 1270,
+            "sha256": "dace5c63e99e9f6e9bbd3bd36a1c0dd78b1b95e88bcbcf8dddcb47f1538b6fff"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chopta-tungnath",
+      "country": "India",
+      "description": "Tungnath and Chandrashila summit · Garhwal Himalaya",
+      "assetDirectory": "regions/chopta-tungnath",
+      "tiles": [
+        {
+          "path": "terrain/N30E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E079.hgt.gz",
+          "downloadBytes": 19206975,
+          "downloadSha256": "a54c8361799d729820f939ef91e4ce35bd181924d53cb2fd3747bef7e532d5d4"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "chopta-tungnath",
+        "name": "Chopta · Tungnath",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 30.47,
+          "west": 79.21,
+          "north": 30.51,
+          "east": 79.25
+        },
+        "terrainBounds": {
+          "south": 30,
+          "west": 79,
+          "north": 31,
+          "east": 80
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 30.4899,
+          "longitude": 79.2184,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N30E079.hgt",
+            "size": 25934402,
+            "sha256": "f1652f5e39e98b153ed2837ac79ee58428a09da777332dcbf246b7c4dc7b60e3"
+          },
+          {
+            "path": "peaks.json",
+            "size": 25586,
+            "sha256": "a7df8f3a796cf51ddf742802ff2a904be0dfbb0595b637d93375c9bd844954a2"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1273,
+            "sha256": "8d099e9e6c8c23d4b2d1e6d640175d815739f569d61e3c4caaf7c703453e2f21"
+          }
+        ]
+      }
+    },
+    {
+      "id": "valley-of-flowers",
+      "country": "India",
+      "description": "Ghangaria, Hemkund Sahib and the valley · Garhwal Himalaya",
+      "assetDirectory": "regions/valley-of-flowers",
+      "tiles": [
+        {
+          "path": "terrain/N30E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E079.hgt.gz",
+          "downloadBytes": 19206975,
+          "downloadSha256": "a54c8361799d729820f939ef91e4ce35bd181924d53cb2fd3747bef7e532d5d4"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "valley-of-flowers",
+        "name": "Valley of Flowers · Hemkund",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 30.7,
+          "west": 79.58,
+          "north": 30.74,
+          "east": 79.64
+        },
+        "terrainBounds": {
+          "south": 30,
+          "west": 79,
+          "north": 31,
+          "east": 80
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 30.72,
+          "longitude": 79.6,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N30E079.hgt",
+            "size": 25934402,
+            "sha256": "f1652f5e39e98b153ed2837ac79ee58428a09da777332dcbf246b7c4dc7b60e3"
+          },
+          {
+            "path": "peaks.json",
+            "size": 25586,
+            "sha256": "a7df8f3a796cf51ddf742802ff2a904be0dfbb0595b637d93375c9bd844954a2"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1283,
+            "sha256": "2771425d3cadb53a736e6a42cc74869ca7e7197803ebdfa470b966e0428e6dfe"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kedarnath",
+      "country": "India",
+      "description": "Kedarnath temple and the Chorabari trail · Garhwal Himalaya",
+      "assetDirectory": "regions/kedarnath",
+      "tiles": [
+        {
+          "path": "terrain/N30E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E078.hgt.gz",
+          "downloadBytes": 18131689,
+          "downloadSha256": "4051e87302421410513f85b8ee6a431341426f95a191a1859cfab9bb19c0b828"
+        },
+        {
+          "path": "terrain/N30E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E079.hgt.gz",
+          "downloadBytes": 19206975,
+          "downloadSha256": "a54c8361799d729820f939ef91e4ce35bd181924d53cb2fd3747bef7e532d5d4"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "kedarnath",
+        "name": "Kedarnath",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 30.72,
+          "west": 79.05,
+          "north": 30.75,
+          "east": 79.09
+        },
+        "terrainBounds": {
+          "south": 30,
+          "west": 78,
+          "north": 31,
+          "east": 80
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 30.7346,
+          "longitude": 79.0669,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N30E078.hgt",
+            "size": 25934402,
+            "sha256": "4a942e7759f5da31f73dce270d341c31406cb1e576ae792a51f12acaef058656"
+          },
+          {
+            "path": "terrain/N30E079.hgt",
+            "size": 25934402,
+            "sha256": "f1652f5e39e98b153ed2837ac79ee58428a09da777332dcbf246b7c4dc7b60e3"
+          },
+          {
+            "path": "peaks.json",
+            "size": 32827,
+            "sha256": "62d37d3423b162f8b0c8be61411428a3601ca90aba0a0860fdf563eb162e9a89"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1335,
+            "sha256": "efe6e6c43b974b21a487ebee88060062a389075293085e5386a9a3f6963899ce"
+          }
+        ]
+      }
+    },
+    {
+      "id": "triund",
+      "country": "India",
+      "description": "Triund ridge above McLeod Ganj · Dhauladhar Himalaya",
+      "assetDirectory": "regions/triund",
+      "tiles": [
+        {
+          "path": "terrain/N32E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E076.hgt.gz",
+          "downloadBytes": 19198872,
+          "downloadSha256": "33c85639ba48152ee2eb45d9b8faddeedbe4968229aeb73227d230496fe811c3"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "triund",
+        "name": "Triund · Dharamshala",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 32.22,
+          "west": 76.32,
+          "north": 32.27,
+          "east": 76.4
+        },
+        "terrainBounds": {
+          "south": 32,
+          "west": 76,
+          "north": 33,
+          "east": 77
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 32.2437,
+          "longitude": 76.3528,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N32E076.hgt",
+            "size": 25934402,
+            "sha256": "01b48d40369f394cb960ede11fff9bf895d810fc0922b625555d0bd82d156e30"
+          },
+          {
+            "path": "peaks.json",
+            "size": 31268,
+            "sha256": "e985a65b53edfa072a3dd2ca7d81a71ddf1f1bdc1e6ab020959fa8d0a9209480"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1276,
+            "sha256": "d558ea9b04d67afd57c643f43e1da1896dfb29d7bc314d1245d62cc63ec77e2f"
+          }
+        ]
+      }
+    },
+    {
+      "id": "nainital",
+      "country": "India",
+      "description": "Naina Peak and Snow View · Kumaon Himalaya",
+      "assetDirectory": "regions/nainital",
+      "tiles": [
+        {
+          "path": "terrain/N29E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E079.hgt.gz",
+          "downloadBytes": 14988747,
+          "downloadSha256": "6e16aec11401c587f045f25a6a434aa76dacae73dcdedfa591e5bfe07c4b82e1"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "nainital",
+        "name": "Nainital · Naina Peak",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 29.37,
+          "west": 79.42,
+          "north": 29.42,
+          "east": 79.47
+        },
+        "terrainBounds": {
+          "south": 29,
+          "west": 79,
+          "north": 30,
+          "east": 80
+        },
+        "radiusM": 40000,
+        "viewpoint": {
+          "latitude": 29.395,
+          "longitude": 79.44,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N29E079.hgt",
+            "size": 25934402,
+            "sha256": "aeb25fdece746729a43e40fc970717ccea6b5b326da0fa766f1734d518043298"
+          },
+          {
+            "path": "peaks.json",
+            "size": 20889,
+            "sha256": "2b07945d681fc6250069756c7e2ff3a28bf212acc0518610c0f0f11a58a40080"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1277,
+            "sha256": "1e0e4ceeee0d32782bd1f3d0d3cfc2699cbc7905fb560bec1492e0225dd854f3"
+          }
+        ]
+      }
+    },
+    {
+      "id": "fairy-meadows",
+      "country": "Pakistan",
+      "description": "Fairy Meadows and Beyal Camp · Himalaya",
+      "assetDirectory": "regions/fairy-meadows",
+      "tiles": [
+        {
+          "path": "terrain/N35E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N35/N35E074.hgt.gz",
+          "downloadBytes": 19280029,
+          "downloadSha256": "03398ebd2def3304fe69ac010561e5cd44b3b15c3392f3373e4c6b7b3a81ba80"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "fairy-meadows",
+        "name": "Fairy Meadows · Nanga Parbat",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 35.36,
+          "west": 74.56,
+          "north": 35.4,
+          "east": 74.6
+        },
+        "terrainBounds": {
+          "south": 35,
+          "west": 74,
+          "north": 36,
+          "east": 75
+        },
+        "radiusM": 25000,
+        "viewpoint": {
+          "latitude": 35.3792,
+          "longitude": 74.58,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N35E074.hgt",
+            "size": 25934402,
+            "sha256": "fd893255bdbd2e2bb0976a08719059452f26b8cdb6f05c58308731df18c5c59e"
+          },
+          {
+            "path": "peaks.json",
+            "size": 17828,
+            "sha256": "11c7b43acb755e4ddd5fae66d63be44cff13cf31a76d6e8898337246f53b8123"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1284,
+            "sha256": "ef29ec8dcf57bc02ebe86807b48ba48d06a2b52fc40a294de6507c9a3b87c6db"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hunza-eagles-nest",
+      "country": "Pakistan",
+      "description": "Duikar viewpoint above Karimabad · Karakoram",
+      "assetDirectory": "regions/hunza-eagles-nest",
+      "tiles": [
+        {
+          "path": "terrain/N36E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N36/N36E074.hgt.gz",
+          "downloadBytes": 19112694,
+          "downloadSha256": "4dbf2d3d6b7d0df812381ff097db3c897390b6ed83306f9e26afaa5a6fec3d1f"
+        },
+        {
+          "path": "terrain/N36E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N36/N36E075.hgt.gz",
+          "downloadBytes": 18276423,
+          "downloadSha256": "4a66b77674014c6f0e5ada374c1b1ff457bde5d213407389069e4815e47c3f35"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "hunza-eagles-nest",
+        "name": "Hunza · Eagle's Nest",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 36.31,
+          "west": 74.65,
+          "north": 36.35,
+          "east": 74.71
+        },
+        "terrainBounds": {
+          "south": 36,
+          "west": 74,
+          "north": 37,
+          "east": 76
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 36.33,
+          "longitude": 74.68,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N36E074.hgt",
+            "size": 25934402,
+            "sha256": "da0a932d8b88653342a57fce8b6fefca586c06bf34b56d33f14cded8dcf5c9cf"
+          },
+          {
+            "path": "terrain/N36E075.hgt",
+            "size": 25934402,
+            "sha256": "6b3602bd5a7d43fb972882f21f1e9a9c7fd04e6260fea88052fee5106a6b6eaa"
+          },
+          {
+            "path": "peaks.json",
+            "size": 30310,
+            "sha256": "5436a251ad1084b9ba391c7d8de393841f158d1c89108e2f6f8cdbf786996cda"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1347,
+            "sha256": "8e90445fcf6fc1b85c2125ec2e07460b3f33926bb3baf871ffb282bd596f9006"
+          }
+        ]
+      }
+    },
+    {
+      "id": "paro-taktsang",
+      "country": "Bhutan",
+      "description": "Taktsang monastery trail · Himalaya",
+      "assetDirectory": "regions/paro-taktsang",
+      "tiles": [
+        {
+          "path": "terrain/N27E089.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E089.hgt.gz",
+          "downloadBytes": 18595049,
+          "downloadSha256": "9215624415a3f4efb4b708ad3cf26867b55a4c70aba532356198cd026972738d"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "paro-taktsang",
+        "name": "Paro · Tiger's Nest",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.47,
+          "west": 89.33,
+          "north": 27.52,
+          "east": 89.4
+        },
+        "terrainBounds": {
+          "south": 27,
+          "west": 89,
+          "north": 28,
+          "east": 90
+        },
+        "radiusM": 25000,
+        "viewpoint": {
+          "latitude": 27.4917,
+          "longitude": 89.3633,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N27E089.hgt",
+            "size": 25934402,
+            "sha256": "f1bcfa2c5c35090e632b8e50a0d15427151cde78202b93440af467707d3b972c"
+          },
+          {
+            "path": "peaks.json",
+            "size": 870,
+            "sha256": "0ae4a90692ddc72b58e6a3d784757850f3019e9814e566fd9513139ac68aceaf"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1275,
+            "sha256": "8b22510550ce1d353f30223da089632b1a520cf49cea42e3bb722f68788f6769"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kazbegi",
+      "country": "Georgia",
+      "description": "Gergeti Trinity Church and Mount Kazbek · Caucasus",
+      "assetDirectory": "regions/kazbegi",
+      "tiles": [
+        {
+          "path": "terrain/N42E044.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N42/N42E044.hgt.gz",
+          "downloadBytes": 16214789,
+          "downloadSha256": "bb641422cf0e35f58982d8fd4cd0a93ba768e4414802a7cc7eba3b56b5b3ab1f"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "kazbegi",
+        "name": "Kazbegi · Gergeti",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 42.64,
+          "west": 44.62,
+          "north": 42.68,
+          "east": 44.66
+        },
+        "terrainBounds": {
+          "south": 42,
+          "west": 44,
+          "north": 43,
+          "east": 45
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 42.66,
+          "longitude": 44.64,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N42E044.hgt",
+            "size": 25934402,
+            "sha256": "5b1aded0208c9efc5f69809671270c7e318712809fcc3efa28c5930762bde44a"
+          },
+          {
+            "path": "peaks.json",
+            "size": 44960,
+            "sha256": "ba1934bc83f0abf9f51b1224150f258f7fc9f88118a05deb14500c282694e379"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1273,
+            "sha256": "6042eb2a74287638f4ff9ed193c614ebc7408be95504c2bc694fb693e7c5e1bc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "fuji-kawaguchiko",
+      "country": "Japan",
+      "description": "Lake Kawaguchi shoreline viewpoints · Fuji Five Lakes",
+      "assetDirectory": "regions/fuji-kawaguchiko",
+      "tiles": [
+        {
+          "path": "terrain/N35E138.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N35/N35E138.hgt.gz",
+          "downloadBytes": 16475161,
+          "downloadSha256": "2b05933c73a67f5aa9c1cf831943bbedc8d4340ec1227048a1c49deefe95a3b9"
+        },
+        {
+          "path": "terrain/N35E139.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N35/N35E139.hgt.gz",
+          "downloadBytes": 10294039,
+          "downloadSha256": "86b6ceed267a6ae6f23cedaf8a9ce07de049df07880464c7d897eaf297002f1b"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "fuji-kawaguchiko",
+        "name": "Mount Fuji · Kawaguchiko",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 35.48,
+          "west": 138.74,
+          "north": 35.52,
+          "east": 138.8
+        },
+        "terrainBounds": {
+          "south": 35,
+          "west": 138,
+          "north": 36,
+          "east": 140
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 35.5,
+          "longitude": 138.76,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N35E138.hgt",
+            "size": 25934402,
+            "sha256": "0dc32611bdeec9b9c1a084ac3ed74ff6d8448939dccd499592845aff34bf4729"
+          },
+          {
+            "path": "terrain/N35E139.hgt",
+            "size": 25934402,
+            "sha256": "caa8ed5bb097ae6b4d5f4a46b72539c0aa994e23b3b1b22f179a0aaeb373a3b6"
+          },
+          {
+            "path": "peaks.json",
+            "size": 73514,
+            "sha256": "24a57d459e553e9317d1189e9089f3937d0e85c7d4e5dbe6a2162271f7b81ca4"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1351,
+            "sha256": "a7c914ac27fd580fb1cc122bd38b2c5dd4682f1c4f9b19f4921df2d3c689e89c"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kamikochi",
+      "country": "Japan",
+      "description": "Kappa Bridge and the Azusa valley",
+      "assetDirectory": "regions/kamikochi",
+      "tiles": [
+        {
+          "path": "terrain/N36E137.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N36/N36E137.hgt.gz",
+          "downloadBytes": 15633357,
+          "downloadSha256": "465cf176ea9f3f0514206ece40d9083195a02bc495e4460950bb88a8458074aa"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "kamikochi",
+        "name": "Kamikochi · Japan Alps",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 36.23,
+          "west": 137.6,
+          "north": 36.27,
+          "east": 137.68
+        },
+        "terrainBounds": {
+          "south": 36,
+          "west": 137,
+          "north": 37,
+          "east": 138
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 36.2497,
+          "longitude": 137.6358,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N36E137.hgt",
+            "size": 25934402,
+            "sha256": "b420de226f1d6846d2ac807c7d63c674e64c80f013b3d93bc67f30679e0fe0c7"
+          },
+          {
+            "path": "peaks.json",
+            "size": 57871,
+            "sha256": "6fa928eb829a9dbf9af3013dc9b7bafcba5d96ff1738b10e69477093f9fb4994"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1278,
+            "sha256": "c431fb0dc98c2b0c46a04aefd9e190465d853a349edb2a55a4d2892fac5bcd2d"
+          }
+        ]
+      }
+    },
+    {
+      "id": "zermatt",
+      "country": "Switzerland",
+      "description": "Zermatt and Gornergrat · Swiss Alps",
+      "assetDirectory": "regions/zermatt",
+      "tiles": [
+        {
+          "path": "terrain/N45E007.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N45/N45E007.hgt.gz",
+          "downloadBytes": 16143921,
+          "downloadSha256": "8f98a452476e0c0af474649d59ebd3c5c40211b2d189ad1fb748ada01b953e6f"
+        },
+        {
+          "path": "terrain/N46E007.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N46/N46E007.hgt.gz",
+          "downloadBytes": 15958095,
+          "downloadSha256": "cf790a87057dfdf126f9b314d9ec71d407afdedbe71c79e2b14c903d024ce0b9"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "zermatt",
+        "name": "Zermatt · Matterhorn",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 45.96,
+          "west": 7.72,
+          "north": 46.02,
+          "east": 7.8
+        },
+        "terrainBounds": {
+          "south": 45,
+          "west": 7,
+          "north": 47,
+          "east": 8
+        },
+        "radiusM": 15000,
+        "viewpoint": {
+          "latitude": 45.9836,
+          "longitude": 7.7843,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N45E007.hgt",
+            "size": 25934402,
+            "sha256": "d7cf38485e0edd9f68dbcab080c9536477f30ede2b3997c156d8ad0753c3eef7"
+          },
+          {
+            "path": "terrain/N46E007.hgt",
+            "size": 25934402,
+            "sha256": "459a8feb64bb5f4a5b88718b4b4361e6c6646a1d7349503661df414deebdbd7b"
+          },
+          {
+            "path": "peaks.json",
+            "size": 602654,
+            "sha256": "1cb0de3f053a38801e0de3feb6bb7cf73e30f821438bf6cef18d598f415a9acb"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1470,
+            "sha256": "ac00b4be64b87e434963ad806e055692cda2274e1688fedc272aaf88e82cb38b"
+          }
+        ]
+      }
+    },
+    {
+      "id": "courmayeur",
+      "country": "Italy",
+      "description": "Courmayeur and Val Ferret · Mont Blanc massif, Alps",
+      "assetDirectory": "regions/courmayeur",
+      "tiles": [
+        {
+          "path": "terrain/N45E006.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N45/N45E006.hgt.gz",
+          "downloadBytes": 17435774,
+          "downloadSha256": "6b9699a7d05ad3cf36af7bb1ddbf35f2a465e9236953675afec8552018825651"
+        },
+        {
+          "path": "terrain/N45E007.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N45/N45E007.hgt.gz",
+          "downloadBytes": 16143921,
+          "downloadSha256": "8f98a452476e0c0af474649d59ebd3c5c40211b2d189ad1fb748ada01b953e6f"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "courmayeur",
+        "name": "Courmayeur · Mont Blanc",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 45.77,
+          "west": 6.95,
+          "north": 45.81,
+          "east": 7.0
+        },
+        "terrainBounds": {
+          "south": 45,
+          "west": 6,
+          "north": 46,
+          "east": 8
+        },
+        "radiusM": 15000,
+        "viewpoint": {
+          "latitude": 45.79,
+          "longitude": 6.97,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N45E006.hgt",
+            "size": 25934402,
+            "sha256": "ffa4f15eb3c9e0d144243667181cc27ef8e161d73d656f450ebf2899477606d7"
+          },
+          {
+            "path": "terrain/N45E007.hgt",
+            "size": 25934402,
+            "sha256": "d7cf38485e0edd9f68dbcab080c9536477f30ede2b3997c156d8ad0753c3eef7"
+          },
+          {
+            "path": "peaks.json",
+            "size": 320284,
+            "sha256": "ed2a5738cf5babd207836269e9f5cd4506c0b4654f45d2b81e6aa2a0361028d6"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1596,
+            "sha256": "c0fe6d282e50f14e1e472e902c2220e3e0cd51def8b88c51d29b85b5fcf29371"
+          }
+        ]
+      }
+    },
+    {
+      "id": "grindelwald",
+      "country": "Switzerland",
+      "description": "First, Männlichen and Kleine Scheidegg · Bernese Alps",
+      "assetDirectory": "regions/grindelwald",
+      "tiles": [
+        {
+          "path": "terrain/N46E007.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N46/N46E007.hgt.gz",
+          "downloadBytes": 15958095,
+          "downloadSha256": "cf790a87057dfdf126f9b314d9ec71d407afdedbe71c79e2b14c903d024ce0b9"
+        },
+        {
+          "path": "terrain/N46E008.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N46/N46E008.hgt.gz",
+          "downloadBytes": 17461331,
+          "downloadSha256": "79b5b5e78f7e0edb7aca4e1f74f235c18ba6bd82557b92ab1ec42d8e37600c86"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "grindelwald",
+        "name": "Grindelwald · Jungfrau",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 46.62,
+          "west": 7.95,
+          "north": 46.68,
+          "east": 8.06
+        },
+        "terrainBounds": {
+          "south": 46,
+          "west": 7,
+          "north": 47,
+          "east": 9
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 46.6592,
+          "longitude": 8.0536,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N46E007.hgt",
+            "size": 25934402,
+            "sha256": "459a8feb64bb5f4a5b88718b4b4361e6c6646a1d7349503661df414deebdbd7b"
+          },
+          {
+            "path": "terrain/N46E008.hgt",
+            "size": 25934402,
+            "sha256": "dc98088f2eb13b9713edff1d8f3f8e858b2f8f29d515b2d185ad1efcca72bd40"
+          },
+          {
+            "path": "peaks.json",
+            "size": 1107573,
+            "sha256": "fc66f9a100fc668588bdf4ebbf34a6e0c8321eb3400905b8fb483b40db8d39a1"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1349,
+            "sha256": "ae7681cb050c9be674f3f085d736dcfe7c4b8d6f17ced70dcc6166aebe6882e5"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dolomites-tre-cime",
+      "country": "Italy",
+      "description": "Tre Cime di Lavaredo loop · Dolomites, Alps",
+      "assetDirectory": "regions/dolomites-tre-cime",
+      "tiles": [
+        {
+          "path": "terrain/N46E012.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N46/N46E012.hgt.gz",
+          "downloadBytes": 16312539,
+          "downloadSha256": "e7b756c2026e98a80c2d1caf405869f7a91be333defeeb49dfa2a1e2b0eac523"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "dolomites-tre-cime",
+        "name": "Dolomites · Tre Cime",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 46.59,
+          "west": 12.28,
+          "north": 46.64,
+          "east": 12.33
+        },
+        "terrainBounds": {
+          "south": 46,
+          "west": 12,
+          "north": 47,
+          "east": 13
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 46.6136,
+          "longitude": 12.2952,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N46E012.hgt",
+            "size": 25934402,
+            "sha256": "4dc447a25e290fc722cf9a1cd123b359e9fb23ff7f82691c710e61673b8f021d"
+          },
+          {
+            "path": "peaks.json",
+            "size": 238969,
+            "sha256": "bc8d08b9ab0b34480989d389d38ffc6fb0ad4079df16dd2907b4d12c5c0b5765"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1399,
+            "sha256": "3666fdef977934755f61bd23c85b370a6065074ce7b49494cb70750cbaec3690"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lake-bled",
+      "country": "Slovenia",
+      "description": "Bled and the Julian Alps",
+      "assetDirectory": "regions/lake-bled",
+      "tiles": [
+        {
+          "path": "terrain/N46E013.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N46/N46E013.hgt.gz",
+          "downloadBytes": 15367765,
+          "downloadSha256": "476ac43deaceb30721b8c0ff4a04f5fec37bad9a64c8dc78f23a537305cc724a"
+        },
+        {
+          "path": "terrain/N46E014.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N46/N46E014.hgt.gz",
+          "downloadBytes": 13740093,
+          "downloadSha256": "e1f6c25337ed5250749d4982ff9222f675e585bc89078968004a6e0cee7f66c1"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "lake-bled",
+        "name": "Lake Bled · Triglav",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 46.35,
+          "west": 14.08,
+          "north": 46.4,
+          "east": 14.14
+        },
+        "terrainBounds": {
+          "south": 46,
+          "west": 13,
+          "north": 47,
+          "east": 15
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 46.3683,
+          "longitude": 14.1146,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N46E013.hgt",
+            "size": 25934402,
+            "sha256": "3335b12fd19e8fdbed804c2b8f3d232e36ec2506c079fa61f125eae946125dc6"
+          },
+          {
+            "path": "terrain/N46E014.hgt",
+            "size": 25934402,
+            "sha256": "41ee882398ea41ec4e1b4e336d59bf2acfd3e88c459cdff00163d007f6a49468"
+          },
+          {
+            "path": "peaks.json",
+            "size": 47781,
+            "sha256": "fff0fdf4f6140eb107b350acff2c4b9cb33398f0266ffdb435dd1e0d644e41da"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1346,
+            "sha256": "e00137d22c68e23349b43389cd53a3b2f590c20f3531215e9a5655300000da33"
+          }
+        ]
+      }
+    },
+    {
+      "id": "zakopane",
+      "country": "Poland",
+      "description": "Gubałówka and Kasprowy Wierch · Tatra Mountains",
+      "assetDirectory": "regions/zakopane",
+      "tiles": [
+        {
+          "path": "terrain/N49E019.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N49/N49E019.hgt.gz",
+          "downloadBytes": 11187885,
+          "downloadSha256": "4da94e5b2548853b0d892bdbd9e0cc061cde053788e65f19768ce62e3bf1df28"
+        },
+        {
+          "path": "terrain/N49E020.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N49/N49E020.hgt.gz",
+          "downloadBytes": 11197409,
+          "downloadSha256": "6d14011557646d13f5a2b910852ddf65a14537a1e4dbe07443f421fe705d1646"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "zakopane",
+        "name": "Zakopane · Tatras",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 49.23,
+          "west": 19.93,
+          "north": 49.31,
+          "east": 20.0
+        },
+        "terrainBounds": {
+          "south": 49,
+          "west": 19,
+          "north": 50,
+          "east": 21
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 49.2318,
+          "longitude": 19.9816,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N49E019.hgt",
+            "size": 25934402,
+            "sha256": "b78b23a0447e72d787733b4045a1d3bd776132abebe619965e6f229f2c11d182"
+          },
+          {
+            "path": "terrain/N49E020.hgt",
+            "size": 25934402,
+            "sha256": "49be69381b88ecf5ab7771f25c684fa1f1644a35131a044d1fb1332b20167a45"
+          },
+          {
+            "path": "peaks.json",
+            "size": 231401,
+            "sha256": "78db63294f30df3eef90e86ccdfd39563ce93d7d48459d39899db17593fcfab2"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1467,
+            "sha256": "b821f3bc7292d678c12cc91fd434801491990a6dfc66bbd28601e1fc1ffba374"
+          }
+        ]
+      }
+    },
+    {
+      "id": "innsbruck-nordkette",
+      "country": "Austria",
+      "description": "Hafelekar and Seegrube · Tyrol, Alps",
+      "assetDirectory": "regions/innsbruck-nordkette",
+      "tiles": [
+        {
+          "path": "terrain/N47E011.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N47/N47E011.hgt.gz",
+          "downloadBytes": 14063455,
+          "downloadSha256": "8607d04d340b5b7bc853aa3511701460dcaf9dfe056f05bc4d70ce7bdeaccde4"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "innsbruck-nordkette",
+        "name": "Innsbruck · Nordkette",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 47.26,
+          "west": 11.36,
+          "north": 47.32,
+          "east": 11.42
+        },
+        "terrainBounds": {
+          "south": 47,
+          "west": 11,
+          "north": 48,
+          "east": 12
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 47.3122,
+          "longitude": 11.3851,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N47E011.hgt",
+            "size": 25934402,
+            "sha256": "27d60244595e4d622df36a2e3bad7eaf28fd018134ff85cfcc2a57d7bc8d9240"
+          },
+          {
+            "path": "peaks.json",
+            "size": 146507,
+            "sha256": "27ba8498fb0224ae67267df247900f9f502fb6062be51301fd8e9160924f1359"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1277,
+            "sha256": "061afcd40be7dc5dd36d39a70387b65103930a5d74849aeae15d5f8b66ec73d8"
+          }
+        ]
+      }
+    },
+    {
+      "id": "zugspitze",
+      "country": "Germany",
+      "description": "Zugspitze and Garmisch-Partenkirchen · Bavarian Alps",
+      "assetDirectory": "regions/zugspitze",
+      "tiles": [
+        {
+          "path": "terrain/N47E010.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N47/N47E010.hgt.gz",
+          "downloadBytes": 13586656,
+          "downloadSha256": "247874ed191f70e7ae611a2100b43296916a2b3abe2e0b935020072a66df7144"
+        },
+        {
+          "path": "terrain/N47E011.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N47/N47E011.hgt.gz",
+          "downloadBytes": 14063455,
+          "downloadSha256": "8607d04d340b5b7bc853aa3511701460dcaf9dfe056f05bc4d70ce7bdeaccde4"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "zugspitze",
+        "name": "Zugspitze · Garmisch",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 47.4,
+          "west": 10.98,
+          "north": 47.5,
+          "east": 11.1
+        },
+        "terrainBounds": {
+          "south": 47,
+          "west": 10,
+          "north": 48,
+          "east": 12
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 47.4211,
+          "longitude": 10.9854,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N47E010.hgt",
+            "size": 25934402,
+            "sha256": "83508a80bef2e2dd1ed0dd30cb4d38fa6fb9b8bc31467ab1880ef5de25a0baa2"
+          },
+          {
+            "path": "terrain/N47E011.hgt",
+            "size": 25934402,
+            "sha256": "27d60244595e4d622df36a2e3bad7eaf28fd018134ff85cfcc2a57d7bc8d9240"
+          },
+          {
+            "path": "peaks.json",
+            "size": 652734,
+            "sha256": "ff4e707abd64857010d62c8d84dde747a9b898c3061198a0f1bfb649f313eeb3"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1470,
+            "sha256": "73f3b1981e20fcaa69a95809d5e3fc85dfc8e12b17454e34919ffedf17d70dc6"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lake-district",
+      "country": "United Kingdom",
+      "description": "Keswick, Catbells and Skiddaw · Cumbrian fells",
+      "assetDirectory": "regions/lake-district",
+      "tiles": [
+        {
+          "path": "terrain/N54W004.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N54/N54W004.hgt.gz",
+          "downloadBytes": 4401948,
+          "downloadSha256": "40a4b66a95172468fe22535f794e71b17caed99fc7ef9e8053594830e03611f5"
+        },
+        {
+          "path": "terrain/N54W003.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N54/N54W003.hgt.gz",
+          "downloadBytes": 8268057,
+          "downloadSha256": "021f97677d94ea762da609fc70357db5f8802bda31b00c9d015f0dcaa14e53e3"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "lake-district",
+        "name": "Lake District · Keswick",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 54.5,
+          "west": -3.2,
+          "north": 54.62,
+          "east": -3.05
+        },
+        "terrainBounds": {
+          "south": 54,
+          "west": -4,
+          "north": 55,
+          "east": -2
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 54.6,
+          "longitude": -3.13,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N54W004.hgt",
+            "size": 25934402,
+            "sha256": "f53220bcac3ffc9158ac1820c1b8c1aa782a928432ef463410a0baee1bbb931a"
+          },
+          {
+            "path": "terrain/N54W003.hgt",
+            "size": 25934402,
+            "sha256": "bb7448804d38d3636d001c03803a96fe91a2472f4852b6bbf32b007069238b3c"
+          },
+          {
+            "path": "peaks.json",
+            "size": 27364,
+            "sha256": "aae0f26e2fa5b1264a26c6df66f68f691cb4f0ae9ea267b47f177dc36b46d1b2"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1350,
+            "sha256": "f437d24722e1585c166c2c681d1923e0494d7d9649f38eaa5059570311f8f19d"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yosemite-glacier-point",
+      "country": "United States",
+      "description": "Glacier Point and Yosemite Valley · Sierra Nevada",
+      "assetDirectory": "regions/yosemite-glacier-point",
+      "tiles": [
+        {
+          "path": "terrain/N37W120.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N37/N37W120.hgt.gz",
+          "downloadBytes": 15544827,
+          "downloadSha256": "411a4f04ca8667a7ad5d1cdb61721528c07fbf44da5fe5da495e0a12cc471359"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "yosemite-glacier-point",
+        "name": "Yosemite · Glacier Point",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 37.7,
+          "west": -119.62,
+          "north": 37.76,
+          "east": -119.52
+        },
+        "terrainBounds": {
+          "south": 37,
+          "west": -120,
+          "north": 38,
+          "east": -119
+        },
+        "radiusM": 25000,
+        "viewpoint": {
+          "latitude": 37.7281,
+          "longitude": -119.573,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N37W120.hgt",
+            "size": 25934402,
+            "sha256": "88d991c28df68be1cf6ed49988c47798702a0c4ff438e6a26609bdeea0d0ef39"
+          },
+          {
+            "path": "peaks.json",
+            "size": 89872,
+            "sha256": "593a2cfee422992626173071a265039e97d88a07ed55918fab258e5df227e7b5"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1280,
+            "sha256": "921332960e55da5d823363e0e13bc27e798c3000af97bb4cfda25bbb4bc5207f"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rocky-mountain-bear-lake",
+      "country": "United States",
+      "description": "Bear Lake and Longs Peak · Rocky Mountains",
+      "assetDirectory": "regions/rocky-mountain-bear-lake",
+      "tiles": [
+        {
+          "path": "terrain/N40W106.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N40/N40W106.hgt.gz",
+          "downloadBytes": 13519697,
+          "downloadSha256": "c5a1f830860d947f0f7586cfa67230589f2d80b8a4920d1a54f41f95304228be"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "rocky-mountain-bear-lake",
+        "name": "Rocky Mountain · Bear Lake",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 40.28,
+          "west": -105.7,
+          "north": 40.4,
+          "east": -105.55
+        },
+        "terrainBounds": {
+          "south": 40,
+          "west": -106,
+          "north": 41,
+          "east": -105
+        },
+        "radiusM": 25000,
+        "viewpoint": {
+          "latitude": 40.3125,
+          "longitude": -105.6457,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N40W106.hgt",
+            "size": 25934402,
+            "sha256": "325a905f86210792f3e7bfcac8c03836fb09494d566bf917271f5a967f3e0722"
+          },
+          {
+            "path": "peaks.json",
+            "size": 100758,
+            "sha256": "2af36d73c25951dd7226d57106184e9beab54084b460e60af8fb7113f9958c8b"
+          },
+          {
+            "path": "attribution.txt",
             "size": 1282,
-            "sha256": "81c0e3c56f5306948bd4e50cd27b361044686ebb224c3a414956c23bd2fa4a48"
+            "sha256": "de75f96e3f523dd1774482f6aa56d2e95f40b325450cea6cec56fd9b127ae974"
+          }
+        ]
+      }
+    },
+    {
+      "id": "grand-teton",
+      "country": "United States",
+      "description": "Jenny Lake and the Teton Range · Rocky Mountains",
+      "assetDirectory": "regions/grand-teton",
+      "tiles": [
+        {
+          "path": "terrain/N43W111.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N43/N43W111.hgt.gz",
+          "downloadBytes": 13542080,
+          "downloadSha256": "c37d88a8e34050cddeedab6e872e95ea3dab403ede81dc36e49e0ec2c5c52a44"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "grand-teton",
+        "name": "Grand Teton · Jenny Lake",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 43.7,
+          "west": -110.78,
+          "north": 43.8,
+          "east": -110.68
+        },
+        "terrainBounds": {
+          "south": 43,
+          "west": -111,
+          "north": 44,
+          "east": -110
+        },
+        "radiusM": 15000,
+        "viewpoint": {
+          "latitude": 43.7636,
+          "longitude": -110.7266,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N43W111.hgt",
+            "size": 25934402,
+            "sha256": "ea7dafc8ee7620970473ada0a7a8ac77153bb2062ed3f4c180b701af2d901763"
+          },
+          {
+            "path": "peaks.json",
+            "size": 47480,
+            "sha256": "dd582841a8d96915e37dab2342ffb11caecd2381474cf14ab3b0dc8088fc9d93"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1280,
+            "sha256": "a62430a0e0ab486849aaf729d5e79de1201140bb237907ce42796815b4c110ae"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mount-rainier",
+      "country": "United States",
+      "description": "Paradise and Skyline Trail · Cascade Range",
+      "assetDirectory": "regions/mount-rainier",
+      "tiles": [
+        {
+          "path": "terrain/N46W122.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N46/N46W122.hgt.gz",
+          "downloadBytes": 14244607,
+          "downloadSha256": "55866d108c7b55b911c226e457d727d5558eb418ba2328920cf6ec8149f45bbf"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "mount-rainier",
+        "name": "Mount Rainier · Paradise",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 46.76,
+          "west": -121.75,
+          "north": 46.8,
+          "east": -121.7
+        },
+        "terrainBounds": {
+          "south": 46,
+          "west": -122,
+          "north": 47,
+          "east": -121
+        },
+        "radiusM": 15000,
+        "viewpoint": {
+          "latitude": 46.7865,
+          "longitude": -121.7353,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N46W122.hgt",
+            "size": 25934402,
+            "sha256": "9082196f8eb0ce4415f8c31bed4f7d1a9fa4c2e033a50b1b632e29b2efa5fe61"
+          },
+          {
+            "path": "peaks.json",
+            "size": 76115,
+            "sha256": "b13b307adfb84b7be9d67b33deb174ce1f16dcc09fcae38cebb37c1ed29b1f6d"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1280,
+            "sha256": "7771fab0de3b3e0c84b95ca42a1e3f690d85679b7d19c2312feeee70b4cb2132"
+          }
+        ]
+      }
+    },
+    {
+      "id": "glacier-logan-pass",
+      "country": "United States",
+      "description": "Logan Pass and Hidden Lake · Rocky Mountains",
+      "assetDirectory": "regions/glacier-logan-pass",
+      "tiles": [
+        {
+          "path": "terrain/N48W114.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N48/N48W114.hgt.gz",
+          "downloadBytes": 13453093,
+          "downloadSha256": "9b67d45102913f733b0fdb2ca8c96dcd011c1eb0e2ac82c84b9bd7573a661b7a"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "glacier-logan-pass",
+        "name": "Glacier · Logan Pass",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 48.68,
+          "west": -113.72,
+          "north": 48.72,
+          "east": -113.68
+        },
+        "terrainBounds": {
+          "south": 48,
+          "west": -114,
+          "north": 49,
+          "east": -113
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 48.6957,
+          "longitude": -113.7181,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N48W114.hgt",
+            "size": 25934402,
+            "sha256": "7052ad5c76db133a4202b600870535fec56152aa2604dbe73ef38c6c7cec995d"
+          },
+          {
+            "path": "peaks.json",
+            "size": 80494,
+            "sha256": "2b256da70c910b80cec71b097a3053112babe61c3470b1aafeac309204f1ddef"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1276,
+            "sha256": "dae80b8b99a7a7e0231bd8b37b6e4e79368ed1f8b99b8f24ac3ceca29214ce24"
+          }
+        ]
+      }
+    },
+    {
+      "id": "banff-lake-louise",
+      "country": "Canada",
+      "description": "Lake Louise and Moraine Lake · Canadian Rockies",
+      "assetDirectory": "regions/banff-lake-louise",
+      "tiles": [
+        {
+          "path": "terrain/N51W117.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N51/N51W117.hgt.gz",
+          "downloadBytes": 15794157,
+          "downloadSha256": "1069e20c601ca3332b45bdac8946f9d7d2fb157f2bcdb4e8a2ff43378e0f52c7"
+        },
+        {
+          "path": "terrain/N51W116.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N51/N51W116.hgt.gz",
+          "downloadBytes": 14179095,
+          "downloadSha256": "8605e92f63c05439c4f4aae903395604384b1013d566b950831a36ebb12229aa"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "banff-lake-louise",
+        "name": "Banff · Lake Louise",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 51.4,
+          "west": -116.22,
+          "north": 51.45,
+          "east": -116.14
+        },
+        "terrainBounds": {
+          "south": 51,
+          "west": -117,
+          "north": 52,
+          "east": -115
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": 51.4254,
+          "longitude": -116.1773,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N51W117.hgt",
+            "size": 25934402,
+            "sha256": "6772decc7511f5c7cb38cb012033dde6af4d02aee9509be63fad90dada67eb93"
+          },
+          {
+            "path": "terrain/N51W116.hgt",
+            "size": 25934402,
+            "sha256": "092bdbfd693611da76c4e04fa448907d89abe2fa0cdb122ef200ca375af8f8e1"
+          },
+          {
+            "path": "peaks.json",
+            "size": 116950,
+            "sha256": "c9cbb56bb10e88f360d27af5a2cd9d37aa5f9171d00736f0529408dd741f0f5d"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1346,
+            "sha256": "454063feba14c4e76a5cc12e04453a44e09e31426749b086871a3b850d761675"
+          }
+        ]
+      }
+    },
+    {
+      "id": "machu-picchu",
+      "country": "Peru",
+      "description": "Machu Picchu and Huayna Picchu · Andes",
+      "assetDirectory": "regions/machu-picchu",
+      "tiles": [
+        {
+          "path": "terrain/S14W073.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/S14/S14W073.hgt.gz",
+          "downloadBytes": 18543001,
+          "downloadSha256": "9f2a12cdf2c98db8cd1cb76656cb56990f5eb5ae11b0f9518b9e21ef28e583d5"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "machu-picchu",
+        "name": "Machu Picchu",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": -13.18,
+          "west": -72.57,
+          "north": -13.15,
+          "east": -72.52
+        },
+        "terrainBounds": {
+          "south": -14,
+          "west": -73,
+          "north": -13,
+          "east": -72
+        },
+        "radiusM": 15000,
+        "viewpoint": {
+          "latitude": -13.1631,
+          "longitude": -72.545,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/S14W073.hgt",
+            "size": 25934402,
+            "sha256": "1e0bcc7c7a9f67cdefb3955d49c8d718e79d4eb75d1b7c4d6d43124bc7ad6355"
+          },
+          {
+            "path": "peaks.json",
+            "size": 220911,
+            "sha256": "3c19a5a64e66b707a702f4f6ffff654ded24759175e15399a0842e4c7f87d416"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1267,
+            "sha256": "2fbc94d72fceae8d6d95bcc6cbda9857e956772587c07e21f54b8bb2c53ddc2a"
+          }
+        ]
+      }
+    },
+    {
+      "id": "el-chalten",
+      "country": "Argentina",
+      "description": "El Chaltén and Laguna de los Tres · Patagonia, Andes",
+      "assetDirectory": "regions/el-chalten",
+      "tiles": [
+        {
+          "path": "terrain/S50W074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/S50/S50W074.hgt.gz",
+          "downloadBytes": 14058198,
+          "downloadSha256": "43cb9e444ce0b9f5d3bf8990be4600c2e891e6dd471282d4fdbf01c2ea7b78aa"
+        },
+        {
+          "path": "terrain/S50W073.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/S50/S50W073.hgt.gz",
+          "downloadBytes": 10576478,
+          "downloadSha256": "c436fd8f4cfffad27958dc43cae9c7fa26978f6654bcf12f4efe2caf9bd866c0"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "el-chalten",
+        "name": "El Chaltén · Fitz Roy",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": -49.35,
+          "west": -72.92,
+          "north": -49.3,
+          "east": -72.86
+        },
+        "terrainBounds": {
+          "south": -50,
+          "west": -74,
+          "north": -49,
+          "east": -72
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": -49.3317,
+          "longitude": -72.8862,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/S50W074.hgt",
+            "size": 25934402,
+            "sha256": "2585ef8d23a35d3aa9778433dbcf10a092e9934c8017c4f4e4633c557e825374"
+          },
+          {
+            "path": "terrain/S50W073.hgt",
+            "size": 25934402,
+            "sha256": "694f73905b38b0a796cf99a1ee4f25acb0dd1793ce724949650f2bfa7b474021"
+          },
+          {
+            "path": "peaks.json",
+            "size": 39611,
+            "sha256": "55b931e8451ff4c3d9a78ce69dd3fd70531d61fadcea8fce36cb64932c3354a8"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1472,
+            "sha256": "6f87184d4496acc00f784fc5d108c559532fa12f5a6066cb97c0027737f2835e"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kilimanjaro-moshi",
+      "country": "Tanzania",
+      "description": "Moshi town and the lower slopes of Kilimanjaro",
+      "assetDirectory": "regions/kilimanjaro-moshi",
+      "tiles": [
+        {
+          "path": "terrain/S04E037.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/S04/S04E037.hgt.gz",
+          "downloadBytes": 11538473,
+          "downloadSha256": "37c55b464389712aca02bf8eba2e39072b273cc16efb9867eb403daa3581f96c"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "kilimanjaro-moshi",
+        "name": "Kilimanjaro · Moshi",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": -3.37,
+          "west": 37.32,
+          "north": -3.33,
+          "east": 37.36
+        },
+        "terrainBounds": {
+          "south": -4,
+          "west": 37,
+          "north": -3,
+          "east": 38
+        },
+        "radiusM": 35000,
+        "viewpoint": {
+          "latitude": -3.35,
+          "longitude": 37.34,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/S04E037.hgt",
+            "size": 25934402,
+            "sha256": "7f35cd4bcad8a8f2835574337f7f1a0d10c9aa554557dcb78df5d526df586fa4"
+          },
+          {
+            "path": "peaks.json",
+            "size": 2268,
+            "sha256": "1a363db25696de0d1272c5f896d14134022f11a79b577215313c0838f7b11bab"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1275,
+            "sha256": "123a6768a9f938aabc6b4bfa0e9093fa43b1e4df5c8a4def500283eb83bc3378"
+          }
+        ]
+      }
+    },
+    {
+      "id": "table-mountain",
+      "country": "South Africa",
+      "description": "Table Mountain and Lion's Head",
+      "assetDirectory": "regions/table-mountain",
+      "tiles": [
+        {
+          "path": "terrain/S35E018.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/S35/S35E018.hgt.gz",
+          "downloadBytes": 3232071,
+          "downloadSha256": "2255cd9710993cf73e92adc223c56bd40c5ee7d04e91db518669c9ec1fc6407f"
+        },
+        {
+          "path": "terrain/S34E018.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/S34/S34E018.hgt.gz",
+          "downloadBytes": 5500374,
+          "downloadSha256": "a06cc53e2418ad14ac211374974041b58948aaae77db209e0104b4c82fbfe656"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "table-mountain",
+        "name": "Table Mountain · Cape Town",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": -33.98,
+          "west": 18.38,
+          "north": -33.93,
+          "east": 18.44
+        },
+        "terrainBounds": {
+          "south": -35,
+          "west": 18,
+          "north": -33,
+          "east": 19
+        },
+        "radiusM": 15000,
+        "viewpoint": {
+          "latitude": -33.96,
+          "longitude": 18.4,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/S35E018.hgt",
+            "size": 25934402,
+            "sha256": "b7c8bb4e7da9a650a32780845dd8d40fd8917cc92a071ee8fe701553de5ad3c9"
+          },
+          {
+            "path": "terrain/S34E018.hgt",
+            "size": 25934402,
+            "sha256": "ead56aab3b1564154440ebeedcf9a66300100a9a56f021283b3995636163ae29"
+          },
+          {
+            "path": "peaks.json",
+            "size": 37938,
+            "sha256": "92119690693a5153d33488387c70b0324bf7aa788017ef0ff26ab4c2bcb68d1e"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1353,
+            "sha256": "084fdfab400c7288e8c2e1f369cfb0b0778f7cb6148f7239921f936772562a9d"
+          }
+        ]
+      }
+    },
+    {
+      "id": "queenstown",
+      "country": "New Zealand",
+      "description": "Queenstown and Bob's Peak · Southern Alps",
+      "assetDirectory": "regions/queenstown",
+      "tiles": [
+        {
+          "path": "terrain/S46E168.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/S46/S46E168.hgt.gz",
+          "downloadBytes": 13176339,
+          "downloadSha256": "84501f57abb6072e2d1d768a71dc2f9df299580bd1150fe0a294e59ab2582d09"
+        },
+        {
+          "path": "terrain/S45E168.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/S45/S45E168.hgt.gz",
+          "downloadBytes": 16166010,
+          "downloadSha256": "342201588ff22d4482286c0483fd1911fbbd51f0e594ecb455581e2a18576108"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "queenstown",
+        "name": "Queenstown · Remarkables",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": -45.05,
+          "west": 168.63,
+          "north": -45.0,
+          "east": 168.7
+        },
+        "terrainBounds": {
+          "south": -46,
+          "west": 168,
+          "north": -44,
+          "east": 169
+        },
+        "radiusM": 20000,
+        "viewpoint": {
+          "latitude": -45.03,
+          "longitude": 168.66,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/S46E168.hgt",
+            "size": 25934402,
+            "sha256": "ef43fdb461c2a4288aa2857497c2f410c13413f0b5a09e13c2e7ea074eb73c63"
+          },
+          {
+            "path": "terrain/S45E168.hgt",
+            "size": 25934402,
+            "sha256": "588afcf27ff70d293b57858faab32a7a9625e142e862b2c21faa834a1d600201"
+          },
+          {
+            "path": "peaks.json",
+            "size": 71964,
+            "sha256": "c96682b996131e754f2c700d9bee155a648cec3efc4fecd43d406d58731930bf"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1351,
+            "sha256": "68fd169dea893b2195caeaeea0fd801dd58b15aaa1d9858a7bce93a0007f3787"
+          }
+        ]
+      }
+    },
+    {
+      "id": "aoraki-mount-cook",
+      "country": "New Zealand",
+      "description": "Mount Cook village and Hooker Valley · Southern Alps",
+      "assetDirectory": "regions/aoraki-mount-cook",
+      "tiles": [
+        {
+          "path": "terrain/S44E169.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/S44/S44E169.hgt.gz",
+          "downloadBytes": 7816988,
+          "downloadSha256": "07246023c635a7c105d0efa4b71a9cc6f6efd0b02ae60062fdbd8b6390981af1"
+        },
+        {
+          "path": "terrain/S44E170.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/S44/S44E170.hgt.gz",
+          "downloadBytes": 14585409,
+          "downloadSha256": "951a9b91c96f59cab8e0556ea15b817a0cb24027576f7be1b6e18365e6f85742"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "aoraki-mount-cook",
+        "name": "Aoraki · Mount Cook",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": -43.75,
+          "west": 170.08,
+          "north": -43.72,
+          "east": 170.12
+        },
+        "terrainBounds": {
+          "south": -44,
+          "west": 169,
+          "north": -43,
+          "east": 171
+        },
+        "radiusM": 25000,
+        "viewpoint": {
+          "latitude": -43.735,
+          "longitude": 170.096,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/S44E169.hgt",
+            "size": 25934402,
+            "sha256": "0301f8602a0e57f031b4ac699ed9d094816ff71c60dac5974d42abb23c03d19c"
+          },
+          {
+            "path": "terrain/S44E170.hgt",
+            "size": 25934402,
+            "sha256": "97ee87b39536286083676353e3de348766d9450c6fa711df09a37f2dde765338"
+          },
+          {
+            "path": "peaks.json",
+            "size": 72750,
+            "sha256": "de6a201d61e8ed46509109fb1712a9e712d61295a6735dfcc3d6a73ab144740c"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1346,
+            "sha256": "965815ef4a09ee74ec94912c06843e8958743a69742c91a4bacd99a6c82bcd65"
           }
         ]
       }

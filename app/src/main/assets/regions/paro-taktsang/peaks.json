@@ -1,0 +1,35 @@
+[
+  {
+    "id": "geonames:1252480",
+    "name": "Pumo La",
+    "latitude": 27.45,
+    "longitude": 89.56667,
+    "elevationM": null,
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1252480/",
+    "modified": "1994-01-08",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:1252607",
+    "name": "Cho-mo-la-li Shan",
+    "latitude": 27.82405,
+    "longitude": 89.26919,
+    "elevationM": 7314,
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1252607/",
+    "modified": "2010-06-03",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:12534522",
+    "name": "Jichu Drake",
+    "latitude": 27.85282,
+    "longitude": 89.32839,
+    "elevationM": 6662,
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/12534522/",
+    "modified": "2024-05-17",
+    "featureCode": "MT"
+  }
+]

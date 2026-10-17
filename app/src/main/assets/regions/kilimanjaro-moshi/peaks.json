@@ -1,0 +1,90 @@
+[
+  {
+    "id": "geonames:149999",
+    "name": "Shira",
+    "latitude": -3.03333,
+    "longitude": 37.2,
+    "elevationM": null,
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/149999/",
+    "modified": "2018-12-04",
+    "featureCode": "PK"
+  },
+  {
+    "id": "geonames:153210",
+    "name": "Moshi",
+    "latitude": -3.25,
+    "longitude": 37.43333,
+    "elevationM": null,
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/153210/",
+    "modified": "2016-07-26",
+    "featureCode": "PK"
+  },
+  {
+    "id": "geonames:154498",
+    "name": "Mawensi",
+    "latitude": -3.09292,
+    "longitude": 37.45626,
+    "elevationM": 5149,
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/154498/",
+    "modified": "2016-07-26",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:155887",
+    "name": "Ol Doinyo Lolbene",
+    "latitude": -3.95,
+    "longitude": 37.11667,
+    "elevationM": null,
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/155887/",
+    "modified": "2016-07-26",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:157294",
+    "name": "Kindoroko",
+    "latitude": -3.73333,
+    "longitude": 37.65,
+    "elevationM": null,
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/157294/",
+    "modified": "2018-12-04",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:157452",
+    "name": "Kilimanjaro",
+    "latitude": -3.07583,
+    "longitude": 37.35333,
+    "elevationM": 5895,
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/157452/",
+    "modified": "2023-09-08",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:157976",
+    "name": "Uhuru",
+    "latitude": -3.06505,
+    "longitude": 37.35903,
+    "elevationM": 5895,
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/157976/",
+    "modified": "2017-07-17",
+    "featureCode": "PK"
+  },
+  {
+    "id": "geonames:7303253",
+    "name": "Klute Peak",
+    "latitude": -3.02713,
+    "longitude": 37.21293,
+    "elevationM": 3952,
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/7303253/",
+    "modified": "2016-07-26",
+    "featureCode": "PK"
+  }
+]
