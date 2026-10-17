@@ -20,6 +20,8 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -36,6 +38,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.harsh.peakbud.ui.theme.*
@@ -111,13 +114,19 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
             }
             // A notice with an action blocks use, so it sits centre stage; progress notes stay small near the top.
             val blocking = action != null
-            Surface(Modifier.align(if (blocking && fullScreen) Alignment.Center else Alignment.TopCenter).widthIn(max = TrailSize.noticeWidth)
-                .padding(start = TrailSpace.lg, end = TrailSpace.lg, top = if (fullScreen && !blocking) safeTop + TrailSpace.sm else TrailSpace.md, bottom = TrailSpace.md),
+            // Blocking notices sit centred in the space between the top chips and the bottom controls.
+            // Wider in landscape so the message fits in fewer lines within the short height.
+            val wide = LocalConfiguration.current.let { it.screenWidthDp > it.screenHeightDp }
+            Surface(Modifier.align(if (blocking && fullScreen) Alignment.Center else Alignment.TopCenter).widthIn(max = if (wide) TrailSize.noticeWidth * 1.6f else TrailSize.noticeWidth)
+                .padding(start = TrailSpace.lg, end = TrailSpace.lg,
+                    top = if (fullScreen) safeTop + TrailSpace.sm else TrailSpace.md,
+                    bottom = if (fullScreen && blocking) safeBottom else TrailSpace.md),
                 shape = if (blocking) MaterialTheme.shapes.large else androidx.compose.foundation.shape.CircleShape,
                 color = if (blocking) MaterialTheme.colorScheme.surface.copy(alpha = .94f) else TrailCameraColors.scrim,
                 contentColor = if (blocking) MaterialTheme.colorScheme.onSurface else Color.White) {
                 Column(Modifier.padding(horizontal = if (blocking) TrailSpace.sheet else TrailSpace.lg, vertical = if (blocking) TrailSpace.sheet else TrailSpace.md),
                     verticalArrangement = Arrangement.spacedBy(TrailSpace.lg), horizontalAlignment = if (blocking) Alignment.Start else Alignment.CenterHorizontally) {
+                    // Text may shrink-scroll in short landscape windows; the action button must always stay visible.
                     Text(notice, style = if (blocking) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.labelLarge)
                     action?.invoke()
                 }

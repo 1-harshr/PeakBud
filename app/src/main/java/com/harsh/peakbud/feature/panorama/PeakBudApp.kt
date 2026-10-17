@@ -158,10 +158,13 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
     TrailSystemBars(lightChrome)
     Box(Modifier.fillMaxSize().background(if (cameraTab) Color.Black else MaterialTheme.colorScheme.background)) {
         // Space the floating tab bar occupies above the system navigation bar.
-        val barSpace = TrailSize.bottomBarClearance + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-        if (cameraTab) CameraTab(state, model, cameraFov, barSpace, immersive, onImmersive = { immersive = it }, onFov = { cameraFov = it },
+        // Portrait: floating bar at the bottom. Landscape: a vertical rail on the left so the scene keeps its height.
+        val railSpace = if (compact) TrailSize.tabWidth + TrailSpace.lg + WindowInsets.displayCutout.asPaddingValues().calculateLeftPadding(androidx.compose.ui.unit.LayoutDirection.Ltr) else TrailSpace.none
+        val barSpace = if (compact) WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + TrailSpace.sm
+            else TrailSize.bottomBarClearance + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        if (cameraTab) CameraTab(state, model, cameraFov, barSpace, railSpace, compact, immersive, onImmersive = { immersive = it }, onFov = { cameraFov = it },
             onRegions = { tab = 3 }, onGps = ::gps, onSettings = { settings = true }, onPeak = { selectedPeak = it })
-        else Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = TrailSpace.lg).padding(bottom = if (tab == 1) barSpace else TrailSpace.none),
+        else Column(Modifier.fillMaxSize().statusBarsPadding().padding(start = railSpace).padding(horizontal = TrailSpace.lg).padding(bottom = if (tab == 1 || compact) barSpace else TrailSpace.none),
             verticalArrangement = Arrangement.spacedBy(if (compact) TrailSpace.sm else TrailSpace.md)) {
             AppHeader(compact, when (tab) {
                 2 -> if (state.noRegion) strings(R.string.peaks_pick_a_hiking_area_to_start) else if (state.isDemo) strings(R.string.peaks_demo_landscape) else strings(R.string.peaks_within_km_of_this_spot , distance(state.activePack?.radiusM ?: 0.0, state, strings))
@@ -178,15 +181,13 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
             }
             when (tab) {
                 1 -> {
-                    if (!compact) ObservationStatus(state, false, null, false, ::gps, model::startCameraTracking)
+                    ObservationStatus(state, false, null, compact, ::gps, model::startCameraTracking)
                     BoxWithConstraints(Modifier.weight(1f)) {
                         if (maxWidth > maxHeight) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(TrailSpace.lg)) {
-                                PanoramaPanel(state, model, Modifier.weight(1f).fillMaxHeight(), { tab = 3 }, ::gps, { manual = true }) { selectedPeak = it }
-                                if (compact) Column(Modifier.width(TrailSize.sidePanel).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
-                                    ObservationStatus(state, false, null, true, ::gps, model::startCameraTracking)
-                                    HomeNotes(state)
-                                }
+                            // Landscape: the skyline takes the full width; the heading card is already in the header row.
+                            Column(verticalArrangement = Arrangement.spacedBy(TrailSpace.xs)) {
+                                PanoramaPanel(state, model, Modifier.fillMaxWidth().weight(1f), { tab = 3 }, ::gps, { manual = true }) { selectedPeak = it }
+                                HomeNotes(state)
                             }
                         } else {
                             Column(verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
@@ -206,7 +207,11 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                 }
             }
         }
-        AnimatedVisibility(!(cameraTab && immersive), Modifier.align(Alignment.BottomCenter),
+        if (compact) AnimatedVisibility(!(cameraTab && immersive), Modifier.align(Alignment.CenterStart),
+            enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.slideInHorizontally { -it / 2 },
+            exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.slideOutHorizontally { -it / 2 }) {
+            TabRail(tab, cameraTab, { tab = it }, Modifier.displayCutoutPadding().padding(start = TrailSpace.sm))
+        } else AnimatedVisibility(!(cameraTab && immersive), Modifier.align(Alignment.BottomCenter),
             enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.slideInVertically { it / 2 },
             exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.slideOutVertically { it / 2 }) {
             FloatingTabBar(tab, cameraTab, { tab = it }, Modifier.navigationBarsPadding().padding(bottom = TrailSpace.md))
@@ -249,7 +254,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov: Pair<Double, Double>?, barSpace: Dp, immersive: Boolean,
+private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov: Pair<Double, Double>?, barSpace: Dp, railSpace: Dp, landscape: Boolean, immersive: Boolean,
                       onImmersive: (Boolean) -> Unit, onFov: (Pair<Double, Double>?) -> Unit, onRegions: () -> Unit, onGps: () -> Unit,
                       onSettings: () -> Unit, onPeak: (PeakView) -> Unit) {
     val strings = rememberTrailStrings()
@@ -275,7 +280,7 @@ private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov:
             pose = pose, aligned = alignment.aligned, hiddenPeaks = alignment.hiddenByForeground,
             alignment = model.alignment, rawPose = { model.state.value.cameraPose },
             safeTop = if (showControls) topBar else statusTop + TrailSize.touchTarget,
-            safeBottom = (if (showControls) barSpace + TrailSize.chip else WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()) + TrailSize.cameraBarClearance,
+            safeBottom = (if (showControls) barSpace + (if (landscape) TrailSize.cameraBarClearance else TrailSize.chip) else WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()) + TrailSize.cameraBarClearance,
             onBackgroundTap = { onImmersive(!immersive) },
             onDragNudge = { degrees ->
                 if (dragStart == null) dragStart = state.labelTrim
@@ -290,7 +295,7 @@ private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov:
                 // Gradient scrims keep white controls legible over snow and sky without boxing in the scene.
                 Box(Modifier.fillMaxWidth().height(statusTop + TrailSize.cameraScrimDepth).background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(TrailCameraColors.scrim, Color.Transparent))))
                 Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(barSpace + TrailSize.cameraScrimDepth).background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .5f)))))
-                Column(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = TrailSpace.lg, vertical = TrailSpace.sm), horizontalAlignment = Alignment.CenterHorizontally,
+                Column(Modifier.fillMaxWidth().statusBarsPadding().padding(start = railSpace).padding(horizontal = TrailSpace.lg, vertical = TrailSpace.sm), horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
                     Box(Modifier.fillMaxWidth()) {
                         LocationChip(state, Modifier.align(Alignment.CenterStart)) { sheet = true }
@@ -300,7 +305,10 @@ private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov:
                     if (state.followingCompass && state.cameraPose != null && !state.poseReliable)
                         GlassPill(color = TrailCameraColors.warningSurface) { Text(strings(R.string.compass_unsteady_wave_your_phone_in_a_figure_eight), style = MaterialTheme.typography.labelMedium) }
                 }
-                Column(Modifier.align(Alignment.BottomCenter).padding(bottom = barSpace + TrailSize.cameraBarClearance + TrailSpace.xs), horizontalAlignment = Alignment.CenterHorizontally,
+                // Landscape: actions sit in the bottom-right corner, clear of the scene's centre and the left rail.
+                Column(if (landscape) Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(end = TrailSpace.lg, bottom = TrailSize.cameraBarClearance + TrailSpace.lg)
+                    else Modifier.align(Alignment.BottomCenter).padding(bottom = barSpace + TrailSize.cameraBarClearance + TrailSpace.xs),
+                    horizontalAlignment = if (landscape) Alignment.End else Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
                     AlignControl(alignment, onAlign = { model.startAlignment(cameraFov?.first) }, onReset = model::resetAlignment)
                     shifted?.let { start ->
@@ -318,10 +326,11 @@ private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov:
         }
         // Keep essential metadata visible even when the navigation and adjustment controls are hidden.
         Row(Modifier.align(Alignment.BottomCenter).fillMaxWidth().navigationBarsPadding()
-            .padding(horizontal = TrailSpace.lg)
+            .padding(start = if (showControls) railSpace else TrailSpace.none).padding(horizontal = TrailSpace.lg)
             .padding(bottom = if (showControls) barSpace else TrailSpace.lg),
             horizontalArrangement = Arrangement.spacedBy(TrailSpace.sm), verticalAlignment = Alignment.Bottom) {
-            CameraPositionOverlay(state, Modifier.weight(1f))
+            CameraPositionOverlay(state, if (landscape) Modifier.widthIn(max = TrailSize.sidePanel) else Modifier.weight(1f))
+            if (landscape) Spacer(Modifier.weight(1f))
             if (showControls) GlassIconButton(R.drawable.ic_fullscreen, strings(R.string.enter_full_screen)) {
                 onImmersive(true)
             }
@@ -514,6 +523,31 @@ private fun AppHeader(compact: Boolean, context: String, contextIcon: Int? = nul
  * Items are equal width and never change structure, which keeps the slide smooth (and avoids a Compose crash
  * that structural changes caused on rapid switching).
  */
+/** Landscape navigation: the same pill style as the bottom bar, stacked vertically on the left edge. */
+@Composable
+private fun TabRail(selected: Int, overCamera: Boolean, onSelect: (Int) -> Unit, modifier: Modifier) {
+    val strings = rememberTrailStrings()
+    val tabs = listOf(strings(R.string.camera) to R.drawable.ic_photo_camera, strings(R.string.home) to R.drawable.ic_home, strings(R.string.peaks) to R.drawable.ic_landscape, strings(R.string.regions) to R.drawable.ic_map)
+    val pill = if (overCamera) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer
+    val onPill = if (overCamera) Color.White else MaterialTheme.colorScheme.onPrimaryContainer
+    Surface(modifier, shape = MaterialTheme.shapes.extraLarge, color = if (overCamera) Color.Black.copy(alpha = .55f) else MaterialTheme.colorScheme.inverseSurface,
+        contentColor = Color.White, shadowElevation = if (overCamera) TrailSpace.none else TrailSpace.md) {
+        Column(Modifier.padding(TrailSpace.xs), verticalArrangement = Arrangement.spacedBy(TrailSpace.xxs)) {
+            tabs.forEachIndexed { index, (label, icon) -> key(label) {
+                val active = index == selected
+                val tint by androidx.compose.animation.animateColorAsState(if (active) onPill else Color.White.copy(alpha = .72f), label = "rail")
+                Column(Modifier.size(TrailSize.tabWidth, TrailSize.tabHeight).clip(MaterialTheme.shapes.large)
+                    .background(if (active) pill else Color.Transparent).clickable { onSelect(index) }
+                    .semantics(mergeDescendants = true) { role = Role.Tab; this.selected = active; contentDescription = label },
+                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    Icon(painterResource(icon), null, Modifier.size(TrailSize.icon), tint = tint)
+                    Text(label, style = MaterialTheme.typography.labelSmall, color = tint, maxLines = 1)
+                }
+            } }
+        }
+    }
+}
+
 @Composable
 private fun FloatingTabBar(selected: Int, overCamera: Boolean, onSelect: (Int) -> Unit, modifier: Modifier) {
     val strings = rememberTrailStrings()
