@@ -4,6 +4,13 @@ PeakBud is a native Android application built with Kotlin and Jetpack Compose.
 Versions are centralized in `gradle/libs.versions.toml` and dependencies are
 declared in `app/build.gradle.kts`.
 
+## Android SDK Compatibility
+
+Compile against Android API 37.0 (`release(37)` with `minorApiLevel = 0`).
+The selected AndroidX Core 1.19.1 and Lifecycle 2.11.0 artifacts require at least
+API 37 at compile time. Install Android SDK Platform 37.0 through SDK Manager
+on other development machines. `minSdk` remains 26 and `targetSdk` remains 36.
+
 ## Installed Foundation
 
 | Capability | Dependency | Purpose |
@@ -20,12 +27,18 @@ declared in `app/build.gradle.kts`.
 
 ## Permissions and Hardware
 
-The manifest declares camera, coarse location, and fine location permissions.
+The manifest declares camera, coarse location, fine location, internet, and
+network-state permissions. Internet access supports future offline region
+downloads; network-state access allows connectivity checks. These two network
+permissions do not need runtime prompts. Cleartext HTTP traffic is disabled;
+use HTTPS for downloads.
+
 Camera and location still need runtime permission requests when their features
 are implemented. Request coarse and fine location together; handle approximate
-location, denial, disabled GPS, and missing hardware gracefully. Camera, GPS,
-and compass hardware are optional so manual-location panorama mode can remain
-available. Check sensor availability before use.
+location, denial, disabled GPS, and missing hardware gracefully. Camera, location
+providers, compass, accelerometer, and gyroscope hardware are explicitly optional
+so manual-location panorama mode can remain available. Check sensor availability
+before use.
 
 Use foreground location for the initial prototype. Sensor listeners and camera
 sessions should follow the screen lifecycle. Background location, microphone,
@@ -66,3 +79,5 @@ run the command above from Android Studio's terminal or sync the project there.
 - [DataStore releases](https://developer.android.com/jetpack/androidx/releases/datastore)
 - [KSP 2.3.5](https://github.com/google/ksp/releases/tag/2.3.5)
 - [Android position sensors](https://developer.android.com/develop/sensors-and-location/sensors/sensors_position)
+- [Network permissions](https://developer.android.com/develop/connectivity/network-ops/connecting)
+- [Optional hardware declarations](https://developer.android.com/guide/topics/manifest/uses-feature-element)
