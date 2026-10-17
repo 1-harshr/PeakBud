@@ -1,5 +1,14 @@
 # PeakBud: DEM-Based Offline Peak Identification Plan
 
+> Product direction update (2026-10-17): the primary experience is now a live rear
+> camera preview with sensor-aligned peak labels, like the interaction requested
+> by the user. The panorama remains an alternate reference/demo view. Camera
+> preview and geographic overlays do not depend on computer vision. The original
+> phases below describe the terrain foundation; camera integration has been
+> brought forward. See [camera-overlay.md](camera-overlay.md) for the implemented
+> pipeline, limits, and validation status.
+
+
 Research date: 2026-10-17.
 
 ## 1. Recommended Approach

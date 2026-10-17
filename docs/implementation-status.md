@@ -1,119 +1,78 @@
-# Implementation Status
+# Implementation status
 
-The app is being developed against [plan.md](plan.md). Completion is currently
-blocked by execution and data-access restrictions in this session. The following
-status distinguishes source implementation from verification. It is not a claim
-that the complete hiking experience has been field-validated.
+Updated 2026-10-17. The primary experience is now a live camera view with peak
+labels; the panorama is an alternate reference and demo view. See
+[camera-overlay.md](camera-overlay.md) for the camera pipeline and limitations.
 
 ## Implemented
 
-- Independent Kotlin geographic models, spherical bearings/distances, curvature,
-  horizon sampling, and per-peak checks limited to terrain before the summit.
-- Visible, occluded, uncertain, and unknown outcomes; missing data is never zero.
-  Large differences between published heights and sampled terrain are explicitly
-  uncertain rather than silently moving the summit. The prototype threshold is
-  the larger of 100 m and three times the terrain height-error estimate.
-- HGT big-endian decoding, interpolation, shared-edge lookup, and a bounded block
-  cache (up to four open tiles, 48 MiB of height blocks).
-- Fictional terrain for exploring controls, clearly distinguished from real data.
-- Compose panorama with labelled callouts, drag controls, field of view, peak
-  list/details, manual coordinates/ground height, and portrait/landscape layouts.
-- Foreground GPS with permission handling, fix age/accuracy, and manual fallback.
-- Rotation-vector or accelerometer/magnetometer orientation, true-north correction,
-  display rotation handling, compass quality messaging, and manual alignment trim.
-- Room peak indexing; DataStore preferences and selected-region persistence.
-- Validated ZIP installation, terrain-radius coverage checks, hashes, atomic
-  activation, cancellation, selection, deletion, and attribution display.
-  Installed files are rehashed before first use after process restart.
-- User-initiated HTTPS pack downloads, redirect checks, bounded sizes, and strong
-  ETag-protected resume support. Retry the same URL after interruption/process death.
-  Saved transfers also appear in Regions with Resume/Restart and Discard controls.
-- A desktop preparation tool that packages supplied HGT and OSM JSON, preserving
-  provenance and checking required tiles. No secrets belong in the app.
+- CameraX rear preview, runtime permission/denial/settings handling, lifecycle
+  binding and cleanup, GPS/compass prerequisites, and manual heading alignment.
+- Pinhole peak projection with true-north heading, pitch, roll, actual capture
+  focal length, sensor size, and CameraX sensor-to-preview crop/rotation mapping.
+  Labels have peak names, height/distance, leader lines, and detail tap targets.
+- Terrain line of sight, curvature, uncertainty, and missing-data handling;
+  file-backed HGT interpolation with bounded caching and independent per-peak rays.
+- Foreground GPS/fix age, orientation sensors and reliability messaging,
+  declination correction, settings, and manual panorama viewpoints.
+- Room peak records, DataStore preferences, validated offline region installation,
+  integrity checks, cancellation, selection/deletion/credits, and resumable HTTPS
+  downloads with saved-transfer discovery.
+- Region preparation tool for supplied HGT and OSM inputs.
+- Fictional terrain for panorama exploration. Fictional peaks are never overlaid
+  on live camera images.
 
-## Verification Obtained
+## Verification
 
-- 29 actual Kotlin/JUnit tests pass through `tools/check-core.py`, including geographic
-  projection, occlusion, missing terrain, cancellation, HGT reading/interpolation,
-  pack activation/integrity/path checks, and guarded download resumes.
-  The suite covers same-size file corruption, saved-download discovery after
-  recreation, weak ETags, and conflicting summit heights.
-- Three passing Python preparation-tool tests check source normalization, duplicate IDs, archive
-  hashes, and rejection of missing input terrain.
-- Android Kotlin sources were also compiled with the Compose compiler against
-  locally cached Android libraries as an additional source check, including the
-  generated database/DAO implementations (21 Kotlin files in total). This does not
-  validate Gradle's resolved dependency graph, packaging, or Android runtime.
-- Standalone KSP 2.3.5 / Room 2.8.4 processing of the actual database sources
-  succeeded and exported `app/schemas/com.harsh.peakbud.data.peaks.PeakDatabase/1.json`.
-  The generated Kotlin implementations also compile with the app sources.
-  `tools/check-room-schema.py` passes against that exported schema and the actual
-  DAO SQL, checking pack isolation, bounding queries, nullable heights, and deletion.
+The session permissions now allow Gradle and Git writes. The earlier environment
+blockers have been removed; they are not outstanding build failures.
 
-## Outstanding Verification and Work
+- Full Gradle APK assembly, AAR metadata check, Room/KSP generation, and JVM unit
+  tests pass. The JVM report contains 36 passing tests, including six camera
+  projection tests (center/pitch, perspective, north wrap, roll, rejection, crop).
+- Three instrumentation tests pass on the API 36.1 arm64 emulator, covering camera
+  as default, Panorama switching, demo/manual viewpoint, region entry points,
+  settings, and the original application-context check.
+- Android lint passes with warnings; no lint errors. Warnings include existing
+  dependency/style/localization recommendations.
+- The debug APK was installed and opened on that emulator. The actual camera
+  permission dialog was denied and retried successfully. A live virtual rear
+  camera preview was visually inspected. The app displayed region setup help and
+  correctly withheld fictional peak labels.
+- The prior preparation-tool suite (three Python tests) and independent Room SQL
+  checks remain available; Gradle now validates the actual generated Room wiring.
 
-- Full Gradle AAR metadata/build/unit-test execution is blocked in this session:
-  Gradle's file-lock service cannot open its required local socket. Run the command
-  in README in Android Studio's terminal. The standalone Room/KSP check above
-  verifies generation independently; Gradle plugin wiring and APK packaging still
-  require a full build.
-- No actual SRTM/OSM demo region has been downloaded, curated, or bundled. Shell
-  downloads fail DNS resolution in this session. A complete importer and preparation
-  path exists, but synthetic tests cannot establish real geographic accuracy.
-- No emulator/device execution or screenshots have been obtained. Verify first
-  launch, landscape/small-screen layout, permission denial/approximate location,
-  and cold start with an installed region in airplane mode.
-  `PanoramaNavigationTest` covers the manual demo, region entry points, and settings
-  once run with `./gradlew :app:connectedDebugAndroidTest` on a clean emulator.
-- Validate sightlines independently with projected GDAL viewsheds or another
-  renderer, then check known viewpoints and summit identities in the field.
-- Benchmark real HGT data on a named Android phone. Draft horizon sampling is
-  adaptive; per-peak rays sample more finely. This is not a mathematically exact
-  surface-intersection solver. Near-field obstacles and narrow ridges require
-  uncertainty handling and further validation.
-- Test orientation axes, north correction, pitch, and magnetic interference on
-  real hardware. The uncertainty model uses prototype height-error estimates.
-- A hosted region catalogue, automatic background download scheduler, geoid-aware
-  GNSS altitude conversion, and optional calibrated camera overlay remain future
-  work. The current app uses DEM ground height plus phone height; it does not mix
-  raw ellipsoidal GNSS altitude with EGM96 terrain.
-
-## Commit Checkpoints
-
-The user authorized focused commits. Staging was attempted, but this session
-cannot create `.git/index.lock`, so no implementation commits could be made here.
-Suggested groups once Git writes are available:
-
-1. Geographic models, terrain engine, HGT/demo adapters, and core tests.
-2. Offline pack preparation/import/download, Room metadata, and integrity tests.
-3. Panorama UI, settings, location/orientation providers, and documentation.
-
-## Completion Audit and Unblocking
-
-The same environment restrictions were confirmed across three consecutive goal
-turns. The goal is blocked, not complete. No APK or real region pack is currently
-available in the project outputs for end-to-end verification.
-
-| Plan gate | Current evidence | Remaining requirement |
-| --- | --- | --- |
-| 0: Android baseline | Kotlin compilation, Room/KSP generation and schema checks pass independently. | Full Gradle metadata check, APK assembly, and Gradle unit-test run; local socket creation is denied. |
-| 1: Synthetic prototype | Demo scene and geometry tests pass; Compose sources compile. | Execute the app and navigation test on an emulator/device; inspect rendered layouts. |
-| 2: Real offline terrain | HGT reader, pack tool, and installer tests pass with explicitly synthetic fixtures. | Download and curate real SRTM/OSM data, install its pack, then cold-start in airplane mode. DNS resolution is unavailable here. |
-| 3: Visibility accuracy | Analytic occlusion, missing-data, height-consistency, and projection tests pass. | Independent real-terrain reference views and known-viewpoint validation. |
-| 4: GPS and compass | Providers, permissions, heading correction and calibration controls compile. | Real-device orientation, accuracy, denial/stale-fix, and lifecycle checks. |
-| 5: Region management | Import integrity, corruption detection, restart recovery and download-resume tests pass. | Real HTTPS transfer and installed-pack lifecycle verification on Android. |
-| 6: Optional camera | Camera dependencies/permissions are present. | Calibrated overlay remains optional future work, as specified in the plan. |
-
-Resume in a session that permits Gradle's local sockets and outbound DNS/HTTPS.
-Git metadata writes are also needed to create the authorized checkpoint commits.
-Use [region-packs.md](region-packs.md) to supply genuine source files or a prepared
-pack, then run:
+Run with JDK 21 / Android SDK 37:
 
 ```sh
-./gradlew :app:checkDebugAarMetadata :app:assembleDebug :app:testDebugUnitTest
-./gradlew :app:connectedDebugAndroidTest
+./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
+ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest
 ```
 
-The second command needs a connected emulator/device. Follow with real-region
-airplane-mode checks, independent terrain comparisons, and hardware/field
-validation before considering the applicable plan gates complete.
+APK: `app/build/outputs/apk/debug/app-debug.apk`.
+
+## Remaining work
+
+- No real SRTM/OSM region is bundled. Prepare/import one before testing real peak
+  identities. See [region-packs.md](region-packs.md).
+- Real-device/outdoor alignment is unverified. Check orientation axes, portrait
+  and landscape, magnetic interference, fresh/stale/disabled GPS, camera
+  interruptions, permission revocation, and known summit bearings.
+- Camera calibration is metadata-derived and approximate. Lens distortion,
+  principal-point offsets, stabilization, and logical multi-camera behavior need
+  device-specific measurement. There is no image-recognition correction or zoom.
+- Independently compare real-terrain visibility, benchmark HGT on a named phone,
+  and validate offline cold starts in airplane mode. The DEM model cannot account
+  for weather, vegetation, or terrain features smaller than its sampling.
+- A hosted region catalogue and automatic background scheduler remain future work.
+
+The prototype now builds and runs with camera preview. It has not been validated
+as a complete, geographically accurate outdoor hiking experience.
+
+## Commits
+
+- `3579213`: checkpoint of the terrain panorama, offline storage/downloads, tests,
+  and original documentation before changing the main experience to camera.
+- The subsequent camera implementation is a separate commit in Git history.
+
+Local IDE configuration changes are excluded from these implementation commits.

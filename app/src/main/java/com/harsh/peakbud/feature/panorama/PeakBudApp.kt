@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.harsh.peakbud.feature.camera.CameraPanel
 import com.harsh.peakbud.core.geo.Geography
 import com.harsh.peakbud.core.model.*
 import com.harsh.peakbud.data.regions.RegionPack
@@ -37,6 +38,7 @@ import java.util.Locale
 fun PeakBudApp(model: PanoramaViewModel = viewModel()) {
     val state by model.state.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableIntStateOf(0) }
+    var cameraMode by rememberSaveable { mutableStateOf(true) }
     var manual by rememberSaveable { mutableStateOf(false) }
     var settings by rememberSaveable { mutableStateOf(false) }
     var selectedPeak by remember { mutableStateOf<PeakView?>(null) }
@@ -57,6 +59,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel()) {
         else (context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
     LaunchedEffect(state.followingGps, lifecycle, tab) {
         if (state.followingGps && tab == 0) lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            model.refreshFixAge()
             launch { AndroidLocationProvider(context.applicationContext).fixes().collect(model::gps) }
             launch { while (true) { delay(5000); model.refreshFixAge() } }
         }
@@ -64,6 +67,12 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel()) {
     LaunchedEffect(state.followingCompass, rotation, lifecycle, tab) {
         if (state.followingCompass && tab == 0) lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             AndroidOrientationProvider(context.applicationContext).poses(rotation).collect(model::pose)
+        }
+    }
+    LaunchedEffect(cameraMode, tab, state.activePack?.key) {
+        if (cameraMode && tab == 0 && !state.isDemo) {
+            model.startCameraTracking()
+            if (!state.isDemo && !state.followingGps && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) model.startGps()
         }
     }
     LaunchedEffect(state.scene) { selectedPeak = null }
@@ -76,7 +85,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel()) {
     Scaffold(containerColor = MaterialTheme.colorScheme.background, bottomBar = {
         Surface(tonalElevation = 2.dp) {
             Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(12.dp, 4.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                listOf("Panorama", "Peaks", "Regions").forEachIndexed { index, name ->
+                listOf("Camera", "Peaks", "Regions").forEachIndexed { index, name ->
                     if (tab == index) FilledTonalButton(onClick = { tab = index }) { Text(name) }
                     else TextButton(onClick = { tab = index }) { Text(name) }
                 }
@@ -105,7 +114,19 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel()) {
                         Text(state.activePack?.name ?: "Explorer demo · fictional terrain", Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
                         Text("${state.heading.toInt().toString().padStart(3, '0')}° ${cardinal(state.heading)}", fontWeight = FontWeight.Bold)
                     }
-                    BoxWithConstraints(Modifier.weight(1f)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(selected = cameraMode, onClick = { cameraMode = true }, label = { Text("Live camera") })
+                        FilterChip(selected = !cameraMode, onClick = { cameraMode = false }, label = { Text("Panorama") })
+                    }
+                    if (cameraMode) {
+                        CameraPanel(state, Modifier.weight(1f).fillMaxWidth(), { tab = 2 }, ::gps, model::startCameraTracking) { selectedPeak = it }
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+                            TextButton(onClick = { model.trimCompass(-1.0) }) { Text("−1°") }
+                            Text("Align labels", style = MaterialTheme.typography.labelSmall)
+                            TextButton(onClick = model::resetTrim) { Text("Reset") }
+                            TextButton(onClick = { model.trimCompass(1.0) }) { Text("+1°") }
+                        }
+                    } else BoxWithConstraints(Modifier.weight(1f)) {
                         if (maxWidth > maxHeight) {
                             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                                 PanoramaPanel(state, model, Modifier.weight(1f).fillMaxHeight()) { selectedPeak = it }
@@ -123,7 +144,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel()) {
                 }
                 1 -> PeakList(state, Modifier.weight(1f)) { selectedPeak = it }
                 2 -> Regions(state, Modifier.weight(1f), { importer.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream")) }, { download = true },
-                    { model.selectRegion(it); tab = 0 }, { deletePack = it }, { pack -> scope.launch { attribution = runCatching { model.attribution(pack) }.getOrDefault("Credits unavailable") } }, model::cancelImport,
+                    { model.selectRegion(it); if (it == null) cameraMode = false; tab = 0 }, { deletePack = it }, { pack -> scope.launch { attribution = runCatching { model.attribution(pack) }.getOrDefault("Credits unavailable") } }, model::cancelImport,
                     model::downloadRegion, model::discardDownload)
             }
         }
@@ -146,7 +167,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel()) {
                 Text("${coordinate(peak.peak.point.latitude)}, ${coordinate(peak.peak.point.longitude)}\nSource: ${peak.peak.source}", style = MaterialTheme.typography.bodySmall)
                 peak.geometryHeightM?.let { Text("Terrain height: ${height(it, state)}. Published summit elevation may differ.", style = MaterialTheme.typography.bodySmall) }
             }
-        }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; tab = 0 }) { Text("Look toward peak") } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text("Close") } })
+        }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; cameraMode = false; tab = 0 }) { Text("Look toward peak") } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text("Close") } })
     }
     attribution?.let { text -> AlertDialog(onDismissRequest = { attribution = null }, title = { Text("Data credits") }, text = { Text(text, Modifier.verticalScroll(rememberScrollState())) }, confirmButton = { TextButton(onClick = { attribution = null }) { Text("Done") } }) }
     deletePack?.let { pack -> AlertDialog(onDismissRequest = { deletePack = null }, title = { Text("Delete ${pack.name}?") }, text = { Text("Its offline terrain and peak catalogue will be removed from this device.") }, confirmButton = { TextButton(onClick = { model.deleteRegion(pack); deletePack = null }) { Text("Delete") } }, dismissButton = { TextButton(onClick = { deletePack = null }) { Text("Keep") } }) }

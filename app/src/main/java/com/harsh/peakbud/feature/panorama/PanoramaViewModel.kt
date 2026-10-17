@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.harsh.peakbud.core.geo.Geography
 import com.harsh.peakbud.core.model.*
+import com.harsh.peakbud.core.projection.CameraPose
 import com.harsh.peakbud.core.terrain.TerrainEngine
 import com.harsh.peakbud.data.peaks.*
 import com.harsh.peakbud.data.regions.*
@@ -35,6 +36,9 @@ data class PanoramaState(
     val followingCompass: Boolean = false,
     val followingGps: Boolean = false,
     val gpsStatus: String? = null,
+    val gpsFresh: Boolean = false,
+    val cameraPose: CameraPose? = null,
+    val poseReliable: Boolean = false,
     val compassStatus: String? = null,
     val importing: String? = null,
     val preferences: Preferences = Preferences(),
@@ -129,7 +133,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         lastGpsPoint = null
         mutable.update { it.copy(activePack = pack, point = pack?.viewpoint ?: DemoTerrain.VIEWPOINT,
             heading = pack?.headingDeg ?: 350.0, groundOverrideM = null, followingGps = false, followingCompass = false,
-            gpsStatus = null, compassStatus = null, message = null) }
+            gpsStatus = null, gpsFresh = false, cameraPose = null, compassStatus = null, message = null) }
         recalculate()
         viewModelScope.launch { runCatching { settings.selectRegion(pack?.key) } }
     }
@@ -138,21 +142,21 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     }
     fun setPitch(value: Double) { mutable.update { it.copy(pitch = value.coerceIn(-30.0, 30.0)) } }
     fun setFov(value: Double) { mutable.update { it.copy(fov = value.coerceIn(35.0, 120.0)) } }
-    fun toggleCompass() { lastSmoothedHeading = null; mutable.update { it.copy(followingCompass = !it.followingCompass, compassStatus = null) } }
+    fun toggleCompass() { lastSmoothedHeading = null; mutable.update { it.copy(followingCompass = !it.followingCompass, cameraPose = null, compassStatus = null) } }
     fun trimCompass(degrees: Double) {
         yawTrim = Geography.wrap180(yawTrim + degrees)
         lastSmoothedHeading = lastSmoothedHeading?.let { Geography.wrap360(it + degrees) }
-        mutable.update { it.copy(heading = Geography.wrap360(it.heading + degrees)) }
+        mutable.update { it.copy(heading = Geography.wrap360(it.heading + degrees), cameraPose = it.cameraPose?.let { p -> p.copy(heading = Geography.wrap360(p.heading + degrees)) }) }
     }
     fun resetTrim() {
         val old = yawTrim; yawTrim = 0.0
         lastSmoothedHeading = lastSmoothedHeading?.let { Geography.wrap360(it - old) }
-        mutable.update { it.copy(heading = Geography.wrap360(it.heading - old)) }
+        mutable.update { it.copy(heading = Geography.wrap360(it.heading - old), cameraPose = it.cameraPose?.let { p -> p.copy(heading = Geography.wrap360(p.heading - old)) }) }
     }
     fun pose(value: DevicePose) {
         if (!mutable.value.followingCompass) return
         if (!value.available) {
-            mutable.update { it.copy(followingCompass = false, compassStatus = value.message) }
+            mutable.update { it.copy(followingCompass = false, cameraPose = null, compassStatus = value.message, poseReliable = false) }
             return
         }
         val input = mutable.value
@@ -167,31 +171,36 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         val heading = if (previous == null) raw else Geography.wrap360(previous + Geography.wrap180(raw - previous) * 0.18)
         lastSmoothedHeading = heading
         mutable.update { it.copy(heading = heading, pitch = it.pitch + (value.pitch - it.pitch) * 0.15,
-            compassStatus = value.message) }
+            compassStatus = value.message, poseReliable = value.reliable,
+            cameraPose = if (value.cameraUsable) CameraPose(raw, value.pitch, value.roll) else null) }
+    }
+    fun startCameraTracking() {
+        lastSmoothedHeading = null
+        mutable.update { it.copy(followingCompass = true, cameraPose = null) }
     }
     fun startGps() {
         if (mutable.value.isDemo) { mutable.update { it.copy(message = "Import and select a real terrain region before using GPS. The demo landscape is fictional.") }; return }
         lastGpsPoint = null
         lastFixElapsedMs = null
-        mutable.update { it.copy(followingGps = true, gpsStatus = "Waiting for GPS…") }
+        mutable.update { it.copy(followingGps = true, gpsFresh = false, gpsStatus = "Waiting for GPS…") }
     }
     fun locationDenied() { mutable.update { it.copy(followingGps = false, message = "Precise location was not granted. Use a manual viewpoint or enable precise location in Android settings.") } }
     fun refreshFixAge() {
         val elapsed = lastFixElapsedMs ?: return
         val age = (android.os.SystemClock.elapsedRealtime() - elapsed) / 1000
-        if (age > 30) mutable.update { it.copy(gpsStatus = "GPS fix is ${age}s old; waiting for a fresh position") }
+        if (age > 30) mutable.update { it.copy(gpsFresh = false, gpsStatus = "GPS fix is ${age}s old; waiting for a fresh position") }
     }
     fun stopGps() { mutable.update { it.copy(followingGps = false) } }
     fun gps(status: LocationStatus) {
         if (!mutable.value.followingGps) return
         when (status) {
-            is LocationStatus.Message -> mutable.update { it.copy(gpsStatus = status.text) }
+            is LocationStatus.Message -> mutable.update { it.copy(gpsFresh = false, gpsStatus = status.text) }
             is LocationStatus.Fix -> {
                 val fix = status.value
-                if (fix.ageSeconds > 30) { mutable.update { it.copy(gpsStatus = "GPS fix is stale; waiting for a fresh position") }; return }
+                if (fix.ageSeconds > 30) { mutable.update { it.copy(gpsFresh = false, gpsStatus = "GPS fix is stale; waiting for a fresh position") }; return }
                 gpsAccuracyM = fix.accuracyM.toDouble()
                 lastFixElapsedMs = android.os.SystemClock.elapsedRealtime() - fix.ageSeconds * 1000
-                mutable.update { it.copy(gpsStatus = "GPS ±${fix.accuracyM.toInt()} m · fresh fix") }
+                mutable.update { it.copy(gpsFresh = true, gpsStatus = "GPS ±${fix.accuracyM.toInt()} m · fresh fix") }
                 val previous = lastGpsPoint
                 if (previous == null || Geography.distance(previous, fix.point) >= maxOf(30.0, gpsAccuracyM)) {
                     lastGpsPoint = fix.point

@@ -3,18 +3,20 @@
 An Android hiking companion that identifies mountain peaks from local elevation
 and peak data. Kotlin, Jetpack Compose, CameraX, coroutines, Room, and DataStore.
 
-The app opens with a clearly labelled fictional landscape. Import a prepared
-SRTM/OSM region to work with real terrain. Real region data is not yet bundled.
+The app opens in **Live camera** mode. Enable the rear camera, install a prepared
+SRTM/OSM offline region, and choose **Use my location**. Peak labels use terrain
+visibility, GPS, true-north heading, pitch, roll, and the camera preview transform.
+Real region data is not yet bundled; without a region the camera shows setup help.
 
-- Drag the panorama or use left/right controls to look around.
-- Tap a labelled summit, or open **Peaks**, for elevation, distance, and visibility.
-- Choose a manual viewpoint or use GPS within an installed region.
-- Enable compass alignment; use Settings for calibration, phone height, and units.
+- Tap a peak label for its elevation, distance, and visibility estimate.
+- Use **−1° / +1° / Reset** to adjust compass alignment.
+- Switch to **Panorama** to explore terrain without the camera or with a manual viewpoint.
+- The **Explorer demo** contains fictional peaks and never overlays them on live video.
 - Open **Regions** to import, download, select, inspect, or delete offline packs.
 
-Terrain visibility is an estimate; missing terrain is unknown and borderline
-results are marked uncertain. Clouds and vegetation are outside the DEM model.
-Camera overlay is a later optional feature and is not wired into the current UI.
+Labels are sensor-based estimates, without image recognition. Compass interference,
+lens metadata, GPS error, clouds, and vegetation can affect alignment or visibility.
+Device and outdoor validation are still needed before relying on peak identities.
 
 ## Development
 

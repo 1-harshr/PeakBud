@@ -11,6 +11,15 @@ import org.junit.Test
 class PanoramaNavigationTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
+    @Test fun cameraIsDefaultAndPanoramaRemainsAvailable() {
+        compose.onNodeWithText("Live camera").assertIsDisplayed()
+        compose.onNodeWithText("Align labels").assertIsDisplayed()
+        compose.onNodeWithText("Panorama").performClick()
+        compose.onNodeWithText("Viewpoint").assertIsDisplayed()
+        compose.onNodeWithText("Live camera").performClick()
+        compose.onNodeWithText("Align labels").assertIsDisplayed()
+    }
+
     @Test fun manualDemoAndOfflineRegionEntryPointsRemainAvailable() {
         compose.onNodeWithText("Find your horizon.").assertIsDisplayed()
         compose.onNodeWithText("Peaks").performClick()

@@ -8,7 +8,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlin.math.*
 
-data class DevicePose(val magneticHeading: Double, val pitch: Double, val reliable: Boolean, val message: String? = null, val available: Boolean = true)
+data class DevicePose(val magneticHeading: Double, val pitch: Double, val reliable: Boolean, val message: String? = null, val available: Boolean = true, val roll: Double = 0.0, val cameraUsable: Boolean = true)
 
 class AndroidOrientationProvider(context: Context) {
     private val manager = context.getSystemService(SensorManager::class.java)
@@ -53,7 +53,7 @@ class AndroidOrientationProvider(context: Context) {
                 val heading = Geography.wrap360(Math.toDegrees(atan2(east, north)))
                 val pitch = if (flat) 0.0 else Math.toDegrees(asin((-remapped[8]).toDouble().coerceIn(-1.0, 1.0)))
                 trySend(DevicePose(heading, pitch, accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM,
-                    if (accuracy < SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) "Compass needs calibration. Move the phone in a figure eight, away from metal." else null))
+                    if (accuracy < SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) "Compass needs calibration. Move the phone in a figure eight, away from metal." else null, roll = Math.toDegrees(atan2(remapped[6].toDouble(), remapped[7].toDouble())), cameraUsable = !flat))
             }
         }
         val registered = if (rotation != null) manager.registerListener(listener, rotation, SensorManager.SENSOR_DELAY_GAME)
