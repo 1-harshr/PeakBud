@@ -38,11 +38,12 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         val heading = state.heading
         fun project(b: Double, e: Double) = PanoramaProjector.project(b, e, heading, state.pitch, w, h, state.fov)
         val compassBand = 40 * density
+        val elevationLabels = mutableListOf<Pair<Float, String>>()
         for (angle in -20..40 step 10) {
             val y = project(heading, angle.toDouble()).y
             if (y in (compassBand + 14 * density)..(h - 28 * density)) {
                 drawLine(Color(0x18516B5A), Offset(0f, y), Offset(w, y), 1f)
-                drawContext.canvas.nativeCanvas.drawText("$angle°", 10 * density, y - 4 * density, paint)
+                elevationLabels += y to "$angle°"
             }
         }
         for (b in 0 until 360 step 15) {
@@ -82,7 +83,12 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
             it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN
         }.mapNotNull { peak -> peak.elevationDeg?.let { peak to project(peak.bearingDeg, it) } }
             .filter { it.second.x in 8f..(w - 8f) && it.second.y in compassBand..h }.sortedBy { it.first.distanceM }
+        val maxCards = 5
         for ((peak, point) in peaks) {
+            if (occupied.size >= maxCards) {
+                drawCircle(Color(0xCCF8F7E9), 3 * density, Offset(point.x, point.y))
+                continue
+            }
             paint.textSize = 11 * density
             val label = peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else ""
             val heightText = peak.peak.publishedHeightM?.let { height(it, state) }
@@ -109,9 +115,18 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
             drawContext.canvas.nativeCanvas.drawText(detail, card.left + 8 * density, card.top + 32 * density, paint)
             hits += card to peak
         }
+        paint.textSize = 11 * density
+        paint.color = 0xFF526A60.toInt()
+        // Labels sit against the sky only: skip any covered by a card or by the terrain at the left edge.
+        val skylineAtEdge = samples.filter { it.first.complete }.minByOrNull { abs(it.second.x - 14 * density) }?.second?.y ?: h
+        for ((y, text) in elevationLabels) {
+            val box = RectF(6 * density, y - 14 * density, 10 * density + paint.measureText(text), y)
+            if (y > skylineAtEdge - 2 * density) continue
+            if (occupied.none { RectF.intersects(it, box) }) drawContext.canvas.nativeCanvas.drawText(text, 10 * density, y - 4 * density, paint)
+        }
         paint.textSize = 10 * density
         paint.color = 0xFF566F60.toInt()
-        val bottom = if (state.isDemo) "FICTIONAL LANDSCAPE · EXPLORE THE CONTROLS" else "TERRAIN MODEL · ${(state.scene?.radiusM ?: 0.0).toInt() / 1000} KM RANGE"
+        val bottom = if (state.isDemo) "FICTIONAL LANDSCAPE · DRAG TO LOOK AROUND" else "TERRAIN MODEL · ${(state.scene?.radiusM ?: 0.0).toInt() / 1000} KM · DRAG TO LOOK AROUND"
         drawContext.canvas.nativeCanvas.drawText(bottom, 14 * density, h - 14 * density, paint)
     }
 }
