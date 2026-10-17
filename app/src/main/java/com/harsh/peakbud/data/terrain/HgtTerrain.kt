@@ -5,20 +5,26 @@ import java.io.File
 import java.io.RandomAccessFile
 import kotlin.math.*
 
-/** HGT access with at most four open tiles, 48 MiB of height blocks and 4 MiB of read buffers. */
+/** HGT access with four open files, 48 MiB of height blocks and 4 MiB of read buffers.
+ * Numeric tile keys and cursors for the last tile/block avoid repeated lookup and
+ * string allocation on the millions of adjacent samples along sightlines.
+ */
 class HgtTerrain(private val directory: File, private val bounds: GeoBounds) : Terrain {
     override val datum = VerticalDatum.EGM96
     override val resolutionM = 30.0
     override val heightErrorM = 15.0 // Conservative prototype estimate, not a dataset accuracy guarantee.
-    private val tiles = object : LinkedHashMap<String, Tile>(4, 0.75f, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Tile>?): Boolean {
+    private val tiles = object : LinkedHashMap<Int, Tile>(4, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Int, Tile>?): Boolean {
             if (size <= 4) return false
             eldest?.value?.close()
             return true
         }
     }
-    private val absent = mutableSetOf<String>()
-    private val corrupt = mutableSetOf<String>()
+    private val absent = mutableSetOf<Int>()
+    private val corrupt = mutableSetOf<Int>()
+
+    private var lastKey: Int = Int.MIN_VALUE
+    private var lastTile: Tile? = null
 
     @Synchronized
     override fun sample(point: GeoPoint): TerrainSample {
@@ -26,19 +32,28 @@ class HgtTerrain(private val directory: File, private val bounds: GeoBounds) : T
         val latitude = floor(point.latitude).toInt().coerceAtMost(89)
         val normalizedLongitude = if (point.longitude == 180.0) -180.0 else point.longitude
         val longitude = floor(normalizedLongitude).toInt()
-        val latitudes = if (point.latitude == latitude.toDouble() && latitude > -90) listOf(latitude, latitude - 1) else listOf(latitude)
-        val longitudes = if (normalizedLongitude == longitude.toDouble()) listOf(longitude, if (longitude == -180) 179 else longitude - 1) else listOf(longitude)
+        // Integer-coordinate borders may be served by the neighbouring tile.
+        // Keep the previous fallback order, including the ±180° seam.
+        val latitudeCount = if (point.latitude == latitude.toDouble() && latitude > -90) 2 else 1
+        val longitudeCount = if (normalizedLongitude == longitude.toDouble()) 2 else 1
         var invalid = false
-        for (lat in latitudes) for (lon in longitudes) {
-            val name = tileName(lat, lon)
-            if (name in corrupt) { invalid = true; continue }
-            if (name in absent) continue
-            val tile = tiles[name] ?: run {
-                val file = File(directory, name)
-                if (!file.isFile) { absent += name; null }
-                else try { Tile(file).also { tiles[name] = it } }
-                catch (_: Exception) { corrupt += name; invalid = true; null }
-            } ?: continue
+        for (latIndex in 0 until latitudeCount) for (lonIndex in 0 until longitudeCount) {
+            val lat = latitude - latIndex
+            val lon = if (lonIndex == 0) longitude else if (longitude == -180) 179 else longitude - 1
+            val key = (lat + 90) * 360 + lon + 180
+            val tile = if (lastKey == key) lastTile else {
+                if (key in corrupt) { invalid = true; continue }
+                if (key in absent) continue
+                tiles[key] ?: run {
+                    val file = File(directory, tileName(lat, lon))
+                    if (!file.isFile) { absent += key; null }
+                    else try { Tile(file).also { tiles[key] = it } }
+                    catch (_: Exception) { corrupt += key; invalid = true; null }
+                }
+            }
+            if (tile == null) continue
+            lastKey = key
+            lastTile = tile
             val longitudeDelta = ((normalizedLongitude - lon) + 360) % 360
             val x = longitudeDelta * (tile.side - 1)
             val y = (lat + 1 - point.latitude) * (tile.side - 1)
@@ -48,7 +63,7 @@ class HgtTerrain(private val directory: File, private val bounds: GeoBounds) : T
     }
 
     @Synchronized
-    override fun close() { tiles.values.forEach { it.close() }; tiles.clear(); absent.clear(); corrupt.clear() }
+    override fun close() { tiles.values.forEach { it.close() }; tiles.clear(); absent.clear(); corrupt.clear(); lastKey = Int.MIN_VALUE; lastTile = null }
 
     private class Tile(file: File) : AutoCloseable {
         val side = when (file.length()) {
@@ -62,10 +77,13 @@ class HgtTerrain(private val directory: File, private val bounds: GeoBounds) : T
         private val blocks = object : LinkedHashMap<Int, ShortArray>(384, 0.75f, true) {
             override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Int, ShortArray>?): Boolean = size > 384
         }
+        private var lastBlockKey = -1
+        private var lastBlock: ShortArray? = null
         private fun value(row: Int, column: Int): Short {
             val blockRow = row / 128
             val blockColumn = column / 128
-            val block = blocks.getOrPut(blockRow * 32 + blockColumn) {
+            val key = blockRow * 32 + blockColumn
+            val block = if (key == lastBlockKey) lastBlock!! else blocks.getOrPut(key) {
                 val top = blockRow * 128
                 val left = blockColumn * 128
                 val width = min(128, side - left)
@@ -81,6 +99,8 @@ class HgtTerrain(private val directory: File, private val bounds: GeoBounds) : T
                 }
                 values
             }
+            lastBlockKey = key
+            lastBlock = block
             return block[(row % 128) * 128 + column % 128]
         }
         fun interpolate(x: Double, y: Double): TerrainSample {
@@ -94,7 +114,7 @@ class HgtTerrain(private val directory: File, private val bounds: GeoBounds) : T
             val fy = y - top
             return TerrainSample.Valid((a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy)
         }
-        override fun close() { input.close(); blocks.clear() }
+        override fun close() { input.close(); blocks.clear(); lastBlock = null; lastBlockKey = -1 }
     }
 
     companion object {
