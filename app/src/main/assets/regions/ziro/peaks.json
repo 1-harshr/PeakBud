@@ -1,0 +1,62 @@
+[
+  {
+    "id": "geonames:1252780",
+    "name": "Yarbo Po",
+    "latitude": 27.7001,
+    "longitude": 93.75513,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1252780/",
+    "modified": "2024-01-06",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:1258062",
+    "name": "Romta",
+    "latitude": 27.96667,
+    "longitude": 93.98333,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1258062/",
+    "modified": "2024-01-06",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:1264712",
+    "name": "Lulupo",
+    "latitude": 27.43333,
+    "longitude": 93.41667,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1264712/",
+    "modified": "2024-01-06",
+    "featureCode": "PK"
+  },
+  {
+    "id": "geonames:1265326",
+    "name": "Ladu",
+    "latitude": 27.90098,
+    "longitude": 93.76064,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1265326/",
+    "modified": "2024-01-06",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:1266537",
+    "name": "Kimin",
+    "latitude": 27.38333,
+    "longitude": 93.93333,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1266537/",
+    "modified": "2024-01-06",
+    "featureCode": "MT"
+  }
+]

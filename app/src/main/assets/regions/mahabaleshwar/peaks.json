@@ -1,0 +1,38 @@
+[
+  {
+    "id": "geonames:1254293",
+    "name": "Titvi",
+    "latitude": 18.36667,
+    "longitude": 73.01667,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1254293/",
+    "modified": "2024-01-06",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:1267707",
+    "name": "Karnāla",
+    "latitude": 18.9,
+    "longitude": 73.11667,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1267707/",
+    "modified": "2024-01-06",
+    "featureCode": "PK"
+  },
+  {
+    "id": "geonames:1268275",
+    "name": "Kamalgarh",
+    "latitude": 17.9673,
+    "longitude": 73.7449,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1268275/",
+    "modified": "2024-01-06",
+    "featureCode": "MT"
+  }
+]

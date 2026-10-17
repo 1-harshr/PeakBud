@@ -1,0 +1,62 @@
+[
+  {
+    "id": "geonames:1201828",
+    "name": "Gurusa Taung",
+    "latitude": 23.03736,
+    "longitude": 92.309,
+    "elevationM": 425,
+    "countryCode": "BD",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1201828/",
+    "modified": "2016-11-09",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:1205770",
+    "name": "Chipui Tlāng",
+    "latitude": 23.47071,
+    "longitude": 92.2604,
+    "elevationM": 477,
+    "countryCode": "BD",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1205770/",
+    "modified": "2016-11-09",
+    "featureCode": "PK"
+  },
+  {
+    "id": "geonames:1267010",
+    "name": "Khān Tlāng",
+    "latitude": 23.72444,
+    "longitude": 92.26927,
+    "elevationM": 681,
+    "countryCode": "BD",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1267010/",
+    "modified": "2012-01-17",
+    "featureCode": "PK"
+  },
+  {
+    "id": "geonames:1269194",
+    "name": "Jāri Mura",
+    "latitude": 23.52611,
+    "longitude": 91.7625,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1269194/",
+    "modified": "2024-01-06",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:7477183",
+    "name": "Lungphun Tlāng",
+    "latitude": 23.34865,
+    "longitude": 92.31471,
+    "elevationM": 341,
+    "countryCode": "BD",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/7477183/",
+    "modified": "2016-11-09",
+    "featureCode": "PK"
+  }
+]

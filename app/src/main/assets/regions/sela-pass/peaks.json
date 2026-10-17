@@ -1,0 +1,38 @@
+[
+  {
+    "id": "geonames:1268079",
+    "name": "Kanggardo Rizê",
+    "latitude": 27.86571,
+    "longitude": 92.53136,
+    "elevationM": 7060,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1268079/",
+    "modified": "2024-05-17",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:12809188",
+    "name": "Chiumo",
+    "latitude": 27.90996,
+    "longitude": 92.62562,
+    "elevationM": 6890,
+    "countryCode": "CN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/12809188/",
+    "modified": "2024-05-17",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:7898027",
+    "name": "Bailin Laze",
+    "latitude": 27.8,
+    "longitude": 91.5,
+    "elevationM": null,
+    "countryCode": "CN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/7898027/",
+    "modified": "2024-07-12",
+    "featureCode": "PK"
+  }
+]

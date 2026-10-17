@@ -1,0 +1,22 @@
+PeakBud Gangtok · Tashi Viewpoint · catalog version 1
+Terrain: Mapzen/Tilezen Skadi, 1 arc-second HGT, WGS84 / EGM96.
+Global SRTM and GMTED2010 terrain data courtesy of the U.S. Geological Survey.
+Mapzen / Tilezen: https://github.com/tilezen/joerd
+Source and attribution: https://github.com/tilezen/joerd/blob/master/docs/attribution.md
+Format: https://github.com/tilezen/joerd/blob/master/docs/formats.md
+Terrain tiles may combine SRTM and other source data; not labelled NASA SRTMGL1 v003.
+Verified tile downloads: 2026-10-17. Source bytes are pinned by SHA-256 in this app.
+Peak names/coordinates: GeoNames, https://www.geonames.org/ (CC BY 4.0).
+License: https://creativecommons.org/licenses/by/4.0/
+Country dumps retrieved 2026-10-17:
+https://download.geonames.org/export/dump/IN.zip  SHA-256 9e6374d0fe7d9a5268a432daa9aba6f5a545041c05ea6e67c9427edefc93a5ba
+https://download.geonames.org/export/dump/NP.zip  SHA-256 e34491a77b4bd613b96d8264872c5e5f7db237720405a0cde27f6a5ce3dd7f1c
+https://download.geonames.org/export/dump/BT.zip  SHA-256 89312c7517f7ce0664cbd566a27db6f572409cbabf53347d3c7c17adcaef707b
+https://download.geonames.org/export/dump/CN.zip  SHA-256 5b6dfb4e9c2d88ba0f01b41552954b6ad8af3833ce6e42ccac1242304e204e45
+
+Changes: selected single-mountain/peak records (MT/PK; HLL also included for broad hill regions), clipped to terrain bounds,
+normalized fields, retained IDs/source links/modification dates; absent elevation stays null.
+The GeoNames DEM column is not used as a published summit elevation.
+Data is provided as is. Coverage and summit positions require field validation.
+Tile source URLs:
+https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E088.hgt.gz

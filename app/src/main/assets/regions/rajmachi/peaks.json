@@ -1,0 +1,62 @@
+[
+  {
+    "id": "geonames:1254293",
+    "name": "Titvi",
+    "latitude": 18.36667,
+    "longitude": 73.01667,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1254293/",
+    "modified": "2024-01-06",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:1264159",
+    "name": "Malangarh",
+    "latitude": 19.10959,
+    "longitude": 73.17831,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1264159/",
+    "modified": "2024-01-06",
+    "featureCode": "PK"
+  },
+  {
+    "id": "geonames:1267707",
+    "name": "Karnāla",
+    "latitude": 18.9,
+    "longitude": 73.11667,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1267707/",
+    "modified": "2024-01-06",
+    "featureCode": "PK"
+  },
+  {
+    "id": "geonames:1268318",
+    "name": "Kalsūbai",
+    "latitude": 19.59973,
+    "longitude": 73.707,
+    "elevationM": 1646,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1268318/",
+    "modified": "2024-01-06",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:1270323",
+    "name": "Harischandragarh",
+    "latitude": 19.38643,
+    "longitude": 73.77808,
+    "elevationM": 1422,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1270323/",
+    "modified": "2024-01-06",
+    "featureCode": "MT"
+  }
+]

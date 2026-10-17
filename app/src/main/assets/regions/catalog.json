@@ -2296,6 +2296,3578 @@
       }
     },
     {
+      "id": "tawang",
+      "country": "India",
+      "description": "Tawang monastery and the eastern Himalaya · Arunachal Pradesh",
+      "assetDirectory": "regions/tawang",
+      "tiles": [
+        {
+          "path": "terrain/N27E091.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E091.hgt.gz",
+          "downloadBytes": 19126766,
+          "downloadSha256": "04080bf218828833b5533e58a6b0548a03c66efc364e0a39f7e9b3f9156a0ec2"
+        },
+        {
+          "path": "terrain/N27E092.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E092.hgt.gz",
+          "downloadBytes": 19070511,
+          "downloadSha256": "a53bbd5fd83a75d512201c335bd14b81ea8a986c989510777743c0846625b1fb"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "tawang",
+        "name": "Tawang",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.556,
+          "west": 91.839,
+          "north": 27.616,
+          "east": 91.899
+        },
+        "terrainBounds": {
+          "south": 27,
+          "west": 91,
+          "north": 28,
+          "east": 93
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 27.586,
+          "longitude": 91.869,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N27E091.hgt",
+            "size": 25934402,
+            "sha256": "aa55fc7e66bd3dd75d393b127eaf241ee8bb5a36365b7a76a8897c6552b82bbe"
+          },
+          {
+            "path": "terrain/N27E092.hgt",
+            "size": 25934402,
+            "sha256": "75c58f5125a51c3644a4cfe84b1686574a1626cea0c873cb2d9666e8f382d547"
+          },
+          {
+            "path": "peaks.json",
+            "size": 937,
+            "sha256": "32052f9158711e6befebf8aa69da06c75bf38074e73ab08b78e009391431bc6a"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1866,
+            "sha256": "362deed34b825b69989cd3b98e6820c1a7ddbf3cc35a489e638cc76790bfdb1e"
+          }
+        ]
+      }
+    },
+    {
+      "id": "sela-pass",
+      "country": "India",
+      "description": "Sela Lake and pass on the Tawang road · Arunachal Pradesh",
+      "assetDirectory": "regions/sela-pass",
+      "tiles": [
+        {
+          "path": "terrain/N27E091.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E091.hgt.gz",
+          "downloadBytes": 19126766,
+          "downloadSha256": "04080bf218828833b5533e58a6b0548a03c66efc364e0a39f7e9b3f9156a0ec2"
+        },
+        {
+          "path": "terrain/N27E092.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E092.hgt.gz",
+          "downloadBytes": 19070511,
+          "downloadSha256": "a53bbd5fd83a75d512201c335bd14b81ea8a986c989510777743c0846625b1fb"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "sela-pass",
+        "name": "Sela Pass",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.475,
+          "west": 92.074,
+          "north": 27.535,
+          "east": 92.134
+        },
+        "terrainBounds": {
+          "south": 27,
+          "west": 91,
+          "north": 28,
+          "east": 93
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 27.505,
+          "longitude": 92.104,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N27E091.hgt",
+            "size": 25934402,
+            "sha256": "aa55fc7e66bd3dd75d393b127eaf241ee8bb5a36365b7a76a8897c6552b82bbe"
+          },
+          {
+            "path": "terrain/N27E092.hgt",
+            "size": 25934402,
+            "sha256": "75c58f5125a51c3644a4cfe84b1686574a1626cea0c873cb2d9666e8f382d547"
+          },
+          {
+            "path": "peaks.json",
+            "size": 937,
+            "sha256": "32052f9158711e6befebf8aa69da06c75bf38074e73ab08b78e009391431bc6a"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1869,
+            "sha256": "c641b976a749e3dba9a69196b47207fac8a40e4a3590f47fd7f974971d19bea6"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ziro",
+      "country": "India",
+      "description": "Ziro plateau and surrounding ridges · Arunachal Pradesh",
+      "assetDirectory": "regions/ziro",
+      "tiles": [
+        {
+          "path": "terrain/N27E093.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E093.hgt.gz",
+          "downloadBytes": 17544812,
+          "downloadSha256": "321a01e9ff8a7fdf7c80cc11e180e7aa3c43a9d68229518be3c506f286bdf5de"
+        },
+        {
+          "path": "terrain/N27E094.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E094.hgt.gz",
+          "downloadBytes": 11005512,
+          "downloadSha256": "75332aefbbfb18ed9d735a024e6aeb95fe43776981c0ef12f11ac755dc883998"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "ziro",
+        "name": "Ziro Valley",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.514,
+          "west": 93.798,
+          "north": 27.574,
+          "east": 93.858
+        },
+        "terrainBounds": {
+          "south": 27,
+          "west": 93,
+          "north": 28,
+          "east": 95
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 27.544,
+          "longitude": 93.828,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N27E093.hgt",
+            "size": 25934402,
+            "sha256": "2f48980806e9e7e107bd40083a189c4ede5abbf4bbc36a6affefaba27ae59f67"
+          },
+          {
+            "path": "terrain/N27E094.hgt",
+            "size": 25934402,
+            "sha256": "ba58d6d128968d60800d01ea34d33d86f3e6db93b5979c607ebf7c77d20b0371"
+          },
+          {
+            "path": "peaks.json",
+            "size": 1544,
+            "sha256": "c3212d82fde8436c4f482b3290a27f86a39d19b6a56fe0b906282732437709a0"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1871,
+            "sha256": "be32c9ce49f8495550aae3e5743bc35bf89a9e7a0399abc856f7fe71c5fde088"
+          }
+        ]
+      }
+    },
+    {
+      "id": "shillong-peak",
+      "country": "India",
+      "description": "Shillong Peak viewpoint · Meghalaya",
+      "assetDirectory": "regions/shillong-peak",
+      "tiles": [
+        {
+          "path": "terrain/N25E091.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E091.hgt.gz",
+          "downloadBytes": 12948923,
+          "downloadSha256": "ccb45d61537cb5c40b8ac3ef5e12f23ff9e5ff2ffc158ee50789229eb61406b8"
+        },
+        {
+          "path": "terrain/N25E092.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E092.hgt.gz",
+          "downloadBytes": 13920607,
+          "downloadSha256": "5a0f433b84b4e4d5cf9cb9fcafa4803f6ec9d06cdc3d2f4dd15ca8f0c325d13d"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "shillong-peak",
+        "name": "Shillong Peak",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 25.505,
+          "west": 91.845,
+          "north": 25.565,
+          "east": 91.905
+        },
+        "terrainBounds": {
+          "south": 25,
+          "west": 91,
+          "north": 26,
+          "east": 93
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 25.535,
+          "longitude": 91.875,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N25E091.hgt",
+            "size": 25934402,
+            "sha256": "c6e18332e0dabf5ae60b2d7cf0a6487f818ecb3f5694a4adcfb35ca12bd17191"
+          },
+          {
+            "path": "terrain/N25E092.hgt",
+            "size": 25934402,
+            "sha256": "8a3803713b57c9da87b82bd383ee70b730a161d90b7ed7eb2bd4765d4f153c8b"
+          },
+          {
+            "path": "peaks.json",
+            "size": 939,
+            "sha256": "0a934e2c99c2d8ab9b13b7d2a5ef4cffcc1b904de8fd9f232d20a44acae0c69e"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1873,
+            "sha256": "56fd5a45e14c4410a8f9eb3f95814aaf7515df26b180bfdcbe9768596719e9bc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "sohra",
+      "country": "India",
+      "description": "Cherrapunji cliffs and the Khasi hills · Meghalaya",
+      "assetDirectory": "regions/sohra",
+      "tiles": [
+        {
+          "path": "terrain/N24E091.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E091.hgt.gz",
+          "downloadBytes": 6650341,
+          "downloadSha256": "444d3344bc40cb979b2050b89af29b5acfa68e6e253c6334c3692f1d79d25051"
+        },
+        {
+          "path": "terrain/N24E092.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E092.hgt.gz",
+          "downloadBytes": 10571369,
+          "downloadSha256": "8f7e1cb4c2acdeca5b757beb10349522b7540258e768f2630aac99b2ed20407a"
+        },
+        {
+          "path": "terrain/N25E091.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E091.hgt.gz",
+          "downloadBytes": 12948923,
+          "downloadSha256": "ccb45d61537cb5c40b8ac3ef5e12f23ff9e5ff2ffc158ee50789229eb61406b8"
+        },
+        {
+          "path": "terrain/N25E092.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E092.hgt.gz",
+          "downloadBytes": 13920607,
+          "downloadSha256": "5a0f433b84b4e4d5cf9cb9fcafa4803f6ec9d06cdc3d2f4dd15ca8f0c325d13d"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "sohra",
+        "name": "Sohra · Cherrapunji",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 25.24,
+          "west": 91.7,
+          "north": 25.3,
+          "east": 91.76
+        },
+        "terrainBounds": {
+          "south": 24,
+          "west": 91,
+          "north": 26,
+          "east": 93
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 25.27,
+          "longitude": 91.73,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N24E091.hgt",
+            "size": 25934402,
+            "sha256": "f4ca4d93ebde2bdd01ebe153995d4919e61929670aa978cdd7b2153642b707a8"
+          },
+          {
+            "path": "terrain/N24E092.hgt",
+            "size": 25934402,
+            "sha256": "ea69f1c6eec3d0cb4aa4ae8025b2a10b18461779fe5fd0d16a1ee6ac296ab901"
+          },
+          {
+            "path": "terrain/N25E091.hgt",
+            "size": 25934402,
+            "sha256": "c6e18332e0dabf5ae60b2d7cf0a6487f818ecb3f5694a4adcfb35ca12bd17191"
+          },
+          {
+            "path": "terrain/N25E092.hgt",
+            "size": 25934402,
+            "sha256": "8a3803713b57c9da87b82bd383ee70b730a161d90b7ed7eb2bd4765d4f153c8b"
+          },
+          {
+            "path": "peaks.json",
+            "size": 2517,
+            "sha256": "69498349fe83c2361a7f1b6ff881dc4cb2e848edaeab8582ec23bb026588d838"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 2022,
+            "sha256": "1277285024ea3f22ec4fd70ed4ac000f847b21bf1a075e345f852d326f42df24"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dzukou",
+      "country": "India",
+      "description": "Dzükou valley and Japfu peak · Nagaland",
+      "assetDirectory": "regions/dzukou",
+      "tiles": [
+        {
+          "path": "terrain/N25E093.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E093.hgt.gz",
+          "downloadBytes": 14901922,
+          "downloadSha256": "f9c8cf62ff300a126a9028726079ec547390ed46829ebabeba6e2f9820c1ffe7"
+        },
+        {
+          "path": "terrain/N25E094.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E094.hgt.gz",
+          "downloadBytes": 17614764,
+          "downloadSha256": "ee98b1bfd18167457b753f8fe1e0688f0cb9f9ecea53729066782af10a58d6e7"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "dzukou",
+        "name": "Dzükou Valley",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 25.53,
+          "west": 94.04,
+          "north": 25.59,
+          "east": 94.1
+        },
+        "terrainBounds": {
+          "south": 25,
+          "west": 93,
+          "north": 26,
+          "east": 95
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 25.56,
+          "longitude": 94.07,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N25E093.hgt",
+            "size": 25934402,
+            "sha256": "bcb7c7a5082aab752cb7558cf16c1f1f4458d7a6b8ef7229630c8616ea5acba7"
+          },
+          {
+            "path": "terrain/N25E094.hgt",
+            "size": 25934402,
+            "sha256": "2e41be305a9cbb3ab328177be1d05c680883e4127187eab43fa92fdb6f60e2b0"
+          },
+          {
+            "path": "peaks.json",
+            "size": 5270,
+            "sha256": "1bce5da09786f50158a80c3edc0fe06d9b2c49c6baf2c1e36e1dfa9d38f50d05"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1874,
+            "sha256": "c338ecb8799dfb00c0a6ce111c4a62d42dd1b43439535ea0e239f8fca0a8bdb5"
+          }
+        ]
+      }
+    },
+    {
+      "id": "shirui",
+      "country": "India",
+      "description": "Shirui Kashung peak · Manipur",
+      "assetDirectory": "regions/shirui",
+      "tiles": [
+        {
+          "path": "terrain/N24E094.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E094.hgt.gz",
+          "downloadBytes": 14342589,
+          "downloadSha256": "7d28e289be599d610a265968ef3c42150ca61d715d50dc840008dc438d0258db"
+        },
+        {
+          "path": "terrain/N25E094.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E094.hgt.gz",
+          "downloadBytes": 17614764,
+          "downloadSha256": "ee98b1bfd18167457b753f8fe1e0688f0cb9f9ecea53729066782af10a58d6e7"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "shirui",
+        "name": "Shirui Hill · Ukhrul",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 25.08,
+          "west": 94.42,
+          "north": 25.14,
+          "east": 94.48
+        },
+        "terrainBounds": {
+          "south": 24,
+          "west": 94,
+          "north": 26,
+          "east": 95
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 25.11,
+          "longitude": 94.45,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N24E094.hgt",
+            "size": 25934402,
+            "sha256": "5508a0b021d5ada9c51507d3fa973960a7ab360d400e3770800e2b05f48839bc"
+          },
+          {
+            "path": "terrain/N25E094.hgt",
+            "size": 25934402,
+            "sha256": "2e41be305a9cbb3ab328177be1d05c680883e4127187eab43fa92fdb6f60e2b0"
+          },
+          {
+            "path": "peaks.json",
+            "size": 7788,
+            "sha256": "36aa7d5e98832a3db9c78eac5ce29f1219e65d0607c52f30cb2a0c7cba32979d"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1881,
+            "sha256": "4a6ed3a4ed4c1900aab35a832bdc0d590f42d9641757350b39c7ad011538ea5e"
+          }
+        ]
+      }
+    },
+    {
+      "id": "phawngpui",
+      "country": "India",
+      "description": "Mizoram's highest peak · Mizoram",
+      "assetDirectory": "regions/phawngpui",
+      "tiles": [
+        {
+          "path": "terrain/N22E092.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E092.hgt.gz",
+          "downloadBytes": 14517418,
+          "downloadSha256": "cd4797ea2dbe54effaf93db3ac8a09606144f5d49eee18e447441a196c370e59"
+        },
+        {
+          "path": "terrain/N22E093.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E093.hgt.gz",
+          "downloadBytes": 17751970,
+          "downloadSha256": "62da54eb415072cfddd1abf4e1babb8d266473ef8c07717ea2681552e8d91812"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "phawngpui",
+        "name": "Phawngpui · Blue Mountain",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 22.6,
+          "west": 93.01,
+          "north": 22.66,
+          "east": 93.07
+        },
+        "terrainBounds": {
+          "south": 22,
+          "west": 92,
+          "north": 23,
+          "east": 94
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 22.63,
+          "longitude": 93.04,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N22E092.hgt",
+            "size": 25934402,
+            "sha256": "7433c37191f66610ceea3f503259821f96ac6f401b41625668bb15dcbacec5d9"
+          },
+          {
+            "path": "terrain/N22E093.hgt",
+            "size": 25934402,
+            "sha256": "bc2a9198a541864c5726cce9983cb43f89c11669ca65dd8d70d48a6feeb1e641"
+          },
+          {
+            "path": "peaks.json",
+            "size": 10671,
+            "sha256": "bf3addb6ea73d8410e00e30024e1f11de502f20208ee0444a4fa9503511586a0"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1886,
+            "sha256": "0359ed3c7bde7c7f7900c9aeb891b4500ccd8843a336b9b9b81f58cfac24c427"
+          }
+        ]
+      }
+    },
+    {
+      "id": "aizawl",
+      "country": "India",
+      "description": "Aizawl ridge and Durtlang hills · Mizoram",
+      "assetDirectory": "regions/aizawl",
+      "tiles": [
+        {
+          "path": "terrain/N23E092.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E092.hgt.gz",
+          "downloadBytes": 15760459,
+          "downloadSha256": "70cecaeb15103cbcd45795774cf7b0ad30e1cfaa87bc9c298e0e11d5567d394e"
+        },
+        {
+          "path": "terrain/N23E093.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E093.hgt.gz",
+          "downloadBytes": 17565674,
+          "downloadSha256": "fda821f5acf83754dcc1243c5cf3ba36311cbde2915e0dbac5fc3bcd9552a762"
+        },
+        {
+          "path": "terrain/N24E092.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E092.hgt.gz",
+          "downloadBytes": 10571369,
+          "downloadSha256": "8f7e1cb4c2acdeca5b757beb10349522b7540258e768f2630aac99b2ed20407a"
+        },
+        {
+          "path": "terrain/N24E093.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E093.hgt.gz",
+          "downloadBytes": 15858065,
+          "downloadSha256": "7b9981e9806ba672d08b301b3b8d3f7cb51d40b56b8a51fe770bdb867d3c04d4"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "aizawl",
+        "name": "Aizawl Hills",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 23.7,
+          "west": 92.69,
+          "north": 23.76,
+          "east": 92.75
+        },
+        "terrainBounds": {
+          "south": 23,
+          "west": 92,
+          "north": 25,
+          "east": 94
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 23.73,
+          "longitude": 92.72,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N23E092.hgt",
+            "size": 25934402,
+            "sha256": "994b76162cbed03f19da0a034e47fad056c0130e027b5fdaa200e604a0d26687"
+          },
+          {
+            "path": "terrain/N23E093.hgt",
+            "size": 25934402,
+            "sha256": "6b1f37df18915defb34295991d1dde47c23d3566628d05bbebf99a0244d2f177"
+          },
+          {
+            "path": "terrain/N24E092.hgt",
+            "size": 25934402,
+            "sha256": "ea69f1c6eec3d0cb4aa4ae8025b2a10b18461779fe5fd0d16a1ee6ac296ab901"
+          },
+          {
+            "path": "terrain/N24E093.hgt",
+            "size": 25934402,
+            "sha256": "7f6b7a0fc738094bd945dba80e342af947e73551db48940489f60eb8fc442c1c"
+          },
+          {
+            "path": "peaks.json",
+            "size": 11581,
+            "sha256": "206ad820559afe95b670f82e0c10b8169e1f87e014debfbfbe125c924d8d722a"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 2014,
+            "sha256": "0bea35fc30ce4e7fe6cc0da29c925297e13beed0767be052c63042bc654c33d8"
+          }
+        ]
+      }
+    },
+    {
+      "id": "jampui",
+      "country": "India",
+      "description": "Betlingshib and the Jampui range · Tripura",
+      "assetDirectory": "regions/jampui",
+      "tiles": [
+        {
+          "path": "terrain/N23E091.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E091.hgt.gz",
+          "downloadBytes": 9660858,
+          "downloadSha256": "0cd4fbbbcba314caf34d5677f3d751cee207396c343b9bba3a480b8717c9af2c"
+        },
+        {
+          "path": "terrain/N23E092.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E092.hgt.gz",
+          "downloadBytes": 15760459,
+          "downloadSha256": "70cecaeb15103cbcd45795774cf7b0ad30e1cfaa87bc9c298e0e11d5567d394e"
+        },
+        {
+          "path": "terrain/N24E091.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E091.hgt.gz",
+          "downloadBytes": 6650341,
+          "downloadSha256": "444d3344bc40cb979b2050b89af29b5acfa68e6e253c6334c3692f1d79d25051"
+        },
+        {
+          "path": "terrain/N24E092.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E092.hgt.gz",
+          "downloadBytes": 10571369,
+          "downloadSha256": "8f7e1cb4c2acdeca5b757beb10349522b7540258e768f2630aac99b2ed20407a"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "jampui",
+        "name": "Jampui Hills",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 23.87,
+          "west": 92.24,
+          "north": 23.93,
+          "east": 92.3
+        },
+        "terrainBounds": {
+          "south": 23,
+          "west": 91,
+          "north": 25,
+          "east": 93
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 23.9,
+          "longitude": 92.27,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N23E091.hgt",
+            "size": 25934402,
+            "sha256": "76cce629b90ef510387807cf339910a44f29855e233bcf996e76ad60177b7003"
+          },
+          {
+            "path": "terrain/N23E092.hgt",
+            "size": 25934402,
+            "sha256": "994b76162cbed03f19da0a034e47fad056c0130e027b5fdaa200e604a0d26687"
+          },
+          {
+            "path": "terrain/N24E091.hgt",
+            "size": 25934402,
+            "sha256": "f4ca4d93ebde2bdd01ebe153995d4919e61929670aa978cdd7b2153642b707a8"
+          },
+          {
+            "path": "terrain/N24E092.hgt",
+            "size": 25934402,
+            "sha256": "ea69f1c6eec3d0cb4aa4ae8025b2a10b18461779fe5fd0d16a1ee6ac296ab901"
+          },
+          {
+            "path": "peaks.json",
+            "size": 1571,
+            "sha256": "59bbc3774b1c462479ecda337062a7f503df17fb485de32fccb8a5f9571ccf63"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 2014,
+            "sha256": "dfc3febe0180ef5d94d92aec8228a3ec6a38cf4569541d62743fe5d2975faa22"
+          }
+        ]
+      }
+    },
+    {
+      "id": "gangtok",
+      "country": "India",
+      "description": "Gangtok views of Kangchenjunga · Sikkim",
+      "assetDirectory": "regions/gangtok",
+      "tiles": [
+        {
+          "path": "terrain/N27E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E088.hgt.gz",
+          "downloadBytes": 19126851,
+          "downloadSha256": "7fe3800064057256cc431a0d7d7258899b251b8facc355c3c45d93ad5d127ee1"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "gangtok",
+        "name": "Gangtok · Tashi Viewpoint",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.32,
+          "west": 88.59,
+          "north": 27.38,
+          "east": 88.65
+        },
+        "terrainBounds": {
+          "south": 27,
+          "west": 88,
+          "north": 28,
+          "east": 89
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 27.35,
+          "longitude": 88.62,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N27E088.hgt",
+            "size": 25934402,
+            "sha256": "ee9422b5141d21a2db47a5719a89df00968bd81e4c0631bbf31a33ab6da34322"
+          },
+          {
+            "path": "peaks.json",
+            "size": 25476,
+            "sha256": "cacd530738ed3ee82c3e447c1a13c1de77c7c7f0d74a0c22f53f50b685df1c67"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1692,
+            "sha256": "cf18b55543d94531c9a58bfbaecb37386a50bd1d51a161d42904e7bf8096deb4"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pelling",
+      "country": "India",
+      "description": "Pelling and Kangchenjunga views · Sikkim",
+      "assetDirectory": "regions/pelling",
+      "tiles": [
+        {
+          "path": "terrain/N26E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E087.hgt.gz",
+          "downloadBytes": 8234027,
+          "downloadSha256": "05095600ef48793ce1b84157b40c6aa09cf8a63073a275c4fdfe038712f330e6"
+        },
+        {
+          "path": "terrain/N26E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E088.hgt.gz",
+          "downloadBytes": 7777876,
+          "downloadSha256": "026a48813c3363b52bfce9ed71404387cbfeeae2d77944c96cadbaefb0780ebe"
+        },
+        {
+          "path": "terrain/N27E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E087.hgt.gz",
+          "downloadBytes": 19090522,
+          "downloadSha256": "6ba4d52b6943221995ee0301076235336e4934905fab98aa921af425550e3cee"
+        },
+        {
+          "path": "terrain/N27E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E088.hgt.gz",
+          "downloadBytes": 19126851,
+          "downloadSha256": "7fe3800064057256cc431a0d7d7258899b251b8facc355c3c45d93ad5d127ee1"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "pelling",
+        "name": "Pelling",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.27,
+          "west": 88.21,
+          "north": 27.33,
+          "east": 88.27
+        },
+        "terrainBounds": {
+          "south": 26,
+          "west": 87,
+          "north": 28,
+          "east": 89
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 27.3,
+          "longitude": 88.24,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N26E087.hgt",
+            "size": 25934402,
+            "sha256": "d7bce7fe40fb98ea7c4f195268e81dd784aa41febebb781bb4b3bb3bd406d47b"
+          },
+          {
+            "path": "terrain/N26E088.hgt",
+            "size": 25934402,
+            "sha256": "7b7c3df7d07d2785d4ffd51b6090b62f5ae43a50d0f473a5b9fb304337214a89"
+          },
+          {
+            "path": "terrain/N27E087.hgt",
+            "size": 25934402,
+            "sha256": "fc37e9eda5856c60efc298716091afa7ac7c2813f4ebf70ff4bbfedd2695cd3f"
+          },
+          {
+            "path": "terrain/N27E088.hgt",
+            "size": 25934402,
+            "sha256": "ee9422b5141d21a2db47a5719a89df00968bd81e4c0631bbf31a33ab6da34322"
+          },
+          {
+            "path": "peaks.json",
+            "size": 59615,
+            "sha256": "e2155d6b1267f77a250f9b1de5d5c5e2d00fb28bea90a8b268bda0cfa73a69e8"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1886,
+            "sha256": "58ff51fe4941dec8bcf36871da25b81dd52e0776b9202585e6f3b6a7a590719f"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yumthang",
+      "country": "India",
+      "description": "Yumthang and Lachung valleys · North Sikkim",
+      "assetDirectory": "regions/yumthang",
+      "tiles": [
+        {
+          "path": "terrain/N27E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E088.hgt.gz",
+          "downloadBytes": 19126851,
+          "downloadSha256": "7fe3800064057256cc431a0d7d7258899b251b8facc355c3c45d93ad5d127ee1"
+        },
+        {
+          "path": "terrain/N27E089.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E089.hgt.gz",
+          "downloadBytes": 18595049,
+          "downloadSha256": "9215624415a3f4efb4b708ad3cf26867b55a4c70aba532356198cd026972738d"
+        },
+        {
+          "path": "terrain/N28E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E088.hgt.gz",
+          "downloadBytes": 14463542,
+          "downloadSha256": "00f91737fc11f34bbeb33e8d413f020c54c2c7a0048cf86ff57dfa370ddd9331"
+        },
+        {
+          "path": "terrain/N28E089.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E089.hgt.gz",
+          "downloadBytes": 15335378,
+          "downloadSha256": "16eca079c8e9b9b27fad95094d5900e86f52ea0415fc18455e8714e1ba1cf1f9"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "yumthang",
+        "name": "Yumthang Valley",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.8,
+          "west": 88.67,
+          "north": 27.86,
+          "east": 88.73
+        },
+        "terrainBounds": {
+          "south": 27,
+          "west": 88,
+          "north": 29,
+          "east": 90
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 27.83,
+          "longitude": 88.7,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N27E088.hgt",
+            "size": 25934402,
+            "sha256": "ee9422b5141d21a2db47a5719a89df00968bd81e4c0631bbf31a33ab6da34322"
+          },
+          {
+            "path": "terrain/N27E089.hgt",
+            "size": 25934402,
+            "sha256": "f1bcfa2c5c35090e632b8e50a0d15427151cde78202b93440af467707d3b972c"
+          },
+          {
+            "path": "terrain/N28E088.hgt",
+            "size": 25934402,
+            "sha256": "1b544f90156f4dda78ec1cee36d0bc1ec33e378488519e9d3535204e0b45185d"
+          },
+          {
+            "path": "terrain/N28E089.hgt",
+            "size": 25934402,
+            "sha256": "6ef42c378074e3378b030eef52702fc987c7f347fc25dcb91ffe673c189a60bb"
+          },
+          {
+            "path": "peaks.json",
+            "size": 30731,
+            "sha256": "b122781b84eaa952d62234e325624304602d3173a81e00988dee93e776d0b97f"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1894,
+            "sha256": "36084e9c45b3fb719bb4a7f535aac84e7281a9f4f57f572095d0abca9d1aecfc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dzongri",
+      "country": "India",
+      "description": "Dzongri top on the Goecha La trek · Sikkim",
+      "assetDirectory": "regions/dzongri",
+      "tiles": [
+        {
+          "path": "terrain/N27E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E087.hgt.gz",
+          "downloadBytes": 19090522,
+          "downloadSha256": "6ba4d52b6943221995ee0301076235336e4934905fab98aa921af425550e3cee"
+        },
+        {
+          "path": "terrain/N27E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E088.hgt.gz",
+          "downloadBytes": 19126851,
+          "downloadSha256": "7fe3800064057256cc431a0d7d7258899b251b8facc355c3c45d93ad5d127ee1"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "dzongri",
+        "name": "Dzongri · Goecha La trek",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.45,
+          "west": 88.14,
+          "north": 27.51,
+          "east": 88.2
+        },
+        "terrainBounds": {
+          "south": 27,
+          "west": 87,
+          "north": 28,
+          "east": 89
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 27.48,
+          "longitude": 88.17,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N27E087.hgt",
+            "size": 25934402,
+            "sha256": "fc37e9eda5856c60efc298716091afa7ac7c2813f4ebf70ff4bbfedd2695cd3f"
+          },
+          {
+            "path": "terrain/N27E088.hgt",
+            "size": 25934402,
+            "sha256": "ee9422b5141d21a2db47a5719a89df00968bd81e4c0631bbf31a33ab6da34322"
+          },
+          {
+            "path": "peaks.json",
+            "size": 51786,
+            "sha256": "b30c50bfd049adf66d8fccf79cdc11f10a25d159e264992ec1b51c9285bee579"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1762,
+            "sha256": "6e8b3d2068b6c3ef1aa95f000b6484a939d17ce78fbd83d4e1a0e6f8ebb6f126"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tsomgo",
+      "country": "India",
+      "description": "Tsomgo lake and Nathu La road · Sikkim",
+      "assetDirectory": "regions/tsomgo",
+      "tiles": [
+        {
+          "path": "terrain/N27E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E088.hgt.gz",
+          "downloadBytes": 19126851,
+          "downloadSha256": "7fe3800064057256cc431a0d7d7258899b251b8facc355c3c45d93ad5d127ee1"
+        },
+        {
+          "path": "terrain/N27E089.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E089.hgt.gz",
+          "downloadBytes": 18595049,
+          "downloadSha256": "9215624415a3f4efb4b708ad3cf26867b55a4c70aba532356198cd026972738d"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "tsomgo",
+        "name": "Tsomgo Lake",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.345,
+          "west": 88.73,
+          "north": 27.405,
+          "east": 88.79
+        },
+        "terrainBounds": {
+          "south": 27,
+          "west": 88,
+          "north": 28,
+          "east": 90
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 27.375,
+          "longitude": 88.76,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N27E088.hgt",
+            "size": 25934402,
+            "sha256": "ee9422b5141d21a2db47a5719a89df00968bd81e4c0631bbf31a33ab6da34322"
+          },
+          {
+            "path": "terrain/N27E089.hgt",
+            "size": 25934402,
+            "sha256": "f1bcfa2c5c35090e632b8e50a0d15427151cde78202b93440af467707d3b972c"
+          },
+          {
+            "path": "peaks.json",
+            "size": 27029,
+            "sha256": "3bd1543103ea71079bbb9cccabb4949b268029b93867f591dd4492ec64c289fa"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1748,
+            "sha256": "2c2c9de7e483403638752502717ede77a25efb4792a1ce0de6009e5c28bcaa29"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tiger-hill",
+      "country": "India",
+      "description": "Sunrise over Kangchenjunga · West Bengal",
+      "assetDirectory": "regions/tiger-hill",
+      "tiles": [
+        {
+          "path": "terrain/N26E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E087.hgt.gz",
+          "downloadBytes": 8234027,
+          "downloadSha256": "05095600ef48793ce1b84157b40c6aa09cf8a63073a275c4fdfe038712f330e6"
+        },
+        {
+          "path": "terrain/N26E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E088.hgt.gz",
+          "downloadBytes": 7777876,
+          "downloadSha256": "026a48813c3363b52bfce9ed71404387cbfeeae2d77944c96cadbaefb0780ebe"
+        },
+        {
+          "path": "terrain/N27E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E087.hgt.gz",
+          "downloadBytes": 19090522,
+          "downloadSha256": "6ba4d52b6943221995ee0301076235336e4934905fab98aa921af425550e3cee"
+        },
+        {
+          "path": "terrain/N27E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E088.hgt.gz",
+          "downloadBytes": 19126851,
+          "downloadSha256": "7fe3800064057256cc431a0d7d7258899b251b8facc355c3c45d93ad5d127ee1"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "tiger-hill",
+        "name": "Tiger Hill · Darjeeling",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 26.96,
+          "west": 88.26,
+          "north": 27.02,
+          "east": 88.32
+        },
+        "terrainBounds": {
+          "south": 26,
+          "west": 87,
+          "north": 28,
+          "east": 89
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 26.99,
+          "longitude": 88.29,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N26E087.hgt",
+            "size": 25934402,
+            "sha256": "d7bce7fe40fb98ea7c4f195268e81dd784aa41febebb781bb4b3bb3bd406d47b"
+          },
+          {
+            "path": "terrain/N26E088.hgt",
+            "size": 25934402,
+            "sha256": "7b7c3df7d07d2785d4ffd51b6090b62f5ae43a50d0f473a5b9fb304337214a89"
+          },
+          {
+            "path": "terrain/N27E087.hgt",
+            "size": 25934402,
+            "sha256": "fc37e9eda5856c60efc298716091afa7ac7c2813f4ebf70ff4bbfedd2695cd3f"
+          },
+          {
+            "path": "terrain/N27E088.hgt",
+            "size": 25934402,
+            "sha256": "ee9422b5141d21a2db47a5719a89df00968bd81e4c0631bbf31a33ab6da34322"
+          },
+          {
+            "path": "peaks.json",
+            "size": 59615,
+            "sha256": "e2155d6b1267f77a250f9b1de5d5c5e2d00fb28bea90a8b268bda0cfa73a69e8"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1903,
+            "sha256": "701003b3287537121bb23e669078d63e6efa0aa2a60a038c6feb4ece58270b77"
+          }
+        ]
+      }
+    },
+    {
+      "id": "sandakphu",
+      "country": "India",
+      "description": "Sleeping Buddha and Everest views · West Bengal",
+      "assetDirectory": "regions/sandakphu",
+      "tiles": [
+        {
+          "path": "terrain/N26E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E087.hgt.gz",
+          "downloadBytes": 8234027,
+          "downloadSha256": "05095600ef48793ce1b84157b40c6aa09cf8a63073a275c4fdfe038712f330e6"
+        },
+        {
+          "path": "terrain/N26E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E088.hgt.gz",
+          "downloadBytes": 7777876,
+          "downloadSha256": "026a48813c3363b52bfce9ed71404387cbfeeae2d77944c96cadbaefb0780ebe"
+        },
+        {
+          "path": "terrain/N27E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E087.hgt.gz",
+          "downloadBytes": 19090522,
+          "downloadSha256": "6ba4d52b6943221995ee0301076235336e4934905fab98aa921af425550e3cee"
+        },
+        {
+          "path": "terrain/N27E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E088.hgt.gz",
+          "downloadBytes": 19126851,
+          "downloadSha256": "7fe3800064057256cc431a0d7d7258899b251b8facc355c3c45d93ad5d127ee1"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "sandakphu",
+        "name": "Sandakphu",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.076,
+          "west": 87.97,
+          "north": 27.136,
+          "east": 88.03
+        },
+        "terrainBounds": {
+          "south": 26,
+          "west": 87,
+          "north": 28,
+          "east": 89
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 27.106,
+          "longitude": 88.0,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N26E087.hgt",
+            "size": 25934402,
+            "sha256": "d7bce7fe40fb98ea7c4f195268e81dd784aa41febebb781bb4b3bb3bd406d47b"
+          },
+          {
+            "path": "terrain/N26E088.hgt",
+            "size": 25934402,
+            "sha256": "7b7c3df7d07d2785d4ffd51b6090b62f5ae43a50d0f473a5b9fb304337214a89"
+          },
+          {
+            "path": "terrain/N27E087.hgt",
+            "size": 25934402,
+            "sha256": "fc37e9eda5856c60efc298716091afa7ac7c2813f4ebf70ff4bbfedd2695cd3f"
+          },
+          {
+            "path": "terrain/N27E088.hgt",
+            "size": 25934402,
+            "sha256": "ee9422b5141d21a2db47a5719a89df00968bd81e4c0631bbf31a33ab6da34322"
+          },
+          {
+            "path": "peaks.json",
+            "size": 59615,
+            "sha256": "e2155d6b1267f77a250f9b1de5d5c5e2d00fb28bea90a8b268bda0cfa73a69e8"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1888,
+            "sha256": "37e0f33bc376f17fdc383db94bde6c0f4e998456e1c91f890e0facf07e710266"
+          }
+        ]
+      }
+    },
+    {
+      "id": "manali",
+      "country": "India",
+      "description": "Manali, Solang and the Pir Panjal · Himachal Pradesh",
+      "assetDirectory": "regions/manali",
+      "tiles": [
+        {
+          "path": "terrain/N31E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E076.hgt.gz",
+          "downloadBytes": 13420698,
+          "downloadSha256": "2b1ed9985d4813d24869f618a2c7190bf22ac3dcc28b7f18d8aa465bc9caa773"
+        },
+        {
+          "path": "terrain/N31E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E077.hgt.gz",
+          "downloadBytes": 19057173,
+          "downloadSha256": "9b3dfe53077505ccc586ace88f3c4210764ae9feadaded2a1c2932438d8074cd"
+        },
+        {
+          "path": "terrain/N32E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E076.hgt.gz",
+          "downloadBytes": 19198872,
+          "downloadSha256": "33c85639ba48152ee2eb45d9b8faddeedbe4968229aeb73227d230496fe811c3"
+        },
+        {
+          "path": "terrain/N32E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E077.hgt.gz",
+          "downloadBytes": 18415941,
+          "downloadSha256": "ead497f10d93cbdd555e5b26f0732f4955ad8b9970ca85a6486a0991fc99b184"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "manali",
+        "name": "Manali · Solang",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 32.24,
+          "west": 77.15,
+          "north": 32.3,
+          "east": 77.21
+        },
+        "terrainBounds": {
+          "south": 31,
+          "west": 76,
+          "north": 33,
+          "east": 78
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 32.27,
+          "longitude": 77.18,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N31E076.hgt",
+            "size": 25934402,
+            "sha256": "0d6a9b56a88a572bf89ccaf467bebbc2ef87c2ae24a5ee0661013b3cd883b18a"
+          },
+          {
+            "path": "terrain/N31E077.hgt",
+            "size": 25934402,
+            "sha256": "b4aa13901bb91504cd4f054d89465003d2510d3e2df66f4189b5dc2f49eb58e6"
+          },
+          {
+            "path": "terrain/N32E076.hgt",
+            "size": 25934402,
+            "sha256": "01b48d40369f394cb960ede11fff9bf895d810fc0922b625555d0bd82d156e30"
+          },
+          {
+            "path": "terrain/N32E077.hgt",
+            "size": 25934402,
+            "sha256": "e786e192841431a215dfbf242e06e0b544edccb3f7a89040ae56c2bcf7c5ccc7"
+          },
+          {
+            "path": "peaks.json",
+            "size": 60905,
+            "sha256": "29ccda51826f44d6c484d70296a178e5e16e348a957f44d814de3b67811e30be"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1895,
+            "sha256": "89e8f98423319b5bb07a3365bff0afb1786ca4c23004d4eec225329d196f4902"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rohtang",
+      "country": "India",
+      "description": "Rohtang pass views · Himachal Pradesh",
+      "assetDirectory": "regions/rohtang",
+      "tiles": [
+        {
+          "path": "terrain/N32E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E076.hgt.gz",
+          "downloadBytes": 19198872,
+          "downloadSha256": "33c85639ba48152ee2eb45d9b8faddeedbe4968229aeb73227d230496fe811c3"
+        },
+        {
+          "path": "terrain/N32E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E077.hgt.gz",
+          "downloadBytes": 18415941,
+          "downloadSha256": "ead497f10d93cbdd555e5b26f0732f4955ad8b9970ca85a6486a0991fc99b184"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "rohtang",
+        "name": "Rohtang Pass",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 32.34,
+          "west": 77.22,
+          "north": 32.4,
+          "east": 77.28
+        },
+        "terrainBounds": {
+          "south": 32,
+          "west": 76,
+          "north": 33,
+          "east": 78
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 32.37,
+          "longitude": 77.25,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N32E076.hgt",
+            "size": 25934402,
+            "sha256": "01b48d40369f394cb960ede11fff9bf895d810fc0922b625555d0bd82d156e30"
+          },
+          {
+            "path": "terrain/N32E077.hgt",
+            "size": 25934402,
+            "sha256": "e786e192841431a215dfbf242e06e0b544edccb3f7a89040ae56c2bcf7c5ccc7"
+          },
+          {
+            "path": "peaks.json",
+            "size": 34596,
+            "sha256": "1d5583441cabc7d88856a85514bd26f2a3598c0a72e7d80589807023b2479b2e"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1749,
+            "sha256": "931d1c8a78c48af40d2d1e1920d2eaafafaadd15cce4215e7e4fb915bd339c53"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kheerganga",
+      "country": "India",
+      "description": "Kheerganga and the Parvati valley · Himachal Pradesh",
+      "assetDirectory": "regions/kheerganga",
+      "tiles": [
+        {
+          "path": "terrain/N31E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E077.hgt.gz",
+          "downloadBytes": 19057173,
+          "downloadSha256": "9b3dfe53077505ccc586ace88f3c4210764ae9feadaded2a1c2932438d8074cd"
+        },
+        {
+          "path": "terrain/N32E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E077.hgt.gz",
+          "downloadBytes": 18415941,
+          "downloadSha256": "ead497f10d93cbdd555e5b26f0732f4955ad8b9970ca85a6486a0991fc99b184"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "kheerganga",
+        "name": "Kheerganga · Parvati Valley",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 31.96,
+          "west": 77.48,
+          "north": 32.02,
+          "east": 77.54
+        },
+        "terrainBounds": {
+          "south": 31,
+          "west": 77,
+          "north": 33,
+          "east": 78
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 31.99,
+          "longitude": 77.51,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N31E077.hgt",
+            "size": 25934402,
+            "sha256": "b4aa13901bb91504cd4f054d89465003d2510d3e2df66f4189b5dc2f49eb58e6"
+          },
+          {
+            "path": "terrain/N32E077.hgt",
+            "size": 25934402,
+            "sha256": "e786e192841431a215dfbf242e06e0b544edccb3f7a89040ae56c2bcf7c5ccc7"
+          },
+          {
+            "path": "peaks.json",
+            "size": 16318,
+            "sha256": "dd469e9ca4bf5f1befacbd4228fab396e8010333091ae01f3e52d01cd5eeeba0"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1765,
+            "sha256": "04ceee46352420f3f871ac0d66fce0508b6967312cbc5869abfdbb565ffccbf0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kaza",
+      "country": "India",
+      "description": "Kaza, Key monastery and Spiti valley · Himachal Pradesh",
+      "assetDirectory": "regions/kaza",
+      "tiles": [
+        {
+          "path": "terrain/N31E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E077.hgt.gz",
+          "downloadBytes": 19057173,
+          "downloadSha256": "9b3dfe53077505ccc586ace88f3c4210764ae9feadaded2a1c2932438d8074cd"
+        },
+        {
+          "path": "terrain/N31E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E078.hgt.gz",
+          "downloadBytes": 19243769,
+          "downloadSha256": "69b82462392cfa17255a2d13004ff96ea6339ad3df6f0117b6a6720df67618b2"
+        },
+        {
+          "path": "terrain/N32E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E077.hgt.gz",
+          "downloadBytes": 18415941,
+          "downloadSha256": "ead497f10d93cbdd555e5b26f0732f4955ad8b9970ca85a6486a0991fc99b184"
+        },
+        {
+          "path": "terrain/N32E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E078.hgt.gz",
+          "downloadBytes": 17040269,
+          "downloadSha256": "fc6e8237cd5f8fb35cd777066137c8ba07a7e9237153ca0495f01e0d48f86838"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "kaza",
+        "name": "Kaza · Spiti",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 32.2,
+          "west": 78.04,
+          "north": 32.26,
+          "east": 78.1
+        },
+        "terrainBounds": {
+          "south": 31,
+          "west": 77,
+          "north": 33,
+          "east": 79
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 32.23,
+          "longitude": 78.07,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N31E077.hgt",
+            "size": 25934402,
+            "sha256": "b4aa13901bb91504cd4f054d89465003d2510d3e2df66f4189b5dc2f49eb58e6"
+          },
+          {
+            "path": "terrain/N31E078.hgt",
+            "size": 25934402,
+            "sha256": "f05a36c2c082fb9ca0bb8d0c1b845fb96b95c08cde6c81a83180fc7c24612300"
+          },
+          {
+            "path": "terrain/N32E077.hgt",
+            "size": 25934402,
+            "sha256": "e786e192841431a215dfbf242e06e0b544edccb3f7a89040ae56c2bcf7c5ccc7"
+          },
+          {
+            "path": "terrain/N32E078.hgt",
+            "size": 25934402,
+            "sha256": "ddc423fd9b1ef0158ce34d9ed3c52c33321a97466f5a1fc66a2a092702be2611"
+          },
+          {
+            "path": "peaks.json",
+            "size": 30156,
+            "sha256": "53c84e40c7e3a1cfb3b91e78c7d4a1442099601ab09feb06553185eb732a76f1"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1892,
+            "sha256": "d18daa63e295b7790a25ffb039217a39737ee0b2f7195633581efd872ccb59da"
+          }
+        ]
+      }
+    },
+    {
+      "id": "shimla",
+      "country": "India",
+      "description": "Jakhu hill and Shimla ridge · Himachal Pradesh",
+      "assetDirectory": "regions/shimla",
+      "tiles": [
+        {
+          "path": "terrain/N30E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E076.hgt.gz",
+          "downloadBytes": 6967980,
+          "downloadSha256": "25f6f0cf535b3ec9556553945761d2c57c30f47fc604afd96544f824eb2f5e88"
+        },
+        {
+          "path": "terrain/N30E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E077.hgt.gz",
+          "downloadBytes": 12913075,
+          "downloadSha256": "0d9be7d97b9589b5582ee56e40c288b3c201cd8061e390e9f0beaac7410793d9"
+        },
+        {
+          "path": "terrain/N31E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E076.hgt.gz",
+          "downloadBytes": 13420698,
+          "downloadSha256": "2b1ed9985d4813d24869f618a2c7190bf22ac3dcc28b7f18d8aa465bc9caa773"
+        },
+        {
+          "path": "terrain/N31E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E077.hgt.gz",
+          "downloadBytes": 19057173,
+          "downloadSha256": "9b3dfe53077505ccc586ace88f3c4210764ae9feadaded2a1c2932438d8074cd"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "shimla",
+        "name": "Shimla · Jakhu",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 31.07,
+          "west": 77.15,
+          "north": 31.13,
+          "east": 77.21
+        },
+        "terrainBounds": {
+          "south": 30,
+          "west": 76,
+          "north": 32,
+          "east": 78
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 31.1,
+          "longitude": 77.18,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N30E076.hgt",
+            "size": 25934402,
+            "sha256": "8cf2820d24e457c5fd7a1de97065ff38b930715cd8df606962c7370481a18777"
+          },
+          {
+            "path": "terrain/N30E077.hgt",
+            "size": 25934402,
+            "sha256": "30393fabcf9d0dd7b73799ebc0f7584661c5e664606fe22e29aad242a9c58574"
+          },
+          {
+            "path": "terrain/N31E076.hgt",
+            "size": 25934402,
+            "sha256": "0d6a9b56a88a572bf89ccaf467bebbc2ef87c2ae24a5ee0661013b3cd883b18a"
+          },
+          {
+            "path": "terrain/N31E077.hgt",
+            "size": 25934402,
+            "sha256": "b4aa13901bb91504cd4f054d89465003d2510d3e2df66f4189b5dc2f49eb58e6"
+          },
+          {
+            "path": "peaks.json",
+            "size": 51257,
+            "sha256": "9bb623b6f3132a9debb28413a68443dd47e670cfc94810d51130e08b301549dd"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1894,
+            "sha256": "069f63fae2a438bc09f3d30c3d9bd220cd8235b1ef42da7acab2478ba8f76801"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dalhousie",
+      "country": "India",
+      "description": "Dainkund peak and Dhauladhar views · Himachal Pradesh",
+      "assetDirectory": "regions/dalhousie",
+      "tiles": [
+        {
+          "path": "terrain/N32E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E075.hgt.gz",
+          "downloadBytes": 12851208,
+          "downloadSha256": "8b552f3981a7f276c7fcd2b94a887a1f960256fd174dcbe5239d353112a999ef"
+        },
+        {
+          "path": "terrain/N32E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E076.hgt.gz",
+          "downloadBytes": 19198872,
+          "downloadSha256": "33c85639ba48152ee2eb45d9b8faddeedbe4968229aeb73227d230496fe811c3"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "dalhousie",
+        "name": "Dalhousie · Dainkund",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 32.51,
+          "west": 75.98,
+          "north": 32.57,
+          "east": 76.04
+        },
+        "terrainBounds": {
+          "south": 32,
+          "west": 75,
+          "north": 33,
+          "east": 77
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 32.54,
+          "longitude": 76.01,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N32E075.hgt",
+            "size": 25934402,
+            "sha256": "1129d445a2e7847b6076bab55fa40b85dee6be8838db7b600c03554e35de9fc9"
+          },
+          {
+            "path": "terrain/N32E076.hgt",
+            "size": 25934402,
+            "sha256": "01b48d40369f394cb960ede11fff9bf895d810fc0922b625555d0bd82d156e30"
+          },
+          {
+            "path": "peaks.json",
+            "size": 39627,
+            "sha256": "031571592725232aef2b50c0cfe1b98cf012a58b69bd2a2161b26eb35408956c"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1758,
+            "sha256": "928a5c29df59f63baed7f07d1c44e9e8ac3a1e30a67bc1b09c3a46e5c3d9bf5b"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bir-billing",
+      "country": "India",
+      "description": "Billing launch site and Dhauladhar · Himachal Pradesh",
+      "assetDirectory": "regions/bir-billing",
+      "tiles": [
+        {
+          "path": "terrain/N31E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E076.hgt.gz",
+          "downloadBytes": 13420698,
+          "downloadSha256": "2b1ed9985d4813d24869f618a2c7190bf22ac3dcc28b7f18d8aa465bc9caa773"
+        },
+        {
+          "path": "terrain/N31E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E077.hgt.gz",
+          "downloadBytes": 19057173,
+          "downloadSha256": "9b3dfe53077505ccc586ace88f3c4210764ae9feadaded2a1c2932438d8074cd"
+        },
+        {
+          "path": "terrain/N32E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E076.hgt.gz",
+          "downloadBytes": 19198872,
+          "downloadSha256": "33c85639ba48152ee2eb45d9b8faddeedbe4968229aeb73227d230496fe811c3"
+        },
+        {
+          "path": "terrain/N32E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E077.hgt.gz",
+          "downloadBytes": 18415941,
+          "downloadSha256": "ead497f10d93cbdd555e5b26f0732f4955ad8b9970ca85a6486a0991fc99b184"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "bir-billing",
+        "name": "Bir Billing",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 32.03,
+          "west": 76.7,
+          "north": 32.09,
+          "east": 76.76
+        },
+        "terrainBounds": {
+          "south": 31,
+          "west": 76,
+          "north": 33,
+          "east": 78
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 32.06,
+          "longitude": 76.73,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N31E076.hgt",
+            "size": 25934402,
+            "sha256": "0d6a9b56a88a572bf89ccaf467bebbc2ef87c2ae24a5ee0661013b3cd883b18a"
+          },
+          {
+            "path": "terrain/N31E077.hgt",
+            "size": 25934402,
+            "sha256": "b4aa13901bb91504cd4f054d89465003d2510d3e2df66f4189b5dc2f49eb58e6"
+          },
+          {
+            "path": "terrain/N32E076.hgt",
+            "size": 25934402,
+            "sha256": "01b48d40369f394cb960ede11fff9bf895d810fc0922b625555d0bd82d156e30"
+          },
+          {
+            "path": "terrain/N32E077.hgt",
+            "size": 25934402,
+            "sha256": "e786e192841431a215dfbf242e06e0b544edccb3f7a89040ae56c2bcf7c5ccc7"
+          },
+          {
+            "path": "peaks.json",
+            "size": 60905,
+            "sha256": "29ccda51826f44d6c484d70296a178e5e16e348a957f44d814de3b67811e30be"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1890,
+            "sha256": "2ee57048690ba0468e9be66cf705e72d3918cdce727e7b9fedb4088b24a76216"
+          }
+        ]
+      }
+    },
+    {
+      "id": "gulmarg",
+      "country": "India",
+      "description": "Gulmarg and Apharwat peak · Jammu and Kashmir",
+      "assetDirectory": "regions/gulmarg",
+      "tiles": [
+        {
+          "path": "terrain/N33E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E074.hgt.gz",
+          "downloadBytes": 16780444,
+          "downloadSha256": "6c5ea5013844e3d243d0598836fb6c1e2e441c96d4c4c365186b485c576bbfb4"
+        },
+        {
+          "path": "terrain/N34E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N34/N34E074.hgt.gz",
+          "downloadBytes": 16579569,
+          "downloadSha256": "1dd4cbc36a5bc52cb72aa5c2be7c4c7a3cd18cfdd657a1f8d46c91c5f3eed7db"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "gulmarg",
+        "name": "Gulmarg · Apharwat",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 34.02,
+          "west": 74.35,
+          "north": 34.08,
+          "east": 74.41
+        },
+        "terrainBounds": {
+          "south": 33,
+          "west": 74,
+          "north": 35,
+          "east": 75
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 34.05,
+          "longitude": 74.38,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N33E074.hgt",
+            "size": 25934402,
+            "sha256": "1c25b398ee334bda22b657ee44158f128a4bce232534f2286349608146bc80d8"
+          },
+          {
+            "path": "terrain/N34E074.hgt",
+            "size": 25934402,
+            "sha256": "a66596535002965d0853f403ca7283e84780ad7b07f452b137eb6b1672def4fd"
+          },
+          {
+            "path": "peaks.json",
+            "size": 83885,
+            "sha256": "0f5594bc1761c0eefeea938f7002e316a4334f099da0d23a2bd7a10adccdad53"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1756,
+            "sha256": "a85a4a433e360345cc51c7b7aca4a6d14a9901ba266098376bd11661d65ca796"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pahalgam",
+      "country": "India",
+      "description": "Pahalgam and the Lidder valley · Jammu and Kashmir",
+      "assetDirectory": "regions/pahalgam",
+      "tiles": [
+        {
+          "path": "terrain/N33E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E074.hgt.gz",
+          "downloadBytes": 16780444,
+          "downloadSha256": "6c5ea5013844e3d243d0598836fb6c1e2e441c96d4c4c365186b485c576bbfb4"
+        },
+        {
+          "path": "terrain/N33E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E075.hgt.gz",
+          "downloadBytes": 18175393,
+          "downloadSha256": "5cc307d645df1e27704715074afd98f438d6e403039bcbd135c40ca6cedd9acd"
+        },
+        {
+          "path": "terrain/N34E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N34/N34E074.hgt.gz",
+          "downloadBytes": 16579569,
+          "downloadSha256": "1dd4cbc36a5bc52cb72aa5c2be7c4c7a3cd18cfdd657a1f8d46c91c5f3eed7db"
+        },
+        {
+          "path": "terrain/N34E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N34/N34E075.hgt.gz",
+          "downloadBytes": 18047911,
+          "downloadSha256": "428e64ec7bd6fe26d31d00d750d469ee62af4ad37599673e1ac282509131306c"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "pahalgam",
+        "name": "Pahalgam",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 33.98,
+          "west": 75.29,
+          "north": 34.04,
+          "east": 75.35
+        },
+        "terrainBounds": {
+          "south": 33,
+          "west": 74,
+          "north": 35,
+          "east": 76
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 34.01,
+          "longitude": 75.32,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N33E074.hgt",
+            "size": 25934402,
+            "sha256": "1c25b398ee334bda22b657ee44158f128a4bce232534f2286349608146bc80d8"
+          },
+          {
+            "path": "terrain/N33E075.hgt",
+            "size": 25934402,
+            "sha256": "632061a51e5f13b3ac37b2fa464a6c421dc867e3eb1bd06b705b63bc32198da2"
+          },
+          {
+            "path": "terrain/N34E074.hgt",
+            "size": 25934402,
+            "sha256": "a66596535002965d0853f403ca7283e84780ad7b07f452b137eb6b1672def4fd"
+          },
+          {
+            "path": "terrain/N34E075.hgt",
+            "size": 25934402,
+            "sha256": "ad323338cd49198e2b8f4f82e37c101de7337fb53f3af522b4dead36f78e38bd"
+          },
+          {
+            "path": "peaks.json",
+            "size": 162248,
+            "sha256": "34bfb234d7104f385869dafdda96b0fcb2eff05ba0750357386f38cf67635847"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1887,
+            "sha256": "9c78890ae973e16caa2587771aa9ce9658690391286cf4f0eea39644e8b79f92"
+          }
+        ]
+      }
+    },
+    {
+      "id": "sonamarg",
+      "country": "India",
+      "description": "Sonamarg and Thajiwas glacier · Jammu and Kashmir",
+      "assetDirectory": "regions/sonamarg",
+      "tiles": [
+        {
+          "path": "terrain/N33E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E074.hgt.gz",
+          "downloadBytes": 16780444,
+          "downloadSha256": "6c5ea5013844e3d243d0598836fb6c1e2e441c96d4c4c365186b485c576bbfb4"
+        },
+        {
+          "path": "terrain/N33E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E075.hgt.gz",
+          "downloadBytes": 18175393,
+          "downloadSha256": "5cc307d645df1e27704715074afd98f438d6e403039bcbd135c40ca6cedd9acd"
+        },
+        {
+          "path": "terrain/N34E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N34/N34E074.hgt.gz",
+          "downloadBytes": 16579569,
+          "downloadSha256": "1dd4cbc36a5bc52cb72aa5c2be7c4c7a3cd18cfdd657a1f8d46c91c5f3eed7db"
+        },
+        {
+          "path": "terrain/N34E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N34/N34E075.hgt.gz",
+          "downloadBytes": 18047911,
+          "downloadSha256": "428e64ec7bd6fe26d31d00d750d469ee62af4ad37599673e1ac282509131306c"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "sonamarg",
+        "name": "Sonamarg",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 34.27,
+          "west": 75.26,
+          "north": 34.33,
+          "east": 75.32
+        },
+        "terrainBounds": {
+          "south": 33,
+          "west": 74,
+          "north": 35,
+          "east": 76
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 34.3,
+          "longitude": 75.29,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N33E074.hgt",
+            "size": 25934402,
+            "sha256": "1c25b398ee334bda22b657ee44158f128a4bce232534f2286349608146bc80d8"
+          },
+          {
+            "path": "terrain/N33E075.hgt",
+            "size": 25934402,
+            "sha256": "632061a51e5f13b3ac37b2fa464a6c421dc867e3eb1bd06b705b63bc32198da2"
+          },
+          {
+            "path": "terrain/N34E074.hgt",
+            "size": 25934402,
+            "sha256": "a66596535002965d0853f403ca7283e84780ad7b07f452b137eb6b1672def4fd"
+          },
+          {
+            "path": "terrain/N34E075.hgt",
+            "size": 25934402,
+            "sha256": "ad323338cd49198e2b8f4f82e37c101de7337fb53f3af522b4dead36f78e38bd"
+          },
+          {
+            "path": "peaks.json",
+            "size": 162248,
+            "sha256": "34bfb234d7104f385869dafdda96b0fcb2eff05ba0750357386f38cf67635847"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1887,
+            "sha256": "7303b49080e51d2e113e67567c6b78e805a487023fbf313c3e46649d43645427"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mussoorie",
+      "country": "India",
+      "description": "Lal Tibba views of the Garhwal Himalaya · Uttarakhand",
+      "assetDirectory": "regions/mussoorie",
+      "tiles": [
+        {
+          "path": "terrain/N30E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E077.hgt.gz",
+          "downloadBytes": 12913075,
+          "downloadSha256": "0d9be7d97b9589b5582ee56e40c288b3c201cd8061e390e9f0beaac7410793d9"
+        },
+        {
+          "path": "terrain/N30E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E078.hgt.gz",
+          "downloadBytes": 18131689,
+          "downloadSha256": "4051e87302421410513f85b8ee6a431341426f95a191a1859cfab9bb19c0b828"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "mussoorie",
+        "name": "Mussoorie · Lal Tibba",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 30.43,
+          "west": 78.06,
+          "north": 30.49,
+          "east": 78.12
+        },
+        "terrainBounds": {
+          "south": 30,
+          "west": 77,
+          "north": 31,
+          "east": 79
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 30.46,
+          "longitude": 78.09,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N30E077.hgt",
+            "size": 25934402,
+            "sha256": "30393fabcf9d0dd7b73799ebc0f7584661c5e664606fe22e29aad242a9c58574"
+          },
+          {
+            "path": "terrain/N30E078.hgt",
+            "size": 25934402,
+            "sha256": "4a942e7759f5da31f73dce270d341c31406cb1e576ae792a51f12acaef058656"
+          },
+          {
+            "path": "peaks.json",
+            "size": 31872,
+            "sha256": "6dd99bff106a7f3bbc05dff47cd49ab0bcd0a235820e7121ed6b5213f18fbe1d"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1759,
+            "sha256": "70ceb3dddbd1393a8b2e5479a9fb024d5266bc6203562439a30a9958d1d3126d"
+          }
+        ]
+      }
+    },
+    {
+      "id": "har-ki-dun",
+      "country": "India",
+      "description": "Har Ki Dun valley and Swargarohini · Uttarakhand",
+      "assetDirectory": "regions/har-ki-dun",
+      "tiles": [
+        {
+          "path": "terrain/N30E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E078.hgt.gz",
+          "downloadBytes": 18131689,
+          "downloadSha256": "4051e87302421410513f85b8ee6a431341426f95a191a1859cfab9bb19c0b828"
+        },
+        {
+          "path": "terrain/N31E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E078.hgt.gz",
+          "downloadBytes": 19243769,
+          "downloadSha256": "69b82462392cfa17255a2d13004ff96ea6339ad3df6f0117b6a6720df67618b2"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "har-ki-dun",
+        "name": "Har Ki Dun",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 31.12,
+          "west": 78.39,
+          "north": 31.18,
+          "east": 78.45
+        },
+        "terrainBounds": {
+          "south": 30,
+          "west": 78,
+          "north": 32,
+          "east": 79
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 31.15,
+          "longitude": 78.42,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N30E078.hgt",
+            "size": 25934402,
+            "sha256": "4a942e7759f5da31f73dce270d341c31406cb1e576ae792a51f12acaef058656"
+          },
+          {
+            "path": "terrain/N31E078.hgt",
+            "size": 25934402,
+            "sha256": "f05a36c2c082fb9ca0bb8d0c1b845fb96b95c08cde6c81a83180fc7c24612300"
+          },
+          {
+            "path": "peaks.json",
+            "size": 21090,
+            "sha256": "799316bf1f6295f0f12d6025289ed3e897c6fffa6751586899859205fcded909"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1747,
+            "sha256": "c23c8f4513f197bb74a100b274def186e84345ed17159252d0ddc7756d4bf150"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kausani",
+      "country": "India",
+      "description": "Kausani panorama of Trishul and Nanda Devi · Uttarakhand",
+      "assetDirectory": "regions/kausani",
+      "tiles": [
+        {
+          "path": "terrain/N29E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E079.hgt.gz",
+          "downloadBytes": 14988747,
+          "downloadSha256": "6e16aec11401c587f045f25a6a434aa76dacae73dcdedfa591e5bfe07c4b82e1"
+        },
+        {
+          "path": "terrain/N30E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E079.hgt.gz",
+          "downloadBytes": 19206975,
+          "downloadSha256": "a54c8361799d729820f939ef91e4ce35bd181924d53cb2fd3747bef7e532d5d4"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "kausani",
+        "name": "Kausani",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 29.81,
+          "west": 79.57,
+          "north": 29.87,
+          "east": 79.63
+        },
+        "terrainBounds": {
+          "south": 29,
+          "west": 79,
+          "north": 31,
+          "east": 80
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 29.84,
+          "longitude": 79.6,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N29E079.hgt",
+            "size": 25934402,
+            "sha256": "aeb25fdece746729a43e40fc970717ccea6b5b326da0fa766f1734d518043298"
+          },
+          {
+            "path": "terrain/N30E079.hgt",
+            "size": 25934402,
+            "sha256": "f1652f5e39e98b153ed2837ac79ee58428a09da777332dcbf246b7c4dc7b60e3"
+          },
+          {
+            "path": "peaks.json",
+            "size": 50473,
+            "sha256": "03b396b24dd4629293f3633a7747bc0d5153c09d08ece7758d3e203981565a62"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1744,
+            "sha256": "94ca7f0c6db2c6004d78f8ee241bdf5f83d2686ace80e20de33aea73033f58e0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "munsiyari",
+      "country": "India",
+      "description": "Munsiyari and the Panchachuli peaks · Uttarakhand",
+      "assetDirectory": "regions/munsiyari",
+      "tiles": [
+        {
+          "path": "terrain/N29E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E079.hgt.gz",
+          "downloadBytes": 14988747,
+          "downloadSha256": "6e16aec11401c587f045f25a6a434aa76dacae73dcdedfa591e5bfe07c4b82e1"
+        },
+        {
+          "path": "terrain/N29E080.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E080.hgt.gz",
+          "downloadBytes": 18222501,
+          "downloadSha256": "914196ef7503d8715d2e1d03a076d27230c561d1969c3695e7283174fc599260"
+        },
+        {
+          "path": "terrain/N30E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E079.hgt.gz",
+          "downloadBytes": 19206975,
+          "downloadSha256": "a54c8361799d729820f939ef91e4ce35bd181924d53cb2fd3747bef7e532d5d4"
+        },
+        {
+          "path": "terrain/N30E080.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E080.hgt.gz",
+          "downloadBytes": 17010979,
+          "downloadSha256": "c56312bbf51a31e3e31f2ad7b26f19d62b632cc62594f2f8d38797c29f97aa7e"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "munsiyari",
+        "name": "Munsiyari",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 30.04,
+          "west": 80.21,
+          "north": 30.1,
+          "east": 80.27
+        },
+        "terrainBounds": {
+          "south": 29,
+          "west": 79,
+          "north": 31,
+          "east": 81
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 30.07,
+          "longitude": 80.24,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N29E079.hgt",
+            "size": 25934402,
+            "sha256": "aeb25fdece746729a43e40fc970717ccea6b5b326da0fa766f1734d518043298"
+          },
+          {
+            "path": "terrain/N29E080.hgt",
+            "size": 25934402,
+            "sha256": "4a2a8cea58f895b51bddbfa1b99a671ad0633c6f6f73461fdc9b7fd1dfa9bd52"
+          },
+          {
+            "path": "terrain/N30E079.hgt",
+            "size": 25934402,
+            "sha256": "f1652f5e39e98b153ed2837ac79ee58428a09da777332dcbf246b7c4dc7b60e3"
+          },
+          {
+            "path": "terrain/N30E080.hgt",
+            "size": 25934402,
+            "sha256": "aa9c73c017b532f76e61cc612f9e261a5ae6058ca6757f24748d248af5f638d4"
+          },
+          {
+            "path": "peaks.json",
+            "size": 62565,
+            "sha256": "efe6c5d950e7629341e8660c8fce30e5ff136ab82078dda5e7384692b9bc62ad"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1888,
+            "sha256": "bbe120eb83c98fdee62c9beb3bd6d3717331398e2dbaee44706f2925e0db0b2c"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bedni-bugyal",
+      "country": "India",
+      "description": "Bedni meadows on the Roopkund trek · Uttarakhand",
+      "assetDirectory": "regions/bedni-bugyal",
+      "tiles": [
+        {
+          "path": "terrain/N29E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E079.hgt.gz",
+          "downloadBytes": 14988747,
+          "downloadSha256": "6e16aec11401c587f045f25a6a434aa76dacae73dcdedfa591e5bfe07c4b82e1"
+        },
+        {
+          "path": "terrain/N29E080.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E080.hgt.gz",
+          "downloadBytes": 18222501,
+          "downloadSha256": "914196ef7503d8715d2e1d03a076d27230c561d1969c3695e7283174fc599260"
+        },
+        {
+          "path": "terrain/N30E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E079.hgt.gz",
+          "downloadBytes": 19206975,
+          "downloadSha256": "a54c8361799d729820f939ef91e4ce35bd181924d53cb2fd3747bef7e532d5d4"
+        },
+        {
+          "path": "terrain/N30E080.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E080.hgt.gz",
+          "downloadBytes": 17010979,
+          "downloadSha256": "c56312bbf51a31e3e31f2ad7b26f19d62b632cc62594f2f8d38797c29f97aa7e"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "bedni-bugyal",
+        "name": "Bedni Bugyal · Roopkund",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 30.18,
+          "west": 79.65,
+          "north": 30.24,
+          "east": 79.71
+        },
+        "terrainBounds": {
+          "south": 29,
+          "west": 79,
+          "north": 31,
+          "east": 81
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 30.21,
+          "longitude": 79.68,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N29E079.hgt",
+            "size": 25934402,
+            "sha256": "aeb25fdece746729a43e40fc970717ccea6b5b326da0fa766f1734d518043298"
+          },
+          {
+            "path": "terrain/N29E080.hgt",
+            "size": 25934402,
+            "sha256": "4a2a8cea58f895b51bddbfa1b99a671ad0633c6f6f73461fdc9b7fd1dfa9bd52"
+          },
+          {
+            "path": "terrain/N30E079.hgt",
+            "size": 25934402,
+            "sha256": "f1652f5e39e98b153ed2837ac79ee58428a09da777332dcbf246b7c4dc7b60e3"
+          },
+          {
+            "path": "terrain/N30E080.hgt",
+            "size": 25934402,
+            "sha256": "aa9c73c017b532f76e61cc612f9e261a5ae6058ca6757f24748d248af5f638d4"
+          },
+          {
+            "path": "peaks.json",
+            "size": 62565,
+            "sha256": "efe6c5d950e7629341e8660c8fce30e5ff136ab82078dda5e7384692b9bc62ad"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1903,
+            "sha256": "98c6a3fe828066806471b0526c4e67220abdd8392f4f6e9b4b37b56493e9f33d"
+          }
+        ]
+      }
+    },
+    {
+      "id": "munnar",
+      "country": "India",
+      "description": "Munnar and Anamudi, highest peak in the south · Kerala",
+      "assetDirectory": "regions/munnar",
+      "tiles": [
+        {
+          "path": "terrain/N09E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N09/N09E076.hgt.gz",
+          "downloadBytes": 7902257,
+          "downloadSha256": "516abc0c43cdb5211486d1002ada1248f6b59cc3fab69531afc49af686c0b51e"
+        },
+        {
+          "path": "terrain/N09E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N09/N09E077.hgt.gz",
+          "downloadBytes": 12122853,
+          "downloadSha256": "36744aa8518e8421f1bdc528b5e1dc4694c6181a1fef70fe8e4ce8284700ae63"
+        },
+        {
+          "path": "terrain/N10E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N10/N10E076.hgt.gz",
+          "downloadBytes": 11221420,
+          "downloadSha256": "7312661a7fa3d02ad7d956f663641284d4e188f655342b07520c0fb7b3e9f4d7"
+        },
+        {
+          "path": "terrain/N10E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N10/N10E077.hgt.gz",
+          "downloadBytes": 11097813,
+          "downloadSha256": "2f55a165d6ac8efa0b4c3dd0ebbbe4469007ac1fcc2bf15fecd6bb4ebe03c059"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "munnar",
+        "name": "Munnar · Anamudi",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 10.06,
+          "west": 77.03,
+          "north": 10.12,
+          "east": 77.09
+        },
+        "terrainBounds": {
+          "south": 9,
+          "west": 76,
+          "north": 11,
+          "east": 78
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 10.09,
+          "longitude": 77.06,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N09E076.hgt",
+            "size": 25934402,
+            "sha256": "fec2bcd590d349c64791db02fcc6ebba87bb2fbe8dd99568a67b28f5f5910c75"
+          },
+          {
+            "path": "terrain/N09E077.hgt",
+            "size": 25934402,
+            "sha256": "538fdb851862b66fd971d47e895fbd26501e94359a980088c30024ab8e0bee31"
+          },
+          {
+            "path": "terrain/N10E076.hgt",
+            "size": 25934402,
+            "sha256": "5565a51ac39b0af602bc4f11cd201584a0b30e1117f687ce6b5210451a00ae4e"
+          },
+          {
+            "path": "terrain/N10E077.hgt",
+            "size": 25934402,
+            "sha256": "2f0893838ea02c0e747979645c6257cc0daff7f55f38252c3bbb86d18cbcc536"
+          },
+          {
+            "path": "peaks.json",
+            "size": 240622,
+            "sha256": "9a3fc394786f02a531f3cc88c196652164dfdce1140914a6e1f25a242fdf2075"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1527,
+            "sha256": "a6efdaf62c533ee32470bfcc5e7c004c425be33fac5a14d034831c40afead700"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ooty",
+      "country": "India",
+      "description": "Doddabetta and the Nilgiris · Tamil Nadu",
+      "assetDirectory": "regions/ooty",
+      "tiles": [
+        {
+          "path": "terrain/N11E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N11/N11E076.hgt.gz",
+          "downloadBytes": 13254841,
+          "downloadSha256": "7ba2967a032f8cba5f3bbd03b7009dff97184588e92c1a40a2db90f0dd0f7406"
+        },
+        {
+          "path": "terrain/N11E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N11/N11E077.hgt.gz",
+          "downloadBytes": 10629451,
+          "downloadSha256": "25a28802172476a80177d0467d5445eea59953db1377a1a1bc61df219d28d7e0"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "ooty",
+        "name": "Ooty · Doddabetta",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 11.37,
+          "west": 76.71,
+          "north": 11.43,
+          "east": 76.77
+        },
+        "terrainBounds": {
+          "south": 11,
+          "west": 76,
+          "north": 12,
+          "east": 78
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 11.4,
+          "longitude": 76.74,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N11E076.hgt",
+            "size": 25934402,
+            "sha256": "138f435256d7a689780778788e011c1141748d9e3485f3f3611e8abd258ecbdd"
+          },
+          {
+            "path": "terrain/N11E077.hgt",
+            "size": 25934402,
+            "sha256": "8d549a9f7de58e461a6cb6a7be230b2589c404d954bebaf105b0fed9326eaf53"
+          },
+          {
+            "path": "peaks.json",
+            "size": 110157,
+            "sha256": "b76811e34050a06497d18cef444bdaa5a262d6c5992991ddb314fbf84318137b"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1386,
+            "sha256": "064d801383e8e9d1ebcd8d093cff55f670e30efa66ac4e56a298dc4f95e673cb"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kodaikanal",
+      "country": "India",
+      "description": "Kodaikanal and the Palani hills · Tamil Nadu",
+      "assetDirectory": "regions/kodaikanal",
+      "tiles": [
+        {
+          "path": "terrain/N09E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N09/N09E077.hgt.gz",
+          "downloadBytes": 12122853,
+          "downloadSha256": "36744aa8518e8421f1bdc528b5e1dc4694c6181a1fef70fe8e4ce8284700ae63"
+        },
+        {
+          "path": "terrain/N10E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N10/N10E077.hgt.gz",
+          "downloadBytes": 11097813,
+          "downloadSha256": "2f55a165d6ac8efa0b4c3dd0ebbbe4469007ac1fcc2bf15fecd6bb4ebe03c059"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "kodaikanal",
+        "name": "Kodaikanal",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 10.21,
+          "west": 77.46,
+          "north": 10.27,
+          "east": 77.52
+        },
+        "terrainBounds": {
+          "south": 9,
+          "west": 77,
+          "north": 11,
+          "east": 78
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 10.24,
+          "longitude": 77.49,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N09E077.hgt",
+            "size": 25934402,
+            "sha256": "538fdb851862b66fd971d47e895fbd26501e94359a980088c30024ab8e0bee31"
+          },
+          {
+            "path": "terrain/N10E077.hgt",
+            "size": 25934402,
+            "sha256": "2f0893838ea02c0e747979645c6257cc0daff7f55f38252c3bbb86d18cbcc536"
+          },
+          {
+            "path": "peaks.json",
+            "size": 169020,
+            "sha256": "5eb7aa9a0ffbb70b3eef1d83ef0d9dd0be7eb9a6a5794d56c26f04ee154830bf"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1378,
+            "sha256": "14ddeffd367ee558af0b20c3bc009bf01750335c296d1c8ff07fc71d9fcd257d"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chembra",
+      "country": "India",
+      "description": "Chembra peak in Wayanad · Kerala",
+      "assetDirectory": "regions/chembra",
+      "tiles": [
+        {
+          "path": "terrain/N11E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N11/N11E075.hgt.gz",
+          "downloadBytes": 5468520,
+          "downloadSha256": "cb788205f6c8da68a121e0ae7b678520a232f9349a9fc63bb022bfe40c431f6c"
+        },
+        {
+          "path": "terrain/N11E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N11/N11E076.hgt.gz",
+          "downloadBytes": 13254841,
+          "downloadSha256": "7ba2967a032f8cba5f3bbd03b7009dff97184588e92c1a40a2db90f0dd0f7406"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "chembra",
+        "name": "Chembra Peak · Wayanad",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 11.52,
+          "west": 76.05,
+          "north": 11.58,
+          "east": 76.11
+        },
+        "terrainBounds": {
+          "south": 11,
+          "west": 75,
+          "north": 12,
+          "east": 77
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 11.55,
+          "longitude": 76.08,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N11E075.hgt",
+            "size": 25934402,
+            "sha256": "6f0ed44875b94368973ae1fe4502bcdc8598b4b5e783e0e888953c4564e29ac9"
+          },
+          {
+            "path": "terrain/N11E076.hgt",
+            "size": 25934402,
+            "sha256": "138f435256d7a689780778788e011c1141748d9e3485f3f3611e8abd258ecbdd"
+          },
+          {
+            "path": "peaks.json",
+            "size": 89985,
+            "sha256": "994936ee677ad29f04d8eebc72e2689d3c72a4cf9b488127da209727240ef2d6"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1391,
+            "sha256": "9fbf13583b750ee3bde3e72d647507a15e8ef5ec8e8cc3fc0e042b9a80aecc92"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kudremukh",
+      "country": "India",
+      "description": "Kudremukh peak · Karnataka",
+      "assetDirectory": "regions/kudremukh",
+      "tiles": [
+        {
+          "path": "terrain/N12E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N12/N12E074.hgt.gz",
+          "downloadBytes": 2206825,
+          "downloadSha256": "9ce24b1cb406ef0af5f412346558e846258eebdc8fad8e450bc27efcf1f6e56c"
+        },
+        {
+          "path": "terrain/N12E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N12/N12E075.hgt.gz",
+          "downloadBytes": 12695821,
+          "downloadSha256": "ee7bb64a7ef85e479c1d546bc9655ecffae4f871c1a0e31c3b597eebabf3b627"
+        },
+        {
+          "path": "terrain/N13E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N13/N13E074.hgt.gz",
+          "downloadBytes": 3896681,
+          "downloadSha256": "0b47d9173b6eab4c54c2dfba3a9444bc36f0664434cc85c05cea5bb90614ec3c"
+        },
+        {
+          "path": "terrain/N13E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N13/N13E075.hgt.gz",
+          "downloadBytes": 12380669,
+          "downloadSha256": "b44fd2ad3bfac95ffbdd9c696c77b74e9cecdb488cba1781996a307c55f01748"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "kudremukh",
+        "name": "Kudremukh",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 13.1,
+          "west": 75.24,
+          "north": 13.16,
+          "east": 75.3
+        },
+        "terrainBounds": {
+          "south": 12,
+          "west": 74,
+          "north": 14,
+          "east": 76
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 13.13,
+          "longitude": 75.27,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N12E074.hgt",
+            "size": 25934402,
+            "sha256": "77f9f9ab16df2ce5e0a706dbce0abdad3fd07025446411912ebfe20026763c9d"
+          },
+          {
+            "path": "terrain/N12E075.hgt",
+            "size": 25934402,
+            "sha256": "5b6b444c1246b5504be0eaafcac5ca8526efe8c19a6036057a2014c1751a72b4"
+          },
+          {
+            "path": "terrain/N13E074.hgt",
+            "size": 25934402,
+            "sha256": "b4871ec9e8c7cb7084700595d11a4fd05796bf454e0aec3bace38f65709be0db"
+          },
+          {
+            "path": "terrain/N13E075.hgt",
+            "size": 25934402,
+            "sha256": "3686568717e2b64695124e94670cdaaa5cf82b15a72719e63382073ee6bf8e19"
+          },
+          {
+            "path": "peaks.json",
+            "size": 120629,
+            "sha256": "8228e5db14bd3ef5d9b4f31b8fdfc48bd11bc770b2060516528eaf14740dcbae"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1519,
+            "sha256": "48d64ee35c0193ed93066ff0aa1ef878f81a787c46d235fb41d5e77dc6e7dbac"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mullayanagiri",
+      "country": "India",
+      "description": "Karnataka's highest peak, Chikmagalur · Karnataka",
+      "assetDirectory": "regions/mullayanagiri",
+      "tiles": [
+        {
+          "path": "terrain/N13E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N13/N13E075.hgt.gz",
+          "downloadBytes": 12380669,
+          "downloadSha256": "b44fd2ad3bfac95ffbdd9c696c77b74e9cecdb488cba1781996a307c55f01748"
+        },
+        {
+          "path": "terrain/N13E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N13/N13E076.hgt.gz",
+          "downloadBytes": 8647695,
+          "downloadSha256": "b653646209a1d28c9e7c7492500607c21aafa54c797ce3ce0f1de8edc10a53d2"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "mullayanagiri",
+        "name": "Mullayanagiri",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 13.36,
+          "west": 75.69,
+          "north": 13.42,
+          "east": 75.75
+        },
+        "terrainBounds": {
+          "south": 13,
+          "west": 75,
+          "north": 14,
+          "east": 77
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 13.39,
+          "longitude": 75.72,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N13E075.hgt",
+            "size": 25934402,
+            "sha256": "3686568717e2b64695124e94670cdaaa5cf82b15a72719e63382073ee6bf8e19"
+          },
+          {
+            "path": "terrain/N13E076.hgt",
+            "size": 25934402,
+            "sha256": "54f96bf5d4cdf1d1d40701e7413fc55e3fab18ba1ecd474f214d93642eda0982"
+          },
+          {
+            "path": "peaks.json",
+            "size": 36778,
+            "sha256": "3647ed97451b32eaf844116be7853b7bc2068676534fc8422da237c7a5fa130c"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1381,
+            "sha256": "d39349a81e7c19cca2486d517e27df6f3a5f64be6f0f0ee0b45fcb29914bbdeb"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tadiandamol",
+      "country": "India",
+      "description": "Tadiandamol, highest peak in Coorg · Karnataka",
+      "assetDirectory": "regions/tadiandamol",
+      "tiles": [
+        {
+          "path": "terrain/N11E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N11/N11E075.hgt.gz",
+          "downloadBytes": 5468520,
+          "downloadSha256": "cb788205f6c8da68a121e0ae7b678520a232f9349a9fc63bb022bfe40c431f6c"
+        },
+        {
+          "path": "terrain/N12E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N12/N12E075.hgt.gz",
+          "downloadBytes": 12695821,
+          "downloadSha256": "ee7bb64a7ef85e479c1d546bc9655ecffae4f871c1a0e31c3b597eebabf3b627"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "tadiandamol",
+        "name": "Tadiandamol · Coorg",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 12.18,
+          "west": 75.6,
+          "north": 12.24,
+          "east": 75.66
+        },
+        "terrainBounds": {
+          "south": 11,
+          "west": 75,
+          "north": 13,
+          "east": 76
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 12.21,
+          "longitude": 75.63,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N11E075.hgt",
+            "size": 25934402,
+            "sha256": "6f0ed44875b94368973ae1fe4502bcdc8598b4b5e783e0e888953c4564e29ac9"
+          },
+          {
+            "path": "terrain/N12E075.hgt",
+            "size": 25934402,
+            "sha256": "5b6b444c1246b5504be0eaafcac5ca8526efe8c19a6036057a2014c1751a72b4"
+          },
+          {
+            "path": "peaks.json",
+            "size": 81898,
+            "sha256": "95c0701b42d3af23e06cf6605de920744ed835c92269586ad5ac5257fa30d68d"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1388,
+            "sha256": "420c447e81670e62fca6a786e31c860d9a311cc335ebf63e48c531b010b68a14"
+          }
+        ]
+      }
+    },
+    {
+      "id": "araku",
+      "country": "India",
+      "description": "Araku valley and the Eastern Ghats · Andhra Pradesh",
+      "assetDirectory": "regions/araku",
+      "tiles": [
+        {
+          "path": "terrain/N18E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N18/N18E082.hgt.gz",
+          "downloadBytes": 13264941,
+          "downloadSha256": "225b12cba3e1b531cc6277162cb716427b86caca99124ebd4b707ec0e25a765f"
+        },
+        {
+          "path": "terrain/N18E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N18/N18E083.hgt.gz",
+          "downloadBytes": 11380244,
+          "downloadSha256": "a13af374c017d15d4a310ca51d3730e21ef3884188e7cfa65e6c995cb5d1e3dc"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "araku",
+        "name": "Araku Valley",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 18.3,
+          "west": 82.84,
+          "north": 18.36,
+          "east": 82.9
+        },
+        "terrainBounds": {
+          "south": 18,
+          "west": 82,
+          "north": 19,
+          "east": 84
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 18.33,
+          "longitude": 82.87,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N18E082.hgt",
+            "size": 25934402,
+            "sha256": "512c1aed59fbc06b0ba25066b500912bdde7b180cf375416e2b0cb62b54591c0"
+          },
+          {
+            "path": "terrain/N18E083.hgt",
+            "size": 25934402,
+            "sha256": "5b2f50f1130049101fe6192ceb117f2a10215b76fcf9c29c266f089e25a92bb0"
+          },
+          {
+            "path": "peaks.json",
+            "size": 77567,
+            "sha256": "3d395b35a70be989ecf156cf8b596d199d3f9824ff95192311c1432c1da1b4b1"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1380,
+            "sha256": "deeeed90be2f7c35770aa8441db9f7d637893d7eba7cda0e15965ecc9955d4bb"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mahabaleshwar",
+      "country": "India",
+      "description": "Mahabaleshwar and the Sahyadri · Maharashtra",
+      "assetDirectory": "regions/mahabaleshwar",
+      "tiles": [
+        {
+          "path": "terrain/N17E073.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N17/N17E073.hgt.gz",
+          "downloadBytes": 11801758,
+          "downloadSha256": "2980a19f201ff888df575b555b3faf6ca32a2f6d2c1e9b7004fe8fb9c56016f8"
+        },
+        {
+          "path": "terrain/N18E073.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N18/N18E073.hgt.gz",
+          "downloadBytes": 12682061,
+          "downloadSha256": "24134d0669da0b41f823656faf072f55da351a97fde18ac22836134381fda356"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "mahabaleshwar",
+        "name": "Mahabaleshwar",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 17.89,
+          "west": 73.63,
+          "north": 17.95,
+          "east": 73.69
+        },
+        "terrainBounds": {
+          "south": 17,
+          "west": 73,
+          "north": 19,
+          "east": 74
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 17.92,
+          "longitude": 73.66,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N17E073.hgt",
+            "size": 25934402,
+            "sha256": "2a2136f2facdcd383faa61cf8e26d87ea6fa50a9d24f7ee6db434bd04e79f192"
+          },
+          {
+            "path": "terrain/N18E073.hgt",
+            "size": 25934402,
+            "sha256": "73523b876c229607f421c529b8c91a5ed7dd9b504ba413064b5ab0fcb193361b"
+          },
+          {
+            "path": "peaks.json",
+            "size": 927,
+            "sha256": "da6914d596ad32ada9baa2980e3f760bcd768911c23d1c46dcec4a4682382b4f"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1381,
+            "sha256": "2136b5721c02c2a3df84c11929f1a1e8bce048ac798f2bd673723f08d900a3d1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kalsubai",
+      "country": "India",
+      "description": "Maharashtra's highest peak · Maharashtra",
+      "assetDirectory": "regions/kalsubai",
+      "tiles": [
+        {
+          "path": "terrain/N19E073.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N19/N19E073.hgt.gz",
+          "downloadBytes": 12061518,
+          "downloadSha256": "ad0f863a870f4412c6c9eca2908bd3a8d91563100fe821b65c3ef2a62c56f2bd"
+        },
+        {
+          "path": "terrain/N19E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N19/N19E074.hgt.gz",
+          "downloadBytes": 8793581,
+          "downloadSha256": "4ab6f0e2fd5665d5199445a016fea9ec2e5e3e4329847b23f97b5586421d84bc"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "kalsubai",
+        "name": "Kalsubai",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 19.57,
+          "west": 73.68,
+          "north": 19.63,
+          "east": 73.74
+        },
+        "terrainBounds": {
+          "south": 19,
+          "west": 73,
+          "north": 20,
+          "east": 75
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 19.6,
+          "longitude": 73.71,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N19E073.hgt",
+            "size": 25934402,
+            "sha256": "32f6fe1bece89cbc207620e6ac73a42d38c18cdbd6dff0c5df600ed386b4e562"
+          },
+          {
+            "path": "terrain/N19E074.hgt",
+            "size": 25934402,
+            "sha256": "bf29b95288ea8f3fca04d79d425188b1660f113ad9f2765efe070d578905e159"
+          },
+          {
+            "path": "peaks.json",
+            "size": 943,
+            "sha256": "f1023857983727efcc37ad03caeb3d1a99dfb4e0f4ee3c2ce529631686eb5fea"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1376,
+            "sha256": "2b6914825f45a3e4edf2298f262a6b262f49f40e47701ba4dc750031923b2d72"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rajmachi",
+      "country": "India",
+      "description": "Rajmachi fort and the Sahyadri · Maharashtra",
+      "assetDirectory": "regions/rajmachi",
+      "tiles": [
+        {
+          "path": "terrain/N18E073.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N18/N18E073.hgt.gz",
+          "downloadBytes": 12682061,
+          "downloadSha256": "24134d0669da0b41f823656faf072f55da351a97fde18ac22836134381fda356"
+        },
+        {
+          "path": "terrain/N19E073.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N19/N19E073.hgt.gz",
+          "downloadBytes": 12061518,
+          "downloadSha256": "ad0f863a870f4412c6c9eca2908bd3a8d91563100fe821b65c3ef2a62c56f2bd"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "rajmachi",
+        "name": "Lonavala · Rajmachi",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 18.8,
+          "west": 73.37,
+          "north": 18.86,
+          "east": 73.43
+        },
+        "terrainBounds": {
+          "south": 18,
+          "west": 73,
+          "north": 20,
+          "east": 74
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 18.83,
+          "longitude": 73.4,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N18E073.hgt",
+            "size": 25934402,
+            "sha256": "73523b876c229607f421c529b8c91a5ed7dd9b504ba413064b5ab0fcb193361b"
+          },
+          {
+            "path": "terrain/N19E073.hgt",
+            "size": 25934402,
+            "sha256": "32f6fe1bece89cbc207620e6ac73a42d38c18cdbd6dff0c5df600ed386b4e562"
+          },
+          {
+            "path": "peaks.json",
+            "size": 1558,
+            "sha256": "651dec2fbc8e63b8ee6dda2b34d11a8fdde9699ab2b96f7141691181dbde36fc"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1388,
+            "sha256": "7bdcced23ea0e51def8b65f4c879e206a2641be1f2361435a9e3488f8e6212b8"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mount-abu",
+      "country": "India",
+      "description": "Guru Shikhar, highest point of the Aravalli · Rajasthan",
+      "assetDirectory": "regions/mount-abu",
+      "tiles": [
+        {
+          "path": "terrain/N24E072.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E072.hgt.gz",
+          "downloadBytes": 9347532,
+          "downloadSha256": "b697f9120dca1818ec77a101db44de26894682d9f7bc61db7b194ce69fdd388d"
+        },
+        {
+          "path": "terrain/N24E073.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E073.hgt.gz",
+          "downloadBytes": 12452241,
+          "downloadSha256": "deedcd48cd4cdfec9c7ae7d2f0a1ac856f657d70c47944ba4bc42969f2150718"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "mount-abu",
+        "name": "Mount Abu · Guru Shikhar",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 24.62,
+          "west": 72.75,
+          "north": 24.68,
+          "east": 72.81
+        },
+        "terrainBounds": {
+          "south": 24,
+          "west": 72,
+          "north": 25,
+          "east": 74
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 24.65,
+          "longitude": 72.78,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N24E072.hgt",
+            "size": 25934402,
+            "sha256": "1d81febe715a6ac7de745a71c246e4db37e6a531aef0e694a66179e6ca290cd6"
+          },
+          {
+            "path": "terrain/N24E073.hgt",
+            "size": 25934402,
+            "sha256": "9337e8acf3f1c07a0278a01e7fb47661fd8104a5efa443fd363719465c055511"
+          },
+          {
+            "path": "peaks.json",
+            "size": 3756,
+            "sha256": "23bc51199e0be2c5b9effa310b79e1e546be07164cfeb9536a48a3542a6c54fd"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1393,
+            "sha256": "3b8b41c155f9c0b32ac5021b12e2020241621502dcf17158098972ee65b21bfd"
+          }
+        ]
+      }
+    },
+    {
+      "id": "saputara",
+      "country": "India",
+      "description": "Saputara and the Sahyadri foothills · Gujarat",
+      "assetDirectory": "regions/saputara",
+      "tiles": [
+        {
+          "path": "terrain/N20E073.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N20/N20E073.hgt.gz",
+          "downloadBytes": 12116360,
+          "downloadSha256": "c6b8406c92060e78c74ee75d10b023af0e77ef5d830d1cd19c93e489daf4e60c"
+        },
+        {
+          "path": "terrain/N20E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N20/N20E074.hgt.gz",
+          "downloadBytes": 8748806,
+          "downloadSha256": "ef70a067771e5bcc09c627d7d64a97ea67d7998408c6d2e5fcb8f7fd25af0117"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "saputara",
+        "name": "Saputara",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 20.55,
+          "west": 73.72,
+          "north": 20.61,
+          "east": 73.78
+        },
+        "terrainBounds": {
+          "south": 20,
+          "west": 73,
+          "north": 21,
+          "east": 75
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 20.58,
+          "longitude": 73.75,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N20E073.hgt",
+            "size": 25934402,
+            "sha256": "2409ab3b571241d7ff776020d6ad38eabccd2746e1bd4e1c64121f9ad75f6ca0"
+          },
+          {
+            "path": "terrain/N20E074.hgt",
+            "size": 25934402,
+            "sha256": "2c756bbe4da98c814e7b544f4739772c91015f0d2f8b9fa496554ddfd6b59f2d"
+          },
+          {
+            "path": "peaks.json",
+            "size": 9096,
+            "sha256": "406307115814777f49adbff0dcea0b807d3795611f54e8d5678da6cd8394d706"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1376,
+            "sha256": "d9e8896eebe00691001b8c301f023c1cd052f8c942c88701cffffd6b62725266"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pachmarhi",
+      "country": "India",
+      "description": "Dhupgarh and the Satpura range · Madhya Pradesh",
+      "assetDirectory": "regions/pachmarhi",
+      "tiles": [
+        {
+          "path": "terrain/N22E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E078.hgt.gz",
+          "downloadBytes": 9857849,
+          "downloadSha256": "fa2bfe7c1ebb07ef5cb61384b768afa27ca407d44557a0278be9daa0127a40b8"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "pachmarhi",
+        "name": "Pachmarhi · Dhupgarh",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 22.44,
+          "west": 78.4,
+          "north": 22.5,
+          "east": 78.46
+        },
+        "terrainBounds": {
+          "south": 22,
+          "west": 78,
+          "north": 23,
+          "east": 79
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 22.47,
+          "longitude": 78.43,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N22E078.hgt",
+            "size": 25934402,
+            "sha256": "758773c3f337c044dc356468099ffd56b0e1b9657a6be834c6b458f7e5add4bf"
+          },
+          {
+            "path": "peaks.json",
+            "size": 22992,
+            "sha256": "1adb3619a60a562cec453ffaaa405d9069bce83ce2d3c90466dd4726c24619d2"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1318,
+            "sha256": "68828223c055799cf51ab2bdf0906bd7a632de15daccc7c6f3ce624ce65676b7"
+          }
+        ]
+      }
+    },
+    {
       "id": "poon-hill",
       "country": "Nepal",
       "description": "Poon Hill and Ghorepani viewpoints · Annapurna Himalaya",

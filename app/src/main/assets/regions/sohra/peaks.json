@@ -1,0 +1,98 @@
+[
+  {
+    "id": "geonames:1186511",
+    "name": "Taramun Tīla",
+    "latitude": 25.04606,
+    "longitude": 91.65541,
+    "elevationM": null,
+    "countryCode": "BD",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1186511/",
+    "modified": "2016-11-09",
+    "featureCode": "HLL"
+  },
+  {
+    "id": "geonames:1191682",
+    "name": "Orthoki Tīla",
+    "latitude": 24.82168,
+    "longitude": 91.81775,
+    "elevationM": null,
+    "countryCode": "BD",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1191682/",
+    "modified": "2016-11-09",
+    "featureCode": "HLL"
+  },
+  {
+    "id": "geonames:1196085",
+    "name": "Lauraga Tīla",
+    "latitude": 24.44284,
+    "longitude": 91.7767,
+    "elevationM": null,
+    "countryCode": "BD",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1196085/",
+    "modified": "2016-11-09",
+    "featureCode": "HLL"
+  },
+  {
+    "id": "geonames:1199413",
+    "name": "Kailas Tila",
+    "latitude": 24.78333,
+    "longitude": 92.03333,
+    "elevationM": null,
+    "countryCode": "BD",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1199413/",
+    "modified": "2016-11-09",
+    "featureCode": "HLL"
+  },
+  {
+    "id": "geonames:1210019",
+    "name": "Barutni Tīla",
+    "latitude": 24.96707,
+    "longitude": 91.98872,
+    "elevationM": null,
+    "countryCode": "BD",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1210019/",
+    "modified": "2016-11-09",
+    "featureCode": "HLL"
+  },
+  {
+    "id": "geonames:1213353",
+    "name": "Abangi Tīla",
+    "latitude": 24.93333,
+    "longitude": 91.85,
+    "elevationM": null,
+    "countryCode": "BD",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1213353/",
+    "modified": "2016-11-09",
+    "featureCode": "HLL"
+  },
+  {
+    "id": "geonames:1256565",
+    "name": "Sherpai",
+    "latitude": 25.15,
+    "longitude": 92.73333,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1256565/",
+    "modified": "2003-02-13",
+    "featureCode": "MT"
+  },
+  {
+    "id": "geonames:1263438",
+    "name": "Maryngksih",
+    "latitude": 25.24781,
+    "longitude": 92.64798,
+    "elevationM": null,
+    "countryCode": "IN",
+    "source": "GeoNames (CC BY 4.0)",
+    "sourceUrl": "https://www.geonames.org/1263438/",
+    "modified": "2024-01-06",
+    "featureCode": "MT"
+  }
+]
