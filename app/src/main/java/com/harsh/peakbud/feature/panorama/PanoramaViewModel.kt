@@ -46,6 +46,8 @@ data class PanoramaState(
     val compassStatus: String? = null,
     val importing: String? = null,
     val preferences: Preferences = Preferences(),
+    /** Manual label offset in degrees, set with Nudge labels. */
+    val labelTrim: Double = 0.0,
 ) {
     /** Fictional terrain is shown only while demo mode is switched on in Settings. */
     val isDemo: Boolean get() = activePack == null && preferences.demoMode
@@ -145,7 +147,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         lastGpsPoint = null
         mutable.update { it.copy(activePack = pack, point = pack?.viewpoint ?: DemoTerrain.VIEWPOINT,
             heading = pack?.headingDeg ?: 350.0, groundOverrideM = null, followingGps = false, followingCompass = false,
-            gpsStatus = null, gpsFresh = false, cameraPose = null, compassStatus = null, message = null) }
+            gpsStatus = null, gpsFresh = false, cameraPose = null, compassStatus = null, message = null, labelTrim = 0.0) }
         recalculate()
         viewModelScope.launch { runCatching { settings.selectRegion(pack?.key) } }
     }
@@ -158,12 +160,12 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     fun trimCompass(degrees: Double) {
         yawTrim = Geography.wrap180(yawTrim + degrees)
         lastSmoothedHeading = lastSmoothedHeading?.let { Geography.wrap360(it + degrees) }
-        mutable.update { it.copy(heading = Geography.wrap360(it.heading + degrees), cameraPose = it.cameraPose?.let { p -> p.copy(heading = Geography.wrap360(p.heading + degrees)) }) }
+        mutable.update { it.copy(labelTrim = yawTrim, heading = Geography.wrap360(it.heading + degrees), cameraPose = it.cameraPose?.let { p -> p.copy(heading = Geography.wrap360(p.heading + degrees)) }) }
     }
     fun resetTrim() {
         val old = yawTrim; yawTrim = 0.0
         lastSmoothedHeading = lastSmoothedHeading?.let { Geography.wrap360(it - old) }
-        mutable.update { it.copy(heading = Geography.wrap360(it.heading - old), cameraPose = it.cameraPose?.let { p -> p.copy(heading = Geography.wrap360(p.heading - old)) }) }
+        mutable.update { it.copy(labelTrim = 0.0, heading = Geography.wrap360(it.heading - old), cameraPose = it.cameraPose?.let { p -> p.copy(heading = Geography.wrap360(p.heading - old)) }) }
     }
     fun pose(value: DevicePose) {
         if (!mutable.value.followingCompass) return

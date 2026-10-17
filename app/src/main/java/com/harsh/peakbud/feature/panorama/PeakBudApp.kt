@@ -46,7 +46,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.harsh.peakbud.feature.camera.CameraPanel
-import com.harsh.peakbud.feature.camera.FullScreenCamera
 import com.harsh.peakbud.core.geo.Geography
 import com.harsh.peakbud.core.model.*
 import com.harsh.peakbud.data.regions.RegionPack
@@ -62,9 +61,13 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
     val configuration = LocalConfiguration.current
     val compact = configuration.screenWidthDp > configuration.screenHeightDp
     var tab by rememberSaveable { mutableIntStateOf(0) }
-    var cameraMode by rememberSaveable { mutableStateOf(true) }
-    var fullScreenCamera by rememberSaveable { mutableStateOf(false) }
-    BackHandler(enabled = fullScreenCamera) { fullScreenCamera = false }
+    // Tabs: 0 Camera (always full screen), 1 Panorama, 2 Peaks, 3 Regions.
+    val cameraTab = tab == 0
+    // Tapping the empty camera view hides every control; leaving the tab or pressing back brings them back.
+    var immersive by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(tab) { immersive = false }
+    BackHandler(enabled = immersive) { immersive = false }
+    BackHandler(enabled = !immersive && tab != 0) { tab = 0 }
     var cameraFov by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     var askedLocation by rememberSaveable { mutableStateOf(false) }
     var manual by rememberSaveable { mutableStateOf(false) }
@@ -92,19 +95,19 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
     val rotation = if (Build.VERSION.SDK_INT >= 30) context.display?.rotation ?: 0
         else (context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
     LaunchedEffect(state.followingGps, lifecycle, tab, device) {
-        if (state.followingGps && tab == 0) lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        if (state.followingGps && tab <= 1) lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             model.refreshFixAge()
             launch { device.fixes().collect(model::gps) }
             launch { while (true) { delay(5000); model.refreshFixAge() } }
         }
     }
     LaunchedEffect(state.followingCompass, rotation, lifecycle, tab, device) {
-        if (state.followingCompass && tab == 0) lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        if (state.followingCompass && tab <= 1) lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             device.poses(rotation).collect(model::pose)
         }
     }
-    LaunchedEffect(cameraMode, tab, state.activePack?.key, state.initialized) {
-        if (cameraMode && tab == 0 && state.initialized) {
+    LaunchedEffect(tab, state.activePack?.key, state.initialized) {
+        if (cameraTab && state.initialized) {
             model.startCameraTracking()
             if (!state.followingGps && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) model.startGps()
         }
@@ -116,17 +119,23 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
             permissions.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
         else model.startGps()
     }
-    if (fullScreenCamera) {
-        FullScreenCamera(state, { fullScreenCamera = false }, { fullScreenCamera = false; tab = 2 }, ::gps,
-            model::startCameraTracking, { cameraFov = it }) { selectedPeak = it }
-    } else Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    // Light status-bar icons over the camera, dark ones over the paper background.
+    val view = androidx.compose.ui.platform.LocalView.current
+    if (!view.isInEditMode) SideEffect {
+        (view.context as? android.app.Activity)?.window?.let { window ->
+            androidx.core.view.WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !cameraTab
+        }
+    }
+    Box(Modifier.fillMaxSize().background(if (cameraTab) Color.Black else MaterialTheme.colorScheme.background)) {
         // Space the floating tab bar occupies above the system navigation bar.
         val barSpace = 84.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-        Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 16.dp).padding(bottom = if (tab == 0) barSpace else 0.dp),
+        if (cameraTab) CameraTab(state, model, cameraFov, barSpace, immersive, onImmersive = { immersive = it }, onFov = { cameraFov = it },
+            onRegions = { tab = 3 }, onGps = ::gps, onSettings = { settings = true }, onPeak = { selectedPeak = it })
+        else Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 16.dp).padding(bottom = if (tab == 1) barSpace else 0.dp),
             verticalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 10.dp)) {
             AppHeader(compact, when (tab) {
-                1 -> if (state.noRegion) "Peaks · pick a hiking area to start" else if (state.isDemo) "Peaks · demo landscape" else "Peaks within ${(state.activePack?.radiusM ?: 0.0).toInt() / 1000} km of this spot"
-                2 -> "Hiking areas · download once, works offline"
+                2 -> if (state.noRegion) "Peaks · pick a hiking area to start" else if (state.isDemo) "Peaks · demo landscape" else "Peaks within ${(state.activePack?.radiusM ?: 0.0).toInt() / 1000} km of this spot"
+                3 -> "Hiking areas · download once, works offline"
                 else -> state.activePack?.name ?: if (state.isDemo) "Demo · made-up landscape" else "Pick a hiking area to start"
             }) { settings = true }
             state.message?.let { message ->
@@ -138,34 +147,12 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                 }
             }
             when (tab) {
-                0 -> {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        SingleChoiceSegmentedButtonRow(Modifier.weight(1f)) {
-                            SegmentedButton(selected = cameraMode, onClick = { cameraMode = true }, shape = SegmentedButtonDefaults.itemShape(0, 2),
-                                icon = { SegmentedButtonDefaults.Icon(cameraMode) { Icon(painterResource(R.drawable.ic_photo_camera), null, Modifier.size(18.dp)) } }) { Text("Camera") }
-                            SegmentedButton(selected = !cameraMode, onClick = { cameraMode = false }, shape = SegmentedButtonDefaults.itemShape(1, 2),
-                                icon = { SegmentedButtonDefaults.Icon(!cameraMode) { Icon(painterResource(R.drawable.ic_landscape), null, Modifier.size(18.dp)) } }) { Text("Panorama") }
-                        }
-                        if (cameraMode) FilledTonalIconButton(onClick = { fullScreenCamera = true }) { Icon(painterResource(R.drawable.ic_fullscreen), contentDescription = "Full screen") }
-                    }
-                    if (!compact) ObservationStatus(state, cameraMode, cameraFov, false, ::gps, model::startCameraTracking)
-                    if (cameraMode) {
-                        if (compact) {
-                            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                CameraPanel(state, Modifier.weight(1f).fillMaxHeight().clip(MaterialTheme.shapes.large), { tab = 2 }, ::gps, model::startCameraTracking, { cameraFov = it }) { selectedPeak = it }
-                                Column(Modifier.width(300.dp).fillMaxHeight().verticalScroll(rememberScrollState())) {
-                                    ObservationStatus(state, true, cameraFov, true, ::gps, model::startCameraTracking)
-                                    AlignmentControls(model)
-                                }
-                            }
-                        } else {
-                            CameraPanel(state, Modifier.weight(1f).fillMaxWidth().clip(MaterialTheme.shapes.large), { tab = 2 }, ::gps, model::startCameraTracking, { cameraFov = it }) { selectedPeak = it }
-                            AlignmentControls(model)
-                        }
-                    } else BoxWithConstraints(Modifier.weight(1f)) {
+                1 -> {
+                    if (!compact) ObservationStatus(state, false, null, false, ::gps, model::startCameraTracking)
+                    BoxWithConstraints(Modifier.weight(1f)) {
                         if (maxWidth > maxHeight) {
                             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                                PanoramaPanel(state, model, Modifier.weight(1f).fillMaxHeight(), { tab = 2 }) { selectedPeak = it }
+                                PanoramaPanel(state, model, Modifier.weight(1f).fillMaxHeight(), { tab = 3 }) { selectedPeak = it }
                                 Column(Modifier.width(320.dp).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     if (compact) ObservationStatus(state, false, null, true, ::gps, model::startCameraTracking)
                                     ViewControls(state, model, { manual = true }, ::gps)
@@ -173,19 +160,23 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                             }
                         } else {
                             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                PanoramaPanel(state, model, Modifier.fillMaxWidth().weight(1f), { tab = 2 }) { selectedPeak = it }
+                                PanoramaPanel(state, model, Modifier.fillMaxWidth().weight(1f), { tab = 3 }) { selectedPeak = it }
                                 ViewControls(state, model, { manual = true }, ::gps)
                             }
                         }
                     }
                 }
-                1 -> PeakList(state, Modifier.weight(1f), barSpace) { selectedPeak = it }
-                2 -> Regions(state, Modifier.weight(1f), barSpace, model::downloadRegion,
-                    { model.selectRegion(it); if (it == null) cameraMode = false; tab = 0 }, { deletePack = it }, { pack -> scope.launch { attribution = runCatching { model.attribution(pack) }.getOrDefault("Credits couldn't be loaded.") } }, model::cancelImport,
+                2 -> PeakList(state, Modifier.weight(1f), barSpace) { selectedPeak = it }
+                3 -> Regions(state, Modifier.weight(1f), barSpace, model::downloadRegion,
+                    { model.selectRegion(it); tab = if (it == null) 1 else 0 }, { deletePack = it }, { pack -> scope.launch { attribution = runCatching { model.attribution(pack) }.getOrDefault("Credits couldn't be loaded.") } }, model::cancelImport,
                     model::discardDownload)
             }
         }
-        FloatingTabBar(tab, { tab = it }, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = 12.dp))
+        AnimatedVisibility(!(cameraTab && immersive), Modifier.align(Alignment.BottomCenter),
+            enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.slideInVertically { it / 2 },
+            exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.slideOutVertically { it / 2 }) {
+            FloatingTabBar(tab, cameraTab, { tab = it }, Modifier.navigationBarsPadding().padding(bottom = 12.dp))
+        }
     }
     if (manual) ViewpointDialog(state, { manual = false }) { point, ground -> model.manualViewpoint(point, ground); manual = false }
     if (settings) SettingsDialog(state, model) { settings = false }
@@ -208,10 +199,156 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                 Text("${coordinate(peak.peak.point.latitude)}, ${coordinate(peak.peak.point.longitude)}\nSource: ${peak.peak.source}", style = MaterialTheme.typography.bodySmall)
                 peak.geometryHeightM?.let { Text("The map puts the ground here at ${height(it, state)}. The official summit height may differ.", style = MaterialTheme.typography.bodySmall) }
             }
-        }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; fullScreenCamera = false; cameraMode = false; tab = 0 }) { Text("Show in panorama") } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text("Close") } })
+        }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; tab = 1 }) { Text("Show in panorama") } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text("Close") } })
     }
     attribution?.let { text -> AlertDialog(onDismissRequest = { attribution = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text("Map and peak credits") }, text = { Text(text, Modifier.verticalScroll(rememberScrollState())) }, confirmButton = { TextButton(onClick = { attribution = null }) { Text("Done") } }) }
     deletePack?.let { pack -> AlertDialog(onDismissRequest = { deletePack = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text("Delete ${pack.name}?") }, text = { Text("Its maps and peak names will be removed from this phone. You can download it again any time.") }, confirmButton = { TextButton(onClick = { model.deleteRegion(pack); deletePack = null }) { Text("Delete") } }, dismissButton = { TextButton(onClick = { deletePack = null }) { Text("Keep") } }) }
+}
+
+/** Shown once per launch so people learn that tapping the view hides the controls. */
+private var hideHintShown = false
+
+/**
+ * Full-screen camera tab. The preview fills the display; controls float above it on translucent pills,
+ * following AR conventions (PeakFinder, Star Walk, Apple HIG): status at the top, area and navigation at
+ * the bottom, fine adjustment behind the heading chip and by dragging the view.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov: Pair<Double, Double>?, barSpace: Dp, immersive: Boolean,
+                      onImmersive: (Boolean) -> Unit, onFov: (Pair<Double, Double>?) -> Unit, onRegions: () -> Unit, onGps: () -> Unit,
+                      onSettings: () -> Unit, onPeak: (PeakView) -> Unit) {
+    val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
+    var sheet by rememberSaveable { mutableStateOf(false) }
+    var showHint by remember { mutableStateOf(!hideHintShown) }
+    // Drag-to-nudge bookkeeping: where the gesture started (for Undo) and the last whole degree (for haptic ticks).
+    var dragStart by remember { mutableStateOf<Double?>(null) }
+    var shifted by remember { mutableStateOf<Double?>(null) }
+    LaunchedEffect(showHint) { if (showHint) { kotlinx.coroutines.delay(5000); showHint = false; hideHintShown = true } }
+    LaunchedEffect(shifted) { if (shifted != null) { kotlinx.coroutines.delay(4000); shifted = null } }
+    val statusTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val topBar = statusTop + 72.dp
+    val showControls = !immersive
+    Box(Modifier.fillMaxSize()) {
+        CameraPanel(state, Modifier.fillMaxSize(), onRegions, onGps, model::startCameraTracking, onFov, fullScreen = true,
+            safeTop = if (showControls) topBar else statusTop, safeBottom = if (showControls) barSpace + 40.dp else 24.dp,
+            onBackgroundTap = { onImmersive(!immersive); showHint = false; hideHintShown = true },
+            onDragNudge = { degrees ->
+                if (dragStart == null) dragStart = state.labelTrim
+                val before = kotlin.math.floor(state.labelTrim)
+                model.trimCompass(degrees)
+                if (kotlin.math.floor(state.labelTrim + degrees) != before) haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.SegmentTick)
+            },
+            onDragEnd = { dragStart?.let { shifted = it }; dragStart = null },
+            onPeak = { haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.ContextClick); onPeak(it) })
+        AnimatedVisibility(showControls, enter = androidx.compose.animation.fadeIn(), exit = androidx.compose.animation.fadeOut()) {
+            Box(Modifier.fillMaxSize()) {
+                // Gradient scrims keep white controls legible over snow and sky without boxing in the scene.
+                Box(Modifier.fillMaxWidth().height(statusTop + 96.dp).background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Black.copy(alpha = .55f), Color.Transparent))))
+                Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(barSpace + 96.dp).background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .5f)))))
+                Column(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Box(Modifier.fillMaxWidth()) {
+                        LocationChip(state, Modifier.align(Alignment.CenterStart)) { sheet = true }
+                        HeadingChip(state, Modifier.align(Alignment.Center)) { sheet = true }
+                        GlassIconButton(R.drawable.ic_settings, "Settings", Modifier.align(Alignment.CenterEnd), onSettings)
+                    }
+                    if (state.followingCompass && state.cameraPose != null && !state.poseReliable)
+                        GlassPill(color = Color(0xE6A45D36)) { Text("Compass unsteady · wave your phone in a figure eight", style = MaterialTheme.typography.labelMedium) }
+                    if (showHint) GlassPill { Text("Tap anywhere to hide controls", style = MaterialTheme.typography.labelMedium) }
+                }
+                Column(Modifier.align(Alignment.BottomCenter).padding(bottom = barSpace + 4.dp), horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    shifted?.let { start ->
+                        GlassPill(Modifier.padding(start = 16.dp, end = 4.dp)) {
+                            Text("Labels shifted ${signedDegrees(state.labelTrim)}", style = MaterialTheme.typography.labelMedium)
+                            TextButton(onClick = { model.trimCompass(start - state.labelTrim); shifted = null }, colors = ButtonDefaults.textButtonColors(contentColor = Color.White)) { Text("Undo") }
+                        }
+                    }
+                    Row(Modifier.clip(CircleShape).clickable(onClick = onRegions).padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(state.activePack?.name ?: if (state.isDemo) "Demo landscape" else "Choose a hiking area", style = MaterialTheme.typography.labelLarge, color = Color.White)
+                        Icon(painterResource(R.drawable.ic_expand_more), null, Modifier.size(18.dp), tint = Color.White.copy(alpha = .8f))
+                    }
+                }
+            }
+        }
+    }
+    if (sheet) ModalBottomSheet(onDismissRequest = { sheet = false }, sheetState = rememberModalBottomSheetState(),
+        containerColor = MaterialTheme.colorScheme.background) {
+        Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(state.cameraPose?.heading?.let { "Pointing ${it.toInt().toString().padStart(3, '0')}° ${cardinal(it)}" } ?: "Compass", style = MaterialTheme.typography.titleLarge)
+            Text(when {
+                !state.followingCompass -> "The compass is off. Turn it on so labels follow where you point."
+                !state.poseReliable -> state.compassStatus ?: "The compass is unsteady. Move away from metal and wave your phone in a figure eight."
+                else -> "The compass is steady and labels follow where you point."
+            }, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            SectionLabel("Line up labels")
+            SettingsGroup {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("If labels sit beside the real peaks, shift them here or drag the camera view sideways.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                        FilledTonalIconButton(onClick = { model.trimCompass(-1.0); haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.SegmentTick) },
+                            modifier = Modifier.size(48.dp)) { Text("‹ 1°", style = MaterialTheme.typography.labelLarge) }
+                        Text(if (state.labelTrim == 0.0) "Not shifted" else signedDegrees(state.labelTrim), style = MaterialTheme.typography.titleMedium)
+                        FilledTonalIconButton(onClick = { model.trimCompass(1.0); haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.SegmentTick) },
+                            modifier = Modifier.size(48.dp)) { Text("1° ›", style = MaterialTheme.typography.labelLarge) }
+                        TextButton(enabled = state.labelTrim != 0.0, onClick = { model.resetTrim(); haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.Confirm) }) { Text("Reset") }
+                    }
+                }
+            }
+            SectionLabel("Your position")
+            ObservationStatus(state, true, cameraFov, false, onGps, model::startCameraTracking, detailsOnly = true)
+        }
+    }
+}
+
+internal fun signedDegrees(value: Double) = "${if (value > 0) "+" else if (value < 0) "−" else ""}${String.format(Locale.US, "%.0f", kotlin.math.abs(value))}°"
+
+/** Top-left: location accuracy at a glance. */
+@Composable
+private fun LocationChip(state: PanoramaState, modifier: Modifier, onClick: () -> Unit) {
+    val text = when {
+        !state.followingGps -> "Off"
+        state.gpsFresh && state.gpsFix != null -> "${state.gpsFix!!.accuracyM.toInt()} m"
+        else -> "Finding…"
+    }
+    Surface(onClick = onClick, modifier = modifier.height(40.dp).semantics { contentDescription = "Location: ${state.gpsStatus ?: text}. Show details" },
+        shape = CircleShape, color = Color.Black.copy(alpha = .55f), contentColor = Color.White) {
+        Row(Modifier.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            if (state.followingGps && !state.gpsFresh) CircularProgressIndicator(Modifier.size(14.dp), color = Color.White, strokeWidth = 2.dp)
+            else Icon(painterResource(R.drawable.ic_my_location), null, Modifier.size(18.dp))
+            Text(text, style = MaterialTheme.typography.labelLarge)
+        }
+    }
+}
+
+/** Top-centre: heading with a status dot (green steady, amber unsteady, white ring when labels are shifted). */
+@Composable
+private fun HeadingChip(state: PanoramaState, modifier: Modifier, onClick: () -> Unit) {
+    val heading = state.cameraPose?.heading
+    val dot = when { !state.followingCompass || heading == null -> Color.White.copy(alpha = .5f); !state.poseReliable -> Color(0xFFF2A65A); else -> Color(0xFF6FD39B) }
+    Surface(onClick = onClick, modifier = modifier.height(40.dp).semantics { contentDescription = "Heading ${heading?.toInt() ?: "unknown"} degrees. Compass and label settings" },
+        shape = CircleShape, color = Color.Black.copy(alpha = .55f), contentColor = Color.White) {
+        Row(Modifier.padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Box(Modifier.size(8.dp).clip(CircleShape).background(dot)
+                .then(if (state.labelTrim != 0.0) Modifier.border(1.5.dp, Color.White, CircleShape) else Modifier))
+            Text(heading?.let { "${it.toInt().toString().padStart(3, '0')}° ${cardinal(it)}" } ?: "Pointing…", style = MaterialTheme.typography.titleSmall)
+        }
+    }
+}
+
+@Composable
+private fun GlassIconButton(icon: Int, description: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = CircleShape, color = Color.Black.copy(alpha = .55f), contentColor = Color.White, modifier = modifier.size(40.dp)) {
+        Box(contentAlignment = Alignment.Center) { Icon(painterResource(icon), contentDescription = description, Modifier.size(20.dp)) }
+    }
+}
+
+@Composable
+private fun GlassPill(modifier: Modifier = Modifier, color: Color = Color.Black.copy(alpha = .55f), content: @Composable RowScope.() -> Unit) {
+    Surface(shape = CircleShape, color = color, contentColor = Color.White) {
+        Row(modifier.heightIn(min = 36.dp).padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically, content = content)
+    }
 }
 
 @Composable
@@ -231,24 +368,25 @@ private fun AppHeader(compact: Boolean, context: String, onSettings: () -> Unit)
 
 /** Pill-shaped bar floating above content. The selected tab expands to show its label. */
 @Composable
-private fun FloatingTabBar(selected: Int, onSelect: (Int) -> Unit, modifier: Modifier) {
-    val tabs = listOf("Camera" to R.drawable.ic_photo_camera, "Peaks" to R.drawable.ic_landscape, "Regions" to R.drawable.ic_map)
-    Surface(modifier, shape = CircleShape, color = Color(0xFF16352A), contentColor = Color.White, shadowElevation = 12.dp) {
+private fun FloatingTabBar(selected: Int, overCamera: Boolean, onSelect: (Int) -> Unit, modifier: Modifier) {
+    val tabs = listOf("Camera" to R.drawable.ic_photo_camera, "Panorama" to R.drawable.ic_panorama, "Peaks" to R.drawable.ic_landscape, "Regions" to R.drawable.ic_map)
+    // Over the camera the bar turns translucent so the scene shows through; elsewhere it is solid forest green.
+    Surface(modifier, shape = CircleShape, color = if (overCamera) Color.Black.copy(alpha = .55f) else Color(0xFF16352A), contentColor = Color.White, shadowElevation = if (overCamera) 0.dp else 12.dp) {
         Row(Modifier.padding(6.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
             tabs.forEachIndexed { index, (label, icon) ->
                 val active = index == selected
                 Row(Modifier.clip(CircleShape)
-                    .background(if (active) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
+                    .background(if (active) (if (overCamera) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer) else Color.Transparent)
                     .clickable { onSelect(index) }
                     .semantics(mergeDescendants = true) { role = Role.Tab; this.selected = active; contentDescription = label }
                     .animateContentSize()
-                    .padding(horizontal = if (active) 18.dp else 16.dp, vertical = 12.dp),
+                    .padding(horizontal = if (active) 16.dp else 14.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                     Icon(painterResource(icon), contentDescription = null, Modifier.size(22.dp),
-                        tint = if (active) MaterialTheme.colorScheme.onPrimaryContainer else Color.White.copy(alpha = .72f))
+                        tint = if (active) (if (overCamera) Color.White else MaterialTheme.colorScheme.onPrimaryContainer) else Color.White.copy(alpha = .72f))
                     if (active) {
                         Spacer(Modifier.width(8.dp))
-                        Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Text(label, style = MaterialTheme.typography.labelLarge, color = if (overCamera) Color.White else MaterialTheme.colorScheme.onPrimaryContainer)
                     }
                 }
             }
@@ -257,27 +395,12 @@ private fun FloatingTabBar(selected: Int, onSelect: (Int) -> Unit, modifier: Mod
 }
 
 @Composable
-private fun AlignmentControls(model: PanoramaViewModel) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
-            Row(Modifier.padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("Nudge labels", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.width(4.dp))
-                TextButton(onClick = { model.trimCompass(-1.0) }, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("← 1°") }
-                TextButton(onClick = { model.trimCompass(1.0) }, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("1° →") }
-                TextButton(onClick = model::resetTrim, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("Reset") }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraFov: Pair<Double, Double>?, compact: Boolean, onGps: () -> Unit, onCompass: () -> Unit) {
+private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraFov: Pair<Double, Double>?, compact: Boolean, onGps: () -> Unit, onCompass: () -> Unit, startExpanded: Boolean = false, detailsOnly: Boolean = false) {
     val context = LocalContext.current
     val fix = state.gpsFix
     val heading = if (cameraMode) state.cameraPose?.heading else state.heading
     val bearing = heading?.let { "${it.toInt().toString().padStart(3, '0')}° ${cardinal(it)}" } ?: "---°"
-    var expanded by rememberSaveable { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(startExpanded) }
     val gpsSummary = when {
         !state.followingGps -> "Location off"
         state.gpsStatus != null -> state.gpsStatus
@@ -286,7 +409,7 @@ private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraF
     val directionSummary = if (state.followingCompass) "Following your phone" else "Drag to turn"
     Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = MaterialTheme.shapes.medium) {
         Column(Modifier.fillMaxWidth().padding(start = 14.dp, end = 4.dp, top = if (compact) 2.dp else 6.dp, bottom = if (compact) 2.dp else 6.dp)) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            if (!detailsOnly) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(bearing, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Text(listOfNotNull(directionSummary, gpsSummary).joinToString(" · "), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -298,7 +421,7 @@ private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraF
                 }
             }
             state.compassStatus?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error) }
-            AnimatedVisibility(expanded) {
+            AnimatedVisibility(expanded || detailsOnly) {
                 Column(Modifier.padding(end = 10.dp, top = 4.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     val small = MaterialTheme.typography.bodySmall
                     val muted = MaterialTheme.colorScheme.onSurfaceVariant
