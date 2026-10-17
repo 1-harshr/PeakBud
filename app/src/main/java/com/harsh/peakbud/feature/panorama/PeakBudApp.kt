@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import kotlin.math.roundToInt
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.ui.graphics.graphicsLayer
@@ -128,8 +129,14 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
             device.poses(rotation).collect(model::pose)
         }
     }
-    LaunchedEffect(tab, state.activePack?.key, state.initialized) {
-        if (cameraTab && state.initialized) {
+    // Leaving Demo mode brings the real location back.
+    var wasDemo by remember { mutableStateOf(state.isDemo) }
+    LaunchedEffect(state.isDemo) {
+        if (wasDemo && !state.isDemo && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) model.startGps()
+        wasDemo = state.isDemo
+    }
+    LaunchedEffect(tab, state.activePack?.key, state.initialized, state.isDemo) {
+        if (cameraTab && state.initialized && !state.isDemo) {
             model.startCameraTracking()
             if (!state.followingGps && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) model.startGps()
         }
@@ -138,6 +145,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
     LaunchedEffect(state.scene?.observer) { selectedPeak = null }
     LaunchedEffect(selectedPeak?.peak?.id) { selectedPeak?.let { Telemetry.event("peak_open", "visibility" to it.visibility.name.lowercase(), "from" to listOf("camera", "home", "peaks", "regions")[tab]) } }
     fun gps() {
+        if (state.isDemo) return  // demo mode never uses the real location
         if (state.followingGps) { model.stopGps(); return }
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             permissions.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
@@ -267,16 +275,34 @@ private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov:
     val statusTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val topBar = statusTop + TrailSize.cameraBarClearance
     val showControls = !immersive
-    val alignment by model.alignment.ui.collectAsStateWithLifecycle()
+    val realAlignment by model.alignment.ui.collectAsStateWithLifecycle()
+    // Demo mode: no camera. Pre-rendered footage of the made-up range, and a scripted "Align with camera".
+    val demo = state.isDemo
+    val demoStory = remember { androidx.compose.animation.core.Animatable(0f) }
+    var demoPhase by remember { mutableStateOf(AlignmentPhase.SENSOR) }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(demo) { if (!demo) { demoPhase = AlignmentPhase.SENSOR; demoStory.snapTo(0f) } }
+    val alignment = if (demo) AlignmentUi(demoPhase, if (demoPhase == AlignmentPhase.ALIGNED) com.harsh.peakbud.core.alignment.AlignmentCorrection(0.0, 0.0) else null)
+        else realAlignment
+    val startAlign: () -> Unit = if (demo) ({
+        scope.launch {
+            demoStory.snapTo(0f); demoPhase = AlignmentPhase.ALIGNING
+            demoStory.animateTo(1f, androidx.compose.animation.core.tween(4_500, easing = androidx.compose.animation.core.LinearEasing))
+            demoPhase = AlignmentPhase.ALIGNED
+        }
+    }) else ({ model.startAlignment(cameraFov?.first) })
+    val resetAlign: () -> Unit = if (demo) ({ scope.launch { demoStory.snapTo(0f); demoPhase = AlignmentPhase.SENSOR } }) else model::resetAlignment
     // Prepare the terrain prediction in the background once camera geometry and a heading are known, after the peak
     // calculation finishes so the two do not compete for the CPU. Tapping Align earlier builds it immediately.
     val headingBucket = state.cameraPose?.heading?.let { (it / 20).toInt() }
     LaunchedEffect(state.point, state.activePack?.key, cameraFov?.first?.toInt(), headingBucket, state.calculating) {
-        if (!state.calculating) model.prefetchAlignment(cameraFov?.first)
+        if (!state.calculating && !demo) model.prefetchAlignment(cameraFov?.first)
     }
-    val pose = alignment.pose(state.cameraPose)
+    val pose = if (demo) CameraPose(state.heading, 0.0, 0.0) else alignment.pose(state.cameraPose)
     Box(Modifier.fillMaxSize()) {
-        CameraPanel(state, Modifier.fillMaxSize(), onRegions, onGps, model::startCameraTracking, onFov, fullScreen = true,
+        if (demo) com.harsh.peakbud.feature.tutorial.DemoCamera(state.scene, Modifier.fillMaxSize().pointerInput(Unit) { detectTapGestures { onImmersive(!immersive) } },
+            com.harsh.peakbud.feature.tutorial.CameraDemo.ALIGN, storyProgress = demoStory.value, showPill = false)
+        else CameraPanel(state, Modifier.fillMaxSize(), onRegions, onGps, model::startCameraTracking, onFov, fullScreen = true,
             pose = pose, aligned = alignment.aligned, hiddenPeaks = alignment.hiddenByForeground,
             alignment = model.alignment, rawPose = { model.state.value.cameraPose },
             safeTop = if (showControls) topBar else statusTop + TrailSize.touchTarget,
@@ -298,7 +324,7 @@ private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov:
                 Column(Modifier.fillMaxWidth().statusBarsPadding().padding(start = railSpace).padding(horizontal = TrailSpace.lg, vertical = TrailSpace.sm), horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
                     Box(Modifier.fillMaxWidth()) {
-                        LocationChip(state, Modifier.align(Alignment.CenterStart)) { sheet = true }
+                        LocationChip(state, Modifier.align(Alignment.CenterStart)) { if (!demo) sheet = true }
                         HeadingChip(state, pose, alignment.aligned, Modifier.align(Alignment.Center)) { sheet = true }
                         GlassIconButton(R.drawable.ic_settings, strings(R.string.settings), Modifier.align(Alignment.CenterEnd), onSettings)
                     }
@@ -310,7 +336,7 @@ private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov:
                     else Modifier.align(Alignment.BottomCenter).padding(bottom = barSpace + TrailSize.cameraBarClearance + TrailSpace.xs),
                     horizontalAlignment = if (landscape) Alignment.End else Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
-                    AlignControl(alignment, onAlign = { model.startAlignment(cameraFov?.first) }, onReset = model::resetAlignment)
+                    AlignControl(alignment, onAlign = startAlign, onReset = resetAlign)
                     shifted?.let { start ->
                         GlassPill(Modifier.padding(start = TrailSpace.lg, end = TrailSpace.xs)) {
                             Text(strings(R.string.labels_shifted , signedDegrees(state.labelTrim, strings)), style = MaterialTheme.typography.labelMedium)
@@ -376,7 +402,10 @@ internal fun CameraPositionOverlay(state: PanoramaState, modifier: Modifier = Mo
         shape = MaterialTheme.shapes.medium, color = TrailCameraColors.scrim, contentColor = TrailCameraColors.content) {
         Column(Modifier.padding(horizontal = TrailSpace.md, vertical = TrailSpace.sm), verticalArrangement = Arrangement.spacedBy(TrailSpace.xxs)) {
             val fix = state.gpsFix
-            if (fix != null) {
+            if (state.isDemo) {
+                // Demo mode never uses the real location.
+                Text(strings(R.string.demo_viewpoint), style = MaterialTheme.typography.labelMedium)
+            } else if (fix != null) {
                 Text(strings(R.string.camera_coordinates, coordinate(fix.point.latitude), coordinate(fix.point.longitude)), style = MaterialTheme.typography.labelMedium)
                 val altitude = fix.seaLevelAltitudeM ?: fix.ellipsoidAltitudeM
                 val detail = listOfNotNull(
@@ -397,6 +426,7 @@ internal fun signedDegrees(value: Double, strings: TrailStrings) = strings(R.str
 private fun LocationChip(state: PanoramaState, modifier: Modifier, onClick: () -> Unit) {
     val strings = rememberTrailStrings()
     val text = when {
+        state.isDemo -> strings(R.string.demo)
         !state.followingGps -> strings(R.string.off)
         state.gpsFresh && state.gpsFix != null -> strings(R.string.metres_value , state.gpsFix!!.accuracyM.toInt())
         else -> strings(R.string.finding)
@@ -404,7 +434,7 @@ private fun LocationChip(state: PanoramaState, modifier: Modifier, onClick: () -
     Surface(onClick = onClick, modifier = modifier.heightIn(min = TrailSize.touchTarget).semantics { contentDescription = strings(R.string.location_show_details , state.gpsStatus ?: text) },
         shape = CircleShape, color = TrailCameraColors.scrim, contentColor = Color.White) {
         Row(Modifier.padding(horizontal = TrailSpace.md), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
-            if (state.followingGps && !state.gpsFresh) CircularProgressIndicator(Modifier.size(TrailSize.iconSmall), color = Color.White, strokeWidth = TrailStroke.normal)
+            if (!state.isDemo && state.followingGps && !state.gpsFresh) CircularProgressIndicator(Modifier.size(TrailSize.iconSmall), color = Color.White, strokeWidth = TrailStroke.normal)
             else Icon(painterResource(R.drawable.ic_my_location), null, Modifier.size(TrailSize.iconSmall))
             Text(text, style = MaterialTheme.typography.labelLarge)
         }
@@ -655,6 +685,7 @@ private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraF
     val bearing = heading?.let { strings(R.string.bearing_with_cardinal , it.toInt().toString().padStart(3, '0'), cardinal(it, strings)) } ?: strings(R.string.bearing_unknown)
     var expanded by rememberSaveable { mutableStateOf(startExpanded) }
     val gpsSummary = when {
+        state.isDemo -> strings(R.string.demo_viewpoint)
         !state.followingGps -> strings(R.string.location_off)
         state.gpsStatus != null -> state.gpsStatus
         else -> strings(R.string.finding_your_location)
@@ -709,7 +740,7 @@ private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifi
                     modifier = Modifier.size(TrailSize.iconSmall), tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .8f))
             }
             // Map-style round buttons instead of chips: locate me, follow the phone's direction, look from another spot.
-            if (state.scene != null || !state.noRegion) Column(Modifier.align(Alignment.BottomEnd).padding(end = TrailSpace.sm, bottom = TrailCanvas.footerClearance + TrailSpace.xs),
+            if (!state.isDemo && (state.scene != null || !state.noRegion)) Column(Modifier.align(Alignment.BottomEnd).padding(end = TrailSpace.sm, bottom = TrailCanvas.footerClearance + TrailSpace.xs),
                 verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
                 MapButton(R.drawable.ic_pin_drop, strings(R.string.choose_spot), active = !state.followingGps && !state.isDemo, onClick = onViewpoint)
                 MapButton(R.drawable.ic_explore, strings(R.string.follow_phone), active = state.followingCompass, onClick = model::toggleCompass)
@@ -1122,6 +1153,7 @@ private fun SettingSlider(title: String, value: String, current: Float, range: C
 
 /** Where the phone is right now: a place name when online, otherwise coordinates. */
 internal fun currentPlace(state: PanoramaState, strings: TrailStrings): String {
+    if (state.isDemo) return strings(R.string.demo_landscape)
     val fix = state.gpsFix ?: return if (state.followingGps) strings(R.string.finding_your_location) else strings(R.string.location_off)
     val where = state.placeName ?: strings(R.string.place_coordinates, kotlin.math.abs(fix.point.latitude),
         strings(if (fix.point.latitude >= 0) R.string.n else R.string.s), kotlin.math.abs(fix.point.longitude), strings(if (fix.point.longitude >= 0) R.string.e else R.string.w))

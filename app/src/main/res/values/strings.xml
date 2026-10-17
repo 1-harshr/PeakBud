@@ -132,7 +132,7 @@
     <string name="phone_height">Standing height</string>
     <string name="demo">Demo</string>
     <string name="demo_mode">Demo mode</string>
-    <string name="adds_a_made_up_landscape_so_you_can_try_peakbud_without_downloading">Adds a made-up landscape so you can try PeakBud without downloading</string>
+    <string name="adds_a_made_up_landscape_so_you_can_try_peakbud_without_downloading">Try PeakBud anywhere with a made-up mountain range. Uses demo camera footage and a demo spot instead of your camera and location.</string>
     <string name="privacy">Privacy</string>
     <string name="send_crash_reports_and_usage">Send crash reports and usage</string>
     <string name="helps_fix_problems_your_location_is_never_sent">Helps fix problems. Your location is never sent.</string>
@@ -308,4 +308,5 @@
     <string name="use_my_location_chip">Use my location</string>
     <string name="follow_phone">Follow phone</string>
     <string name="heights_stretched_caption">%1$s · heights ×%2$s</string>
+    <string name="demo_viewpoint">Demo viewpoint · your real location isn\'t used</string>
 </resources>

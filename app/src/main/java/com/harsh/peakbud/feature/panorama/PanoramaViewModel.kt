@@ -104,7 +104,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                     // Switching Demo mode on without an area shows the made-up landscape from its own viewpoint;
                     // the phone's real position lies outside it.
                     if (!previous.demoMode && value.demoMode && mutable.value.activePack == null)
-                        mutable.update { it.copy(point = DemoTerrain.VIEWPOINT, groundOverrideM = null, followingGps = false, gpsStatus = null, message = null) }
+                        mutable.update { it.copy(point = DemoTerrain.VIEWPOINT, heading = 350.0, groundOverrideM = null, followingGps = false, followingCompass = false, cameraPose = null, gpsStatus = null, message = null) }
                     if (previous.phoneHeightM != value.phoneHeightM || previous.demoMode != value.demoMode) recalculate()
                 }
         }
@@ -277,6 +277,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         mutable.update { it.copy(followingCompass = true, cameraPose = null) }
     }
     fun startGps() {
+        if (mutable.value.isDemo) return  // demo mode never uses the real location
         lastGpsPoint = null
         lastFixElapsedMs = null
         mutable.update { it.copy(followingGps = true, gpsFresh = false, gpsStatus = strings(R.string.finding_your_location)) }

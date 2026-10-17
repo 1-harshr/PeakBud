@@ -128,19 +128,24 @@ private fun rememberDemoScene(): MountainScene? {
     return scene
 }
 
-private enum class CameraDemo { LABELS, ALIGN }
+internal enum class CameraDemo { LABELS, ALIGN }
 
 /**
  * Rendered stand-in for camera footage: sky, distant range, nearer ridge and haze drawn from the demo skyline, with a
  * gentle hand-held sway. ALIGN mode loops the alignment story: labels start a few degrees off (compass estimate), the
  * skyline is traced, then the labels settle onto the summits with green rings.
  */
+/**
+ * [storyProgress] drives the alignment story from outside (0..1, held at 1 once aligned) for the Camera tab in Demo
+ * mode; null loops it, as in the tutorial. [showPill] draws the tutorial's own status pill.
+ */
 @Composable
-private fun DemoCamera(scene: MountainScene?, modifier: Modifier, mode: CameraDemo) {
+internal fun DemoCamera(scene: MountainScene?, modifier: Modifier, mode: CameraDemo, storyProgress: Float? = null, showPill: Boolean = true) {
     val strings = rememberTrailStrings()
     val sway = rememberInfiniteTransition(label = "sway")
     val swing by sway.animateFloat(-4f, 4f, infiniteRepeatable(tween(7_000, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "heading")
-    val story by sway.animateFloat(0f, 1f, infiniteRepeatable(tween(7_500, easing = LinearEasing)), label = "story")
+    val looping by sway.animateFloat(0f, 1f, infiniteRepeatable(tween(7_500, easing = LinearEasing)), label = "story")
+    val story = storyProgress ?: looping
     val labelType = peakLabelTypography()
     if (scene == null) { Box(modifier.background(TrailCameraColors.labelSurface)); return }
     val skyline = remember(scene) { TerrainSkyline(scene.horizon) }
@@ -212,8 +217,8 @@ private fun DemoCamera(scene: MountainScene?, modifier: Modifier, mode: CameraDe
                 drawContext.canvas.nativeCanvas.drawText(name, rect.left + TrailSpace.sm.toPx(), rect.bottom - TrailSpace.sm.toPx(), paint)
             }
         }
-        DemoBadge(Modifier.align(Alignment.TopStart).padding(TrailSpace.md))
-        if (aligning) Surface(Modifier.align(Alignment.BottomCenter).padding(TrailSpace.lg), shape = CircleShape,
+        if (showPill) DemoBadge(Modifier.align(Alignment.TopStart).padding(TrailSpace.md))
+        if (aligning && showPill) Surface(Modifier.align(Alignment.BottomCenter).padding(TrailSpace.lg), shape = CircleShape,
             color = TrailCameraColors.scrim, contentColor = Color.White) {
             Row(Modifier.padding(horizontal = TrailSpace.lg, vertical = TrailSpace.sm), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
                 when {
