@@ -49,6 +49,8 @@ data class PanoramaState(
     val preferences: Preferences = Preferences(),
     /** Manual label offset in degrees, set with Nudge labels. */
     val labelTrim: Double = 0.0,
+    /** Human-readable name of where the phone is, from the geocoder; null offline or before the first fix. */
+    val placeName: String? = null,
 ) {
     /** Fictional terrain is shown only while demo mode is switched on in Settings. */
     val isDemo: Boolean get() = activePack == null && preferences.demoMode
@@ -72,6 +74,8 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     private var lastFixElapsedMs: Long? = null
     private var declinationKey: Triple<GeoPoint, Int, Long>? = null
     private var declination = 0.0
+    private var namedPoint: GeoPoint? = null
+    private var namingJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -224,6 +228,17 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                 gpsAccuracyM = fix.accuracyM.toDouble()
                 lastFixElapsedMs = android.os.SystemClock.elapsedRealtime() - fix.ageSeconds * 1000
                 mutable.update { it.copy(gpsFix = fix, gpsFresh = true, gpsStatus = "Location accurate to ${fix.accuracyM.toInt()} m") }
+                // Look the place name up again only after moving about half a kilometre.
+                val named = namedPoint
+                if (named == null || Geography.distance(named, fix.point) >= 500.0) {
+                    namedPoint = fix.point
+                    namingJob?.cancel()
+                    namingJob = viewModelScope.launch {
+                        val name = PlaceNamer.name(getApplication(), fix.point)
+                        if (name == null) namedPoint = null  // offline: try again with the next fix
+                        mutable.update { it.copy(placeName = name ?: it.placeName) }
+                    }
+                }
                 if (mutable.value.isDemo) return // Keep fictional terrain at its fictional viewpoint.
                 val previous = lastGpsPoint
                 if (previous == null || Geography.distance(previous, fix.point) >= maxOf(30.0, gpsAccuracyM)) {

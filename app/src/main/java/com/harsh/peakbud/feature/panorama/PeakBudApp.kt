@@ -25,6 +25,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import kotlin.math.roundToInt
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -141,8 +148,8 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
             AppHeader(compact, when (tab) {
                 2 -> if (state.noRegion) "Peaks · pick a hiking area to start" else if (state.isDemo) "Peaks · demo landscape" else "Peaks within ${(state.activePack?.radiusM ?: 0.0).toInt() / 1000} km of this spot"
                 3 -> "Hiking areas · download once, works offline"
-                else -> state.activePack?.name ?: if (state.isDemo) "Demo · made-up landscape" else "Pick a hiking area to start"
-            }) { settings = true }
+                else -> currentPlace(state)
+            }, contextIcon = if (tab == 1) R.drawable.ic_my_location else null) { settings = true }
             state.message?.let { message ->
                 Surface(color = MaterialTheme.colorScheme.errorContainer, contentColor = MaterialTheme.colorScheme.onErrorContainer, shape = MaterialTheme.shapes.medium) {
                     Row(Modifier.padding(start = 14.dp, top = 2.dp, bottom = 2.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -357,13 +364,16 @@ private fun GlassPill(modifier: Modifier = Modifier, color: Color = Color.Black.
 }
 
 @Composable
-private fun AppHeader(compact: Boolean, context: String, onSettings: () -> Unit) {
+private fun AppHeader(compact: Boolean, context: String, contextIcon: Int? = null, onSettings: () -> Unit) {
     Row(Modifier.fillMaxWidth().padding(top = if (compact) 4.dp else 12.dp, bottom = 2.dp), verticalAlignment = Alignment.CenterVertically) {
         Image(painterResource(R.drawable.ic_logo_mark), contentDescription = null, modifier = Modifier.size(if (compact) 32.dp else 40.dp))
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             Text("PeakBud", style = if (compact) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
-            Text(context, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                contextIcon?.let { Icon(painterResource(it), null, Modifier.padding(end = 4.dp).size(14.dp), tint = MaterialTheme.colorScheme.primary) }
+                Text(context, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
         }
         FilledTonalIconButton(onClick = onSettings, colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
             Icon(painterResource(R.drawable.ic_settings), contentDescription = "Settings")
@@ -371,33 +381,102 @@ private fun AppHeader(compact: Boolean, context: String, onSettings: () -> Unit)
     }
 }
 
-/** Pill-shaped bar floating above content. The selected tab expands to show its label. */
+/**
+ * Floating tab bar. A highlight pill springs between tabs; press and slide across the bar to move it with your
+ * finger, iOS style, with a tick on each tab you cross. Lifting your finger opens the tab under it.
+ * Items are equal width and never change structure, which keeps the slide smooth (and avoids a Compose crash
+ * that structural changes caused on rapid switching).
+ */
 @Composable
 private fun FloatingTabBar(selected: Int, overCamera: Boolean, onSelect: (Int) -> Unit, modifier: Modifier) {
     val tabs = listOf("Camera" to R.drawable.ic_photo_camera, "Home" to R.drawable.ic_home, "Peaks" to R.drawable.ic_landscape, "Regions" to R.drawable.ic_map)
+    val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val itemWidth = 76.dp
+    val itemHeight = 56.dp
+    val itemPx = with(androidx.compose.ui.platform.LocalDensity.current) { itemWidth.toPx() }
+    val maxPx = itemPx * (tabs.size - 1)
+    val scope = rememberCoroutineScope()
+    val indicator = remember { androidx.compose.animation.core.Animatable(selected * itemPx) }
+    val glide = androidx.compose.animation.core.spring<Float>(dampingRatio = .78f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)
+    var dragging by remember { mutableStateOf(false) }
+    var hover by remember { mutableIntStateOf(selected) }
+    val currentSelected by rememberUpdatedState(selected)
+    val select by rememberUpdatedState(onSelect)
+    LaunchedEffect(selected) { if (!dragging) { hover = selected; indicator.animateTo(selected * itemPx, glide) } }
+    val lift by androidx.compose.animation.core.animateFloatAsState(if (dragging) 1.08f else 1f, label = "lift")
+    val pill = if (overCamera) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer
+    val onPill = if (overCamera) Color.White else MaterialTheme.colorScheme.onPrimaryContainer
     // Over the camera the bar turns translucent so the scene shows through; elsewhere it is solid forest green.
     Surface(modifier, shape = CircleShape, color = if (overCamera) Color.Black.copy(alpha = .55f) else Color(0xFF16352A), contentColor = Color.White, shadowElevation = if (overCamera) 0.dp else 12.dp) {
-        Row(Modifier.padding(6.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-            tabs.forEachIndexed { index, (label, icon) -> key(label) {
-                val active = index == selected
-                Row(Modifier.clip(CircleShape)
-                    .background(if (active) (if (overCamera) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer) else Color.Transparent)
-                    .clickable { onSelect(index) }
-                    .semantics(mergeDescendants = true) { role = Role.Tab; this.selected = active; contentDescription = label }
-                    .animateContentSize()
-                    .padding(horizontal = if (active) 16.dp else 14.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
-                    Icon(painterResource(icon), contentDescription = null, Modifier.size(22.dp),
-                        tint = if (active) (if (overCamera) Color.White else MaterialTheme.colorScheme.onPrimaryContainer) else Color.White.copy(alpha = .72f))
-                    // The label is always composed and collapses to zero width when inactive. Adding and removing it
-                    // on every switch changed the row's structure mid-animation and crashed Compose on rapid taps.
-                    Text(label, Modifier.then(if (active) Modifier.padding(start = 8.dp) else Modifier.width(0.dp)),
-                        style = MaterialTheme.typography.labelLarge, maxLines = 1, softWrap = false, overflow = TextOverflow.Clip,
-                        color = if (overCamera) Color.White else MaterialTheme.colorScheme.onPrimaryContainer)
+        Box(Modifier.padding(6.dp).size(itemWidth * tabs.size, itemHeight)
+            .pointerInput(Unit) {
+                fun indexAt(x: Float) = (x / itemPx).toInt().coerceIn(0, tabs.size - 1)
+                detectHorizontalDragGestures(
+                    onDragStart = { start ->
+                        dragging = true
+                        hover = indexAt(start.x)
+                        scope.launch { indicator.animateTo((start.x - itemPx / 2).coerceIn(0f, maxPx), androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessHigh)) }
+                    },
+                    onDragEnd = {
+                        dragging = false
+                        val target = hover
+                        scope.launch { indicator.animateTo(target * itemPx, glide) }
+                        haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.Confirm)
+                        select(target)
+                    },
+                    onDragCancel = { dragging = false; hover = currentSelected; scope.launch { indicator.animateTo(currentSelected * itemPx, glide) } },
+                ) { change, dx ->
+                    change.consume()
+                    val x = (indicator.value + dx).coerceIn(0f, maxPx)
+                    scope.launch { indicator.snapTo(x) }
+                    val under = indexAt(x + itemPx / 2)
+                    if (under != hover) { hover = under; haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.SegmentTick) }
                 }
-            } }
+            }) {
+            Box(Modifier.offset { androidx.compose.ui.unit.IntOffset(indicator.value.roundToInt(), 0) }.size(itemWidth, itemHeight)
+                .graphicsLayer { scaleX = lift; scaleY = lift }.clip(CircleShape).background(pill))
+            Row {
+                tabs.forEachIndexed { index, (label, icon) -> key(label) {
+                    val lit = index == (if (dragging) hover else selected)
+                    val tint by androidx.compose.animation.animateColorAsState(if (lit) onPill else Color.White.copy(alpha = .72f), label = "tint")
+                    Column(Modifier.size(itemWidth, itemHeight).clip(CircleShape)
+                        .clickable(interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, indication = null) { onSelect(index) }
+                        .semantics(mergeDescendants = true) { role = Role.Tab; this.selected = index == selected; contentDescription = label },
+                        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                        Icon(painterResource(icon), contentDescription = null, Modifier.size(22.dp), tint = tint)
+                        Text(label, style = MaterialTheme.typography.labelSmall, fontWeight = if (lit) FontWeight.SemiBold else FontWeight.Medium, color = tint, maxLines = 1)
+                    }
+                } }
+            }
         }
     }
+}
+
+/** Slider with a round thumb on a thin track, closer to iOS than Material's tall bar thumb. The thumb grows slightly while held. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun TrailSlider(value: Float, onValueChange: (Float) -> Unit, valueRange: ClosedFloatingPointRange<Float>, modifier: Modifier = Modifier,
+                         onValueChangeFinished: (() -> Unit)? = null) {
+    val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    val held by interaction.collectIsDraggedAsState()
+    val pressed by interaction.collectIsPressedAsState()
+    val grow by androidx.compose.animation.core.animateFloatAsState(if (held || pressed) 1.15f else 1f, label = "thumb")
+    val active = MaterialTheme.colorScheme.primary
+    val inactive = MaterialTheme.colorScheme.outlineVariant
+    Slider(value, onValueChange, modifier, valueRange = valueRange, onValueChangeFinished = onValueChangeFinished, interactionSource = interaction,
+        thumb = {
+            Box(Modifier.size(26.dp).graphicsLayer { scaleX = grow; scaleY = grow }
+                .shadow(3.dp, CircleShape).background(Color.White, CircleShape).border(.5.dp, inactive, CircleShape))
+        },
+        track = { sliderState ->
+            Canvas(Modifier.fillMaxWidth().height(4.dp)) {
+                val span = sliderState.valueRange.endInclusive - sliderState.valueRange.start
+                val fraction = if (span > 0f) ((sliderState.value - sliderState.valueRange.start) / span).coerceIn(0f, 1f) else 0f
+                val radius = androidx.compose.ui.geometry.CornerRadius(size.height / 2)
+                drawRoundRect(inactive, cornerRadius = radius)
+                drawRoundRect(active, size = androidx.compose.ui.geometry.Size(size.width * fraction, size.height), cornerRadius = radius)
+            }
+        })
 }
 
 @Composable
@@ -481,7 +560,7 @@ private fun ViewControls(state: PanoramaState, model: PanoramaViewModel, onViewp
         }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("Width", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Slider(state.fov.toFloat(), { model.setFov(it.toDouble()) }, valueRange = 35f..120f, modifier = Modifier.weight(1f))
+            TrailSlider(state.fov.toFloat(), { model.setFov(it.toDouble()) }, 35f..120f, Modifier.weight(1f))
             Text("${state.fov.toInt()}°", style = MaterialTheme.typography.labelMedium, modifier = Modifier.width(36.dp))
         }
         listOfNotNull(
@@ -755,10 +834,17 @@ private fun SettingSlider(title: String, value: String, current: Float, range: C
             Text(title, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
             Text(value, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
         }
-        Slider(current, onChange, valueRange = range, onValueChangeFinished = onDone)
+        TrailSlider(current, onChange, range, onValueChangeFinished = onDone)
     }
 }
 
+/** Where the phone is right now: a place name when online, otherwise coordinates. */
+internal fun currentPlace(state: PanoramaState): String {
+    val fix = state.gpsFix ?: return if (state.followingGps) "Finding your location…" else "Location off"
+    val where = state.placeName ?: "${String.format(Locale.US, "%.4f", kotlin.math.abs(fix.point.latitude))}° ${if (fix.point.latitude >= 0) "N" else "S"}, " +
+        "${String.format(Locale.US, "%.4f", kotlin.math.abs(fix.point.longitude))}° ${if (fix.point.longitude >= 0) "E" else "W"}"
+    return if (state.followingGps) where else "$where · last known"
+}
 internal fun angleText(degrees: Double) = "${String.format(Locale.US, "%.1f", kotlin.math.abs(degrees))}° ${if (degrees >= 0) "up" else "down"}"
 internal fun coordinate(value: Double) = String.format(Locale.US, "%.5f", value)
 internal fun height(metres: Double, state: PanoramaState) = if (state.preferences.useFeet) "${(metres * 3.28084).toInt()} ft" else "${metres.toInt()} m"
