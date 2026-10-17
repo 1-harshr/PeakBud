@@ -197,9 +197,11 @@ internal fun DemoCamera(scene: MountainScene?, modifier: Modifier, mode: CameraD
             val style = PinStyle(stick = Color.White, dot = Color.White, nameSurface = Color.White, nameText = Color(0xFF1B2B25),
                 heightSurface = TrailCameraColors.pinHeight, heightText = Color.White, ring = if (aligned) TrailCameraColors.alignedRing else null)
             val candidates = visible.sortedByDescending { it.peak.publishedHeightM ?: 0.0 }
-                .map { Triple(it, x(it.bearingDeg + offset), y(it.elevationDeg!!)) }.filter { it.second in 0f..w }
-            for ((peak, px, py) in PeakPins.place(this, candidates)) {
-                PeakPins.draw(this, px, py, peak.peak.name, peak.peak.publishedHeightM?.let { "${it.toInt()} m" }, style, labelType.detailPx * 1.05f, TrailSpace.xxl.toPx() * 2)
+                .map { PinCandidate(it, x(it.bearingDeg + offset), y(it.elevationDeg!!), it.peak.name, it.peak.publishedHeightM?.let { h -> "${h.toInt()} m" }) }
+                .filter { it.x in 0f..w }
+            val textSize = labelType.detailPx * 1.05f; val pinTop = TrailSpace.xxl.toPx() * 2
+            for (pin in PeakPins.place(this, candidates, textSize, pinTop)) {
+                PeakPins.draw(this, pin.x, pin.y, pin.name, pin.height, style, textSize, pinTop)
             }
         }
         if (showPill) DemoBadge(Modifier.align(Alignment.TopStart).padding(TrailSpace.md))

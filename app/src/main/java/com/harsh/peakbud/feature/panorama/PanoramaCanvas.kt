@@ -120,18 +120,18 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         val occupied = mutableListOf<RectF>()
         val candidates = state.scene?.peaks.orEmpty().filter {
             it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN
-        }.inLabelPriority().mapNotNull { peak -> peak.elevationDeg?.let { e -> project(peak.bearingDeg, e).let { Triple(peak, it.x, it.y) } } }
-            .filter { it.second in TrailCanvas.labelMargin.toPx()..(w - TrailCanvas.labelMargin.toPx()) && it.third in compassBand..(h - footerClearance) }
+        }.inLabelPriority().mapNotNull { peak -> peak.elevationDeg?.let { e -> project(peak.bearingDeg, e).let { p ->
+            PinCandidate(peak, p.x, p.y, peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else "",
+                peak.peak.publishedHeightM?.let { height(it, state, strings) } ?: peak.geometryHeightM?.let { strings(R.string.approximate_height, height(it, state, strings)) })
+        } } }.filter { it.x in TrailCanvas.labelMargin.toPx()..(w - TrailCanvas.labelMargin.toPx()) && it.y in compassBand..(h - footerClearance) }
         // Same still pins as the camera: dot on the summit, vertical stick, tilted name/height pill.
         val style = PinStyle(stick = palette.leader, dot = palette.marker, nameSurface = palette.labelSurface, nameText = palette.labelText,
             heightSurface = TrailCameraColors.pinHeight, heightText = Color.White)
-        for ((peak, x, y) in PeakPins.place(this, candidates)) {
-            val name = peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else ""
-            val heightText = peak.peak.publishedHeightM?.let { height(it, state, strings) }
-                ?: peak.geometryHeightM?.let { strings(R.string.approximate_height, height(it, state, strings)) }
-            val hit = PeakPins.draw(this, x, y, name, heightText, style, type.detailPx * 1.05f, compassBand + TrailSpace.xs.toPx())
+        val textSize = type.detailPx * 1.05f; val pinTop = compassBand + TrailSpace.xs.toPx()
+        for (pin in PeakPins.place(this, candidates, textSize, pinTop)) {
+            val hit = PeakPins.draw(this, pin.x, pin.y, pin.name, pin.height, style, textSize, pinTop)
             occupied += hit
-            hits += hit to peak
+            hits += hit to pin.item
         }
         paint.textSize = type.axisPx
         paint.color = palette.axis.toArgb()

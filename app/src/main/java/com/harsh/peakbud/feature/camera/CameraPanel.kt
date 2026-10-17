@@ -307,15 +307,16 @@ private fun CameraLabels(state: PanoramaState, pose: CameraPose, aligned: Boolea
         val candidates = peaks.inLabelPriority().mapNotNull { peak ->
             if (peak.peak.id in hiddenPeaks) return@mapNotNull null  // the camera shows something nearer covering this summit
             val point = CameraProjector.project(peak.bearingDeg, peak.elevationDeg ?: return@mapNotNull null, pose, lens) ?: return@mapNotNull null
-            if (point.x !in 0f..size.width || point.y !in clearTop..clearBottom) null else Triple(peak, point.x, point.y)
+            if (point.x !in 0f..size.width || point.y !in clearTop..clearBottom) return@mapNotNull null
+            PinCandidate(peak, point.x, point.y, peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else "",
+                peak.peak.publishedHeightM?.let { height(it, state, strings) } ?: peak.geometryHeightM?.let { strings(R.string.approximate_height, height(it, state, strings)) })
         }
         // Still pins: dot on the summit, vertical stick, tilted name/height pill. Camera-aligned pins get a green ring.
         val style = PinStyle(stick = Color.White, dot = Color.White, nameSurface = Color.White, nameText = Color(0xFF1B2B25),
             heightSurface = TrailCameraColors.pinHeight, heightText = Color.White, ring = if (aligned) TrailCameraColors.alignedRing else null)
-        for ((peak, x, y) in PeakPins.place(this, candidates)) {
-            val name = peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else ""
-            val heightText = peak.peak.publishedHeightM?.let { height(it, state, strings) } ?: peak.geometryHeightM?.let { strings(R.string.approximate_height, height(it, state, strings)) }
-            hits += PeakPins.draw(this, x, y, name, heightText, style, type.detailPx * 1.05f, clearTop) to peak
+        val textSize = type.detailPx * 1.05f
+        for (pin in PeakPins.place(this, candidates, textSize, clearTop)) {
+            hits += PeakPins.draw(this, pin.x, pin.y, pin.name, pin.height, style, textSize, clearTop) to pin.item
         }
     }
 }

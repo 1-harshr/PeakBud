@@ -26,7 +26,8 @@ class TerrainEngine {
             var highest = Double.NEGATIVE_INFINITY
             var distance: Double? = null
             var complete = true
-            var d = terrain.resolutionM / 2
+            // Same near-field skip as the per-peak sight lines, so the drawn skyline never hides a peak judged visible.
+            var d = max(terrain.resolutionM / 2, NEAR_SKIP_M)
             while (d <= settings.radiusM) {
                 if ((d / terrain.resolutionM).toInt() % 128 == 0) checkpoint()
                 when (val sample = terrain.sample(ray.pointAt(d))) {
@@ -81,7 +82,7 @@ class TerrainEngine {
         // Skip the ground at the observer's feet (GPS and 30 m cells make it noise) and the summit's own massif: the last
         // 250 m before the top (the snapping radius) is the peak's flank, not a separate ridge in front of it.
         // Very close peaks keep the original half-cell rule.
-        val nearSkip = min(60.0, distance / 4)
+        val nearSkip = min(NEAR_SKIP_M, distance / 4)
         val summitSkip = if (distance > 1_000) 250.0 else terrain.resolutionM / 2
         var d = max(step, nearSkip)
         while (d < distance - summitSkip) {
@@ -138,6 +139,11 @@ class TerrainEngine {
         }
         return PeakView(peak, distance, bearing, angle, summit.heightM, state,
             (angle - maximum).takeIf { !stoppedAtBlocker && it.isFinite() }, blocker, reason, heightDifference?.toInt())
+    }
+
+    private companion object {
+        /** Ground this close to the phone is GPS and 30 m-cell noise, not a ridge. */
+        const val NEAR_SKIP_M = 60.0
     }
 }
 
