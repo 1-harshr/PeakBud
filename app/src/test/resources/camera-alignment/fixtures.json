@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "fixtures": [
+    {
+      "file": "deoria-tal.jpg",
+      "commons_title": "File:Deoria Tal.jpg",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Deoria_Tal.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/9/94/Deoria_Tal.jpg",
+      "download_url": "https://upload.wikimedia.org/wikipedia/commons/9/94/Deoria_Tal.jpg",
+      "retrieved_date": "2026-10-17",
+      "author": "Mudassarmunshi",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "original_dimensions": [
+        1052,
+        780
+      ],
+      "fixture_dimensions": [
+        1052,
+        780
+      ],
+      "sha256": "b5498c6835b60b0037f73810ba52a08eb6bf212c9fc15b3309e7d100d2f1341c",
+      "camera_location": {
+        "latitude": 30.5222,
+        "longitude": 79.1277,
+        "datum": "WGS-84",
+        "evidence": "Wikimedia Commons camera location metadata; uploader supplied, not independently surveyed",
+        "accuracy_m": null
+      },
+      "capture_date": "2016-05-04",
+      "heading_degrees": null,
+      "heading_accuracy_degrees": null,
+      "horizontal_fov_degrees": null,
+      "camera_altitude_m": null,
+      "modifications": "None"
+    },
+    {
+      "file": "dhanaulti-himalaya.jpg",
+      "commons_title": "File:Nanda Devi (11490510604).jpg",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Nanda_Devi_(11490510604).jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Nanda_Devi_%2811490510604%29.jpg",
+      "download_url": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Nanda_Devi_%2811490510604%29.jpg",
+      "retrieved_date": "2026-10-17",
+      "author": "Koshy Koshy from Faridabad, Haryana, India",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0",
+      "original_dimensions": [
+        1024,
+        507
+      ],
+      "fixture_dimensions": [
+        1024,
+        507
+      ],
+      "sha256": "5195a0a516e43f1f96435234504a4d4e088a2e71f453ca77a4ee47c2fb70e8d8",
+      "camera_location": {
+        "latitude": 30.423519,
+        "longitude": 78.246292,
+        "datum": "WGS-84",
+        "evidence": "Wikimedia Commons camera location metadata; uploader supplied, not independently surveyed",
+        "accuracy_m": null
+      },
+      "capture_date": "2013-12-14 09:51",
+      "heading_degrees": null,
+      "heading_accuracy_degrees": null,
+      "horizontal_fov_degrees": null,
+      "camera_altitude_m": null,
+      "modifications": "None"
+    },
+    {
+      "file": "hemkund-clouds.jpg",
+      "commons_title": "File:Reflection of Nanda Devi Hills on Hemkund Sahib Lake Chamoli, India (Wide).jpg",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Reflection_of_Nanda_Devi_Hills_on_Hemkund_Sahib_Lake_Chamoli,_India_(Wide).jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Reflection_of_Nanda_Devi_Hills_on_Hemkund_Sahib_Lake_Chamoli%2C_India_%28Wide%29.jpg",
+      "download_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Reflection_of_Nanda_Devi_Hills_on_Hemkund_Sahib_Lake_Chamoli%2C_India_%28Wide%29.jpg/1280px-Reflection_of_Nanda_Devi_Hills_on_Hemkund_Sahib_Lake_Chamoli%2C_India_%28Wide%29.jpg",
+      "retrieved_date": "2026-10-17",
+      "author": "Naresh Chandra",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "original_dimensions": [
+        8708,
+        3800
+      ],
+      "fixture_dimensions": [
+        1280,
+        559
+      ],
+      "sha256": "489f9270ac6031b3297b6dbd78cbfd7e57ca1bafa31c0b23769169eda9d3ed02",
+      "camera_location": {
+        "latitude": 30.699436,
+        "longitude": 79.611436,
+        "datum": "WGS-84",
+        "evidence": "Wikimedia Commons camera location metadata; uploader supplied, not independently surveyed",
+        "accuracy_m": null
+      },
+      "capture_date": "2017-06-23 10:10:18",
+      "heading_degrees": null,
+      "heading_accuracy_degrees": null,
+      "horizontal_fov_degrees": null,
+      "camera_altitude_m": null,
+      "modifications": "Wikimedia-generated 1280-pixel-wide thumbnail; no further edits",
+      "reported_page_heading_degrees": 83.657381615599
+    },
+    {
+      "file": "ranchi-temple.jpg",
+      "commons_title": "File:1 Jagganath temple Ranchi Jharkhand.jpg",
+      "source_page": "https://commons.wikimedia.org/wiki/File:1_Jagganath_temple_Ranchi_Jharkhand.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/1_Jagganath_temple_Ranchi_Jharkhand.jpg",
+      "download_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/1_Jagganath_temple_Ranchi_Jharkhand.jpg/1280px-1_Jagganath_temple_Ranchi_Jharkhand.jpg",
+      "retrieved_date": "2026-10-17",
+      "author": "Ms Sarah Welch",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "original_dimensions": [
+        3264,
+        2448
+      ],
+      "fixture_dimensions": [
+        1280,
+        960
+      ],
+      "sha256": "92a189e9d4673d49d433bfd9744b21575d15a91e37e16ed8ead048b96686571f",
+      "camera_location": {
+        "latitude": 23.316714,
+        "longitude": 85.281144,
+        "datum": "WGS-84",
+        "evidence": "Wikimedia Commons camera location metadata; uploader supplied, not independently surveyed",
+        "accuracy_m": null
+      },
+      "capture_date": "2016-09-10 10:59:46",
+      "heading_degrees": null,
+      "heading_accuracy_degrees": null,
+      "horizontal_fov_degrees": null,
+      "camera_altitude_m": null,
+      "modifications": "Wikimedia-generated 1280-pixel-wide thumbnail; no further edits",
+      "reported_page_heading_degrees": 46.318965517241
+    },
+    {
+      "file": "sky-only.png",
+      "derived_from": "dhanaulti-himalaya.jpg",
+      "author": "Koshy Koshy from Faridabad, Haryana, India",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0",
+      "modifications": {
+        "operation": "crop and lossless PNG encode",
+        "box_left_top_right_bottom": [
+          0,
+          0,
+          1024,
+          120
+        ]
+      },
+      "fixture_dimensions": [
+        1024,
+        120
+      ],
+      "sha256": "c092b6a612f6928f1b2e7996233524bee6a6ee325d2b551b9590033bbb3a4f11",
+      "purpose": "Scene-content rejection fixture, not a separately captured ground/sky-facing camera pose"
+    },
+    {
+      "file": "ground-only.png",
+      "derived_from": "deoria-tal.jpg",
+      "author": "Mudassarmunshi",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "modifications": {
+        "operation": "crop and lossless PNG encode",
+        "box_left_top_right_bottom": [
+          0,
+          580,
+          1052,
+          780
+        ]
+      },
+      "fixture_dimensions": [
+        1052,
+        200
+      ],
+      "sha256": "e571cd885c7fccc3c61e7564a11e5df0c0df106faa60db61c6c88eba6b601aac",
+      "purpose": "Scene-content rejection fixture, not a separately captured ground/sky-facing camera pose"
+    },
+    {
+      "file": "trees-only.png",
+      "derived_from": "deoria-tal.jpg",
+      "author": "Mudassarmunshi",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "modifications": {
+        "operation": "crop and lossless PNG encode",
+        "box_left_top_right_bottom": [
+          0,
+          300,
+          340,
+          520
+        ]
+      },
+      "fixture_dimensions": [
+        340,
+        220
+      ],
+      "sha256": "05232a31c303f7d9711f88ff99ce1c61d677e2e887faf95bb1e17757bb037702",
+      "purpose": "Scene-content rejection fixture, not a separately captured ground/sky-facing camera pose"
+    }
+  ]
+}

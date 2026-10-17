@@ -1,0 +1,31 @@
+# Sparse human pixel annotations of highest visible land boundary; original image coordinates.
+# Approximate annotations; tolerance +/- 10 px. No summit identities or angular ground truth.
+x,y
+64,211
+128,189
+160,183
+192,185
+224,198
+256,210
+288,200
+320,210
+352,198
+384,195
+416,184
+448,176
+480,176
+512,178
+544,179
+576,164
+608,164
+640,176
+672,194
+704,202
+736,205
+768,196
+800,210
+832,216
+864,223
+896,225
+928,227
+960,233
