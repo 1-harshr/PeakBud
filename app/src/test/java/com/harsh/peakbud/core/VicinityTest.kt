@@ -47,6 +47,17 @@ class VicinityTest {
         assertEquals(peaks.size.toLong(), record.getLong("size"))
     }
 
+    @Test fun stateWidePacksAreNotOfferedButStillBackAroundMePacks() {
+        val offered = catalog.filter { it.offered }
+        assertTrue(catalog.single { it.id == "uttarakhand-himalaya" }.offered.not())
+        assertTrue(catalog.single { it.id == "jharkhand" }.offered.not())
+        assertTrue("every offered download is small: ${offered.maxOf { it.downloadBytes } / 1_048_576} MB", offered.all { it.downloadBytes <= CatalogRegion.MAX_OFFERED_BYTES })
+        assertTrue(Vicinity.suggestions(GeoPoint(30.52, 79.58), catalog, 50).none { !it.region.offered })
+        // Ranchi is only covered by the Jharkhand pack's tiles; an around-me pack is still possible and small.
+        val ranchi = Vicinity.plan(GeoPoint(23.3441, 85.3096), catalog, ::read)!!
+        assertTrue(ranchi.downloadBytes <= CatalogRegion.MAX_OFFERED_BYTES)
+    }
+
     @Test fun placesOutsideCatalogueCoverageGetNoPack() {
         assertNull(Vicinity.plan(GeoPoint(-20.0, 140.0), catalog, ::read))  // inland Australia
     }

@@ -14,7 +14,15 @@ data class CatalogRegion(val id: String, val name: String, val country: String, 
     val installedBytes get() = tiles.size * HGT_BYTES
     val radiusKm get() = JSONObject(manifest).getDouble("radiusM").toInt() / 1000
     val version get() = JSONObject(manifest).getString("version")
-    companion object { const val HGT_BYTES = 3601L * 3601 * 2 }
+    /**
+     * State-wide packs (hundreds of MB) are not offered as downloads. Their pinned tiles still back "Around me" packs,
+     * which fetch only the few tiles near the user. Already installed copies stay usable.
+     */
+    val offered get() = downloadBytes <= MAX_OFFERED_BYTES
+    companion object {
+        const val HGT_BYTES = 3601L * 3601 * 2
+        const val MAX_OFFERED_BYTES = 120L * 1_048_576
+    }
 }
 
 /** Small peak snapshots and trusted download recipes ship inside the APK. */

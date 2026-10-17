@@ -775,7 +775,8 @@ private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, o
     val words = query.trim().lowercase().split(Regex("\\s+")).filter { it.isNotEmpty() }
     fun matches(vararg fields: String?) = words.all { word -> fields.any { it?.lowercase()?.contains(word) == true } }
     fun installedFor(region: CatalogRegion) = state.packs.lastOrNull { it.id == region.id && it.version == region.version }
-    val catalog = state.catalog.filter { matches(it.name, it.country, it.description) }
+    // Only small areas are offered; state-wide packs remain listed only if already installed.
+    val catalog = state.catalog.filter { (it.offered || installedFor(it) != null) && matches(it.name, it.country, it.description) }
     val here = state.gpsFix?.point
     // With a location, list areas closest first and show how far each one is.
     val distances = here?.let { point -> Vicinity.suggestions(point, catalog, catalog.size).associate { it.region.id to it.distanceM } }.orEmpty()

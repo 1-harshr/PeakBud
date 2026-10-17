@@ -27,7 +27,7 @@ object Vicinity {
 
     /** Catalogue areas ordered by distance from [point] to their supported viewpoints (0 when inside). */
     fun suggestions(point: GeoPoint, catalog: List<CatalogRegion>, limit: Int = 3): List<Suggestion> =
-        catalog.map { Suggestion(it, distanceTo(point, observerBounds(it))) }.sortedBy { it.distanceM }.take(limit)
+        catalog.filter { it.offered }.map { Suggestion(it, distanceTo(point, observerBounds(it))) }.sortedBy { it.distanceM }.take(limit)
 
     /** A plan for a pack centred on [point], or null if any needed tile is not pinned in the catalogue. */
     /** [readAsset] reads a bundled text asset such as "regions/jharkhand/peaks.json". */
