@@ -1858,6 +1858,444 @@
       }
     },
     {
+      "id": "parasnath",
+      "country": "India",
+      "description": "Parasnath Hill, the state's highest summit · Jharkhand",
+      "assetDirectory": "regions/parasnath",
+      "tiles": [
+        {
+          "path": "terrain/N23E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E085.hgt.gz",
+          "downloadBytes": 9685871,
+          "downloadSha256": "a20503975a1ec7fdba2605f41f1ac3994fa1a4d6e2b0066219a06c6b22f03321"
+        },
+        {
+          "path": "terrain/N23E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E086.hgt.gz",
+          "downloadBytes": 8391629,
+          "downloadSha256": "be51a399d345b2846e1a4d4d5136ac8b1b695dab6592593db6da864ce0e55fd1"
+        },
+        {
+          "path": "terrain/N24E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E085.hgt.gz",
+          "downloadBytes": 8355986,
+          "downloadSha256": "b9eb350f4d94b76c971329a0487f86e266fb0cf599162c33b4deafa8dfe544af"
+        },
+        {
+          "path": "terrain/N24E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E086.hgt.gz",
+          "downloadBytes": 8063683,
+          "downloadSha256": "9f25c08fd8d531aa118e440768426a4b8a07c624c1b725d1d38a23779f096c60"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "parasnath",
+        "name": "Parasnath · Shikharji",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 23.94,
+          "west": 86.1,
+          "north": 23.99,
+          "east": 86.17
+        },
+        "terrainBounds": {
+          "south": 23,
+          "west": 85,
+          "north": 25,
+          "east": 87
+        },
+        "radiusM": 40000,
+        "viewpoint": {
+          "latitude": 23.9628,
+          "longitude": 86.1288,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N23E085.hgt",
+            "size": 25934402,
+            "sha256": "2e9170fc4b53daae927207e67a1a9eadbd10a0081c05da9b62b80edcbee322ca"
+          },
+          {
+            "path": "terrain/N23E086.hgt",
+            "size": 25934402,
+            "sha256": "00fb88ea39ffd9fcdc17dc526d98e16f8c228295a9c3c701c4b6d02c16b1eee4"
+          },
+          {
+            "path": "terrain/N24E085.hgt",
+            "size": 25934402,
+            "sha256": "79226f9079f9fbf2d0ff813c72bbfa8391370743ea0f1347e2f27a95fdfc6d01"
+          },
+          {
+            "path": "terrain/N24E086.hgt",
+            "size": 25934402,
+            "sha256": "6e4907b9b070e5fd4b389026610a123f6a1152849770ed1e4c5beaed5e811c30"
+          },
+          {
+            "path": "peaks.json",
+            "size": 17921,
+            "sha256": "d84660776cdc853321cb4f616dec1c0dc458e1e0dd0327a48c7d55a86083968e"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1532,
+            "sha256": "a39bcff4a7f20963b573b3e4be72713ed77412de2961e43c560702a1d8a90db0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "netarhat",
+      "country": "India",
+      "description": "Netarhat sunrise and Magnolia Point · Jharkhand",
+      "assetDirectory": "regions/netarhat",
+      "tiles": [
+        {
+          "path": "terrain/N23E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E083.hgt.gz",
+          "downloadBytes": 10532091,
+          "downloadSha256": "bc86f97c2c73cec6c494c7a6d095a7c54eae5dfcc1cd5194c691da01665b109b"
+        },
+        {
+          "path": "terrain/N23E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E084.hgt.gz",
+          "downloadBytes": 10513308,
+          "downloadSha256": "e61578ea442070738b5bec1cfd6573d7c381249a6e875b59d0da67228f668406"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "netarhat",
+        "name": "Netarhat · Magnolia Point",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 23.45,
+          "west": 84.23,
+          "north": 23.51,
+          "east": 84.3
+        },
+        "terrainBounds": {
+          "south": 23,
+          "west": 83,
+          "north": 24,
+          "east": 85
+        },
+        "radiusM": 40000,
+        "viewpoint": {
+          "latitude": 23.4826,
+          "longitude": 84.2672,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N23E083.hgt",
+            "size": 25934402,
+            "sha256": "f406d8c9d470d20707542fa7e59ed3f48d302ac583e2210088bfddec24cfd360"
+          },
+          {
+            "path": "terrain/N23E084.hgt",
+            "size": 25934402,
+            "sha256": "c1546645562e670a274caba653e4672de1fea88911007f1d0531c3fb9610751f"
+          },
+          {
+            "path": "peaks.json",
+            "size": 37038,
+            "sha256": "b07a1dd987474deded7d95c46b44a3610abf9db7677e996f2086ed1ea5f2cc6a"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1394,
+            "sha256": "d331fd2ab01048a1686f9fc5e74416a246216ef49224827f31a9a66f1bbf6961"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ranchi-hills",
+      "country": "India",
+      "description": "Tagore Hill, Pahari Mandir and the Ranchi plateau · Jharkhand",
+      "assetDirectory": "regions/ranchi-hills",
+      "tiles": [
+        {
+          "path": "terrain/N22E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E084.hgt.gz",
+          "downloadBytes": 10021245,
+          "downloadSha256": "74df02791e8cf5f1898074989879b5b2c9510a6e69c36604006db6994b537348"
+        },
+        {
+          "path": "terrain/N22E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E085.hgt.gz",
+          "downloadBytes": 11154126,
+          "downloadSha256": "e47165878465c3d1229c3e01a356387e5aca45a6a4ce70aa766d79b21b1f1fd2"
+        },
+        {
+          "path": "terrain/N23E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E084.hgt.gz",
+          "downloadBytes": 10513308,
+          "downloadSha256": "e61578ea442070738b5bec1cfd6573d7c381249a6e875b59d0da67228f668406"
+        },
+        {
+          "path": "terrain/N23E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E085.hgt.gz",
+          "downloadBytes": 9685871,
+          "downloadSha256": "a20503975a1ec7fdba2605f41f1ac3994fa1a4d6e2b0066219a06c6b22f03321"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "ranchi-hills",
+        "name": "Ranchi · Tagore Hill",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 23.33,
+          "west": 85.28,
+          "north": 23.41,
+          "east": 85.37
+        },
+        "terrainBounds": {
+          "south": 22,
+          "west": 84,
+          "north": 24,
+          "east": 86
+        },
+        "radiusM": 40000,
+        "viewpoint": {
+          "latitude": 23.3713,
+          "longitude": 85.3268,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N22E084.hgt",
+            "size": 25934402,
+            "sha256": "d5a484755bb43ce770ad7d252cc68447006e065ecc8c7b1a6538bc4e34ea9f45"
+          },
+          {
+            "path": "terrain/N22E085.hgt",
+            "size": 25934402,
+            "sha256": "01aae8da50086561fd26f9fe1ae41a83e96980ce7547f9dd1b4c2753df0af34b"
+          },
+          {
+            "path": "terrain/N23E084.hgt",
+            "size": 25934402,
+            "sha256": "c1546645562e670a274caba653e4672de1fea88911007f1d0531c3fb9610751f"
+          },
+          {
+            "path": "terrain/N23E085.hgt",
+            "size": 25934402,
+            "sha256": "2e9170fc4b53daae927207e67a1a9eadbd10a0081c05da9b62b80edcbee322ca"
+          },
+          {
+            "path": "peaks.json",
+            "size": 94203,
+            "sha256": "5b58559dddfe2fbbf9a6b92e34b78f88b406dc7678ca8f85ff053e6dfd4314b3"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1531,
+            "sha256": "01546d70b21ea86e319f02accb84a44f8a1e072af48fdf06bcf1b5b07fd234a9"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dalma",
+      "country": "India",
+      "description": "Dalma wildlife sanctuary ridge near Jamshedpur · Jharkhand",
+      "assetDirectory": "regions/dalma",
+      "tiles": [
+        {
+          "path": "terrain/N22E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E085.hgt.gz",
+          "downloadBytes": 11154126,
+          "downloadSha256": "e47165878465c3d1229c3e01a356387e5aca45a6a4ce70aa766d79b21b1f1fd2"
+        },
+        {
+          "path": "terrain/N22E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E086.hgt.gz",
+          "downloadBytes": 9677497,
+          "downloadSha256": "c59c851f566ac82de71f382b0800fcb5d138f93048a00150e3b861894327c3c0"
+        },
+        {
+          "path": "terrain/N23E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E085.hgt.gz",
+          "downloadBytes": 9685871,
+          "downloadSha256": "a20503975a1ec7fdba2605f41f1ac3994fa1a4d6e2b0066219a06c6b22f03321"
+        },
+        {
+          "path": "terrain/N23E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E086.hgt.gz",
+          "downloadBytes": 8391629,
+          "downloadSha256": "be51a399d345b2846e1a4d4d5136ac8b1b695dab6592593db6da864ce0e55fd1"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "dalma",
+        "name": "Dalma Hills",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 22.85,
+          "west": 86.15,
+          "north": 22.92,
+          "east": 86.27
+        },
+        "terrainBounds": {
+          "south": 22,
+          "west": 85,
+          "north": 24,
+          "east": 87
+        },
+        "radiusM": 40000,
+        "viewpoint": {
+          "latitude": 22.8857,
+          "longitude": 86.2207,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N22E085.hgt",
+            "size": 25934402,
+            "sha256": "01aae8da50086561fd26f9fe1ae41a83e96980ce7547f9dd1b4c2753df0af34b"
+          },
+          {
+            "path": "terrain/N22E086.hgt",
+            "size": 25934402,
+            "sha256": "5665a78b35c033f9d78a7aed5f80b53cc1d18004aec5963d632f620e987968de"
+          },
+          {
+            "path": "terrain/N23E085.hgt",
+            "size": 25934402,
+            "sha256": "2e9170fc4b53daae927207e67a1a9eadbd10a0081c05da9b62b80edcbee322ca"
+          },
+          {
+            "path": "terrain/N23E086.hgt",
+            "size": 25934402,
+            "sha256": "00fb88ea39ffd9fcdc17dc526d98e16f8c228295a9c3c701c4b6d02c16b1eee4"
+          },
+          {
+            "path": "peaks.json",
+            "size": 54944,
+            "sha256": "3d18e2de4104b9c026d39cb8e5582a0cabdb05d8af9423516978a45a23b73468"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1521,
+            "sha256": "cb421df124edf5277245eaf98dbfeeb237112bc61af0aaba5ac567214044647d"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rajmahal",
+      "country": "India",
+      "description": "Rajmahal hills and Sahibganj on the Ganga · Jharkhand",
+      "assetDirectory": "regions/rajmahal",
+      "tiles": [
+        {
+          "path": "terrain/N24E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E087.hgt.gz",
+          "downloadBytes": 8659639,
+          "downloadSha256": "80cf5a100d4d820b08ab3f385316199d9498c7698cad3e0e5422a9d4a2d932df"
+        },
+        {
+          "path": "terrain/N24E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E088.hgt.gz",
+          "downloadBytes": 5247323,
+          "downloadSha256": "a34e03bf01d1f632231dbba1268bf8002ca7908ea614779e5963b34f9dea0702"
+        },
+        {
+          "path": "terrain/N25E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E087.hgt.gz",
+          "downloadBytes": 5519330,
+          "downloadSha256": "e30f4901731bbb61a908cb2f503f24a7db7d4c8b06b5a5dbfc59e62a1b983530"
+        },
+        {
+          "path": "terrain/N25E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E088.hgt.gz",
+          "downloadBytes": 5374034,
+          "downloadSha256": "bc4b78598857ae36cf0ff87b02091a2bec65406fc1eaf14da3da730e6c5db11b"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "rajmahal",
+        "name": "Rajmahal Hills",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 24.95,
+          "west": 87.6,
+          "north": 25.25,
+          "east": 87.85
+        },
+        "terrainBounds": {
+          "south": 24,
+          "west": 87,
+          "north": 26,
+          "east": 89
+        },
+        "radiusM": 40000,
+        "viewpoint": {
+          "latitude": 25.05,
+          "longitude": 87.75,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N24E087.hgt",
+            "size": 25934402,
+            "sha256": "704f548983888ed2c0d968bfcd901718077c30e44a274697ba41b8fe885b303d"
+          },
+          {
+            "path": "terrain/N24E088.hgt",
+            "size": 25934402,
+            "sha256": "a58362939f99dfe9c817675508862cd0e8b7a826348214bb237a1767ce7e1227"
+          },
+          {
+            "path": "terrain/N25E087.hgt",
+            "size": 25934402,
+            "sha256": "b1b2d27e07d5fa608ce981dc0641153edbcb5747c6d79549a021732980d80931"
+          },
+          {
+            "path": "terrain/N25E088.hgt",
+            "size": 25934402,
+            "sha256": "d1dc584990f9a1596e9855d3bd8e83b986b4972f7e50777d89f277ff396c7c0d"
+          },
+          {
+            "path": "peaks.json",
+            "size": 2227,
+            "sha256": "8ee80f0288fdefc859b9548d0b999d9412cbc38839dad3863f33c02e01ab5888"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1524,
+            "sha256": "4d1c2351721a0719097626c89c845aa3173625b390da1e0874fdb9b842058856"
+          }
+        ]
+      }
+    },
+    {
       "id": "poon-hill",
       "country": "Nepal",
       "description": "Poon Hill and Ghorepani viewpoints · Annapurna Himalaya",

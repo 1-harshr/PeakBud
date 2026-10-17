@@ -1,0 +1,22 @@
+PeakBud Dalma Hills · catalog version 1
+Terrain: Mapzen/Tilezen Skadi, 1 arc-second HGT, WGS84 / EGM96.
+Global SRTM and GMTED2010 terrain data courtesy of the U.S. Geological Survey.
+Mapzen / Tilezen: https://github.com/tilezen/joerd
+Source and attribution: https://github.com/tilezen/joerd/blob/master/docs/attribution.md
+Format: https://github.com/tilezen/joerd/blob/master/docs/formats.md
+Terrain tiles may combine SRTM and other source data; not labelled NASA SRTMGL1 v003.
+Verified tile downloads: 2026-10-17. Source bytes are pinned by SHA-256 in this app.
+Peak names/coordinates: GeoNames, https://www.geonames.org/ (CC BY 4.0).
+License: https://creativecommons.org/licenses/by/4.0/
+Country dumps retrieved 2026-10-17:
+https://download.geonames.org/export/dump/IN.zip  SHA-256 9e6374d0fe7d9a5268a432daa9aba6f5a545041c05ea6e67c9427edefc93a5ba
+
+Changes: selected single-mountain/peak records (MT/PK; HLL also included for broad hill regions), clipped to terrain bounds,
+normalized fields, retained IDs/source links/modification dates; absent elevation stays null.
+The GeoNames DEM column is not used as a published summit elevation.
+Data is provided as is. Coverage and summit positions require field validation.
+Tile source URLs:
+https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E085.hgt.gz
+https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E086.hgt.gz
+https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E085.hgt.gz
+https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E086.hgt.gz

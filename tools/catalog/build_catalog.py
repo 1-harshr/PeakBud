@@ -49,6 +49,17 @@ REGIONS = [
       observerBounds=[32.22,76.32,32.27,76.40], viewpoint=[32.2437,76.3528], radiusM=20000),
     R(id='nainital', name='Nainital · Naina Peak', country='India', description='Naina Peak and Snow View · Kumaon Himalaya', codes=['IN'],
       observerBounds=[29.37,79.42,29.42,79.47], viewpoint=[29.395,79.44], radiusM=40000),
+    # --- Jharkhand (small areas; the state-wide pack is not offered as a download) ---
+    R(id='parasnath', name='Parasnath · Shikharji', country='India', description='Parasnath Hill, the state\'s highest summit · Jharkhand', codes=['IN'],
+      observerBounds=[23.94,86.10,23.99,86.17], viewpoint=[23.9628,86.1288], radiusM=40000),
+    R(id='netarhat', name='Netarhat · Magnolia Point', country='India', description='Netarhat sunrise and Magnolia Point · Jharkhand', codes=['IN'],
+      observerBounds=[23.45,84.23,23.51,84.30], viewpoint=[23.4826,84.2672], radiusM=40000),
+    R(id='ranchi-hills', name='Ranchi · Tagore Hill', country='India', description='Tagore Hill, Pahari Mandir and the Ranchi plateau · Jharkhand', codes=['IN'],
+      observerBounds=[23.33,85.28,23.41,85.37], viewpoint=[23.3713,85.3268], radiusM=40000),
+    R(id='dalma', name='Dalma Hills', country='India', description='Dalma wildlife sanctuary ridge near Jamshedpur · Jharkhand', codes=['IN'],
+      observerBounds=[22.85,86.15,22.92,86.27], viewpoint=[22.8857,86.2207], radiusM=40000),
+    R(id='rajmahal', name='Rajmahal Hills', country='India', description='Rajmahal hills and Sahibganj on the Ganga · Jharkhand', codes=['IN'],
+      observerBounds=[24.95,87.60,25.25,87.85], viewpoint=[25.05,87.75], radiusM=40000),
     # --- Pakistan / Bhutan / Georgia ---
     R(id='fairy-meadows', name='Fairy Meadows · Nanga Parbat', country='Pakistan', description='Fairy Meadows and Beyal Camp · Himalaya', codes=['PK'],
       observerBounds=[35.36,74.56,35.40,74.60], viewpoint=[35.3792,74.58], radiusM=25000),
