@@ -214,7 +214,9 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
     }
     if (manual) ViewpointDialog(state, { manual = false }) { point, ground -> model.manualViewpoint(point, ground); manual = false }
     if (settings) SettingsDialog(state, model, onTutorial = { settings = false; tutorial = true }) { settings = false }
-    if (tutorial) com.harsh.peakbud.feature.tutorial.TutorialScreen(state.preferences) { tutorial = false }
+    // First launch: show the walkthrough once; finishing or skipping it is saved in DataStore.
+    LaunchedEffect(state.tutorialSeen) { if (state.tutorialSeen == false) tutorial = true }
+    if (tutorial) com.harsh.peakbud.feature.tutorial.TutorialScreen(state.preferences) { tutorial = false; model.markTutorialSeen() }
     selectedPeak?.let { peak ->
         AlertDialog(onDismissRequest = { selectedPeak = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text(peak.peak.name) }, text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(TrailSpace.md)) {

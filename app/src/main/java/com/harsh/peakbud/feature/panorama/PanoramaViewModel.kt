@@ -57,6 +57,8 @@ data class PanoramaState(
     val placeName: String? = null,
     /** A small download centred on the phone's position, when catalogue terrain covers it. */
     val nearby: CatalogRegion? = null,
+    /** Null until DataStore has been read, so the first-run tutorial never flashes for returning users. */
+    val tutorialSeen: Boolean? = null,
 ) {
     /** Fictional terrain is shown only while demo mode is switched on in Settings. */
     val isDemo: Boolean get() = activePack == null && preferences.demoMode
@@ -90,6 +92,9 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
 
     init {
         viewModelScope.launch {
+            launch {
+                settings.tutorialSeen.catch { emit(true) }.collect { seen -> mutable.update { it.copy(tutorialSeen = seen) } }
+            }
             settings.preferences.catch { e -> Telemetry.error("settings read", e); mutable.update { it.copy(message = strings(R.string.settings_read_failed)) }; emit(Preferences()) }
                 .collect { value ->
                     val previous = mutable.value.preferences
@@ -186,6 +191,13 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         alignment.start(target, input.cameraPose, blocker)
     }
     fun resetAlignment() = alignment.reset()
+    /** Called when the tutorial is finished or skipped; persisted so it shows only once. */
+    fun markTutorialSeen() {
+        if (mutable.value.tutorialSeen == true) return
+        mutable.update { it.copy(tutorialSeen = true) }
+        Telemetry.event("tutorial_closed")
+        viewModelScope.launch { runCatching { settings.markTutorialSeen() }.onFailure { Telemetry.error("tutorial seen write", it) } }
+    }
     /** Warm the terrain prediction for the current direction while the Camera tab is open. */
     fun prefetchAlignment(hfovDeg: Double?) {
         val input = mutable.value

@@ -13,6 +13,9 @@ class AppSettings(context: Context) {
     private val store = context.preferences
     val preferences = store.data.map { Preferences(it[FEET] ?: false, it[UNCERTAIN] ?: true, it[HEIGHT]?.takeIf { h -> h.isFinite() && h in .5..3.0 } ?: 1.6, it[DEMO] ?: false, it[DIAGNOSTICS] ?: true, runCatching { ThemeMode.valueOf(it[THEME] ?: "SYSTEM") }.getOrDefault(ThemeMode.SYSTEM)) }
     val selectedRegion = store.data.map { it[REGION] }
+    /** Whether the first-run tutorial was finished or skipped. Its own key, so preference updates never reset it. */
+    val tutorialSeen = store.data.map { it[TUTORIAL_SEEN] ?: false }
+    suspend fun markTutorialSeen() = store.edit { it[TUTORIAL_SEEN] = true }
     suspend fun selectRegion(key: String?) = store.edit { if (key == null) it.remove(REGION) else it[REGION] = key }
     suspend fun update(value: Preferences) = store.edit {
         it[FEET] = value.useFeet; it[UNCERTAIN] = value.showUncertain; it[HEIGHT] = value.phoneHeightM; it[DEMO] = value.demoMode; it[DIAGNOSTICS] = value.shareDiagnostics; it[THEME] = value.themeMode.name
@@ -25,5 +28,6 @@ class AppSettings(context: Context) {
         private val REGION = stringPreferencesKey("selected-region")
         private val DEMO = booleanPreferencesKey("demo-mode")
         private val DIAGNOSTICS = booleanPreferencesKey("share-diagnostics")
+        private val TUTORIAL_SEEN = booleanPreferencesKey("tutorial-seen")
     }
 }

@@ -39,9 +39,14 @@ class PanoramaNavigationTest {
             override fun poses(displayRotation: Int) = flowOf(DevicePose(90.0, 0.0, true, source = "Test magnetometer"))
             override fun fixes() = emptyFlow<LocationStatus>()
         }
+        // These tests cover navigation, not the first-run tutorial: mark it seen, and skip it if it already opened.
+        kotlinx.coroutines.runBlocking { com.harsh.peakbud.data.settings.AppSettings(compose.activity).markTutorialSeen() }
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
             compose.activity.setContent { PeakBudTheme { PeakBudApp(readings = readings) } }
         }
+        compose.waitForIdle()
+        val skip = compose.activity.getString(R.string.tutorial_skip)
+        if (compose.onAllNodes(androidx.compose.ui.test.hasText(skip)).fetchSemanticsNodes().isNotEmpty()) compose.onNodeWithText(skip).performClick()
     }
     private fun tab(id: Int) { compose.onNodeWithContentDescription(compose.activity.getString(id)).performClick() }
 
