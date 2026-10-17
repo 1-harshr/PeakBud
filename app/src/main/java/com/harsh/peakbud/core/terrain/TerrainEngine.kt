@@ -99,8 +99,7 @@ class TerrainEngine {
                     // same error budget as the final classification, without scanning the rest
                     // of a 250 km ray for an already hidden summit.
                     if (blocker == d) {
-                        val ridgeError = Math.toDegrees(atan2(terrain.heightErrorM + observer.heightUncertaintyM, max(d, 1.0)))
-                        if (maximum > angle + targetError + angularPositionError + ridgeError + 0.02) {
+                        if (maximum > angle + targetError + angularPositionError + ridgeError(observer, terrain, d) + 0.02) {
                             stoppedAtBlocker = true
                             break
                         }
@@ -112,8 +111,7 @@ class TerrainEngine {
         }
         // Error budget at the limiting ridge and summit, rather than treating a
         // coherent DEM height offset as a new near-field wall at every sample.
-        val ridgeError = Math.toDegrees(atan2(terrain.heightErrorM + observer.heightUncertaintyM, max(blocker ?: distance, 1.0)))
-        val margin = targetError + ridgeError + angularPositionError + 0.02
+        val margin = targetError + ridgeError(observer, terrain, blocker ?: distance) + angularPositionError + 0.02
         val geometricState = when {
             maximum > angle + margin -> Visibility.OCCLUDED
             missing -> Visibility.UNKNOWN
@@ -141,7 +139,19 @@ class TerrainEngine {
             (angle - maximum).takeIf { !stoppedAtBlocker && it.isFinite() }, blocker, reason, heightDifference?.toInt())
     }
 
+    /**
+     * Angular error of a ridge [distanceM] away. The observer's ground comes from the same terrain model, so their height
+     * errors are shared nearby and only become independent over a few kilometres. Using the full absolute error at a
+     * ridge 90 m away (±15°) made anything hidden by nearby ground "uncertain" instead of hidden.
+     */
+    private fun ridgeError(observer: Observer, terrain: Terrain, distanceM: Double): Double {
+        val error = (terrain.heightErrorM + observer.heightUncertaintyM) * min(1.0, distanceM / ERROR_CORRELATION_M)
+        return Math.toDegrees(atan2(error, max(distanceM, 1.0)))
+    }
+
     private companion object {
+        /** Distance over which terrain height errors stop being shared with the observer's own ground. */
+        const val ERROR_CORRELATION_M = 2_000.0
         /** Ground this close to the phone is GPS and 30 m-cell noise, not a ridge. */
         const val NEAR_SKIP_M = 60.0
     }

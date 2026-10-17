@@ -46,7 +46,10 @@ object PanoramaProjector {
         val skyline = samples.filter { it.complete && inView(it.bearingDeg) }.mapNotNull { it.elevationDeg?.takeIf(Double::isFinite) }
         if (skyline.size < 3) return null
         val peaks = peakAngles.filter { inView(it.first) && it.second.isFinite() }.map { it.second }
-        return VerticalWindow(skyline.min(), maxOf(skyline.max(), peaks.maxOrNull() ?: Double.NEGATIVE_INFINITY))
+        // A labelled peak can sit below the lowest skyline point (a low hill in front of a higher range), so it bounds
+        // the window from below as well as above.
+        return VerticalWindow(minOf(skyline.min(), peaks.minOrNull() ?: Double.POSITIVE_INFINITY),
+            maxOf(skyline.max(), peaks.maxOrNull() ?: Double.NEGATIVE_INFINITY))
     }
 
     /**
