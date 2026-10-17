@@ -119,7 +119,9 @@ class CameraAlignmentController(
             Snapshot(generation, sector, target, lastPose, session.state.correction.takeIf { session.state.phase == AlignmentPhase.ALIGNED })
         }
         if (sec == null || tgt == null) return
+        val started = System.nanoTime()
         val outcome = analyse(frame, toView, lens, pose, previousPose, sec, tgt, accepted, peaks)
+        log("alignment frame ${frame.width}x${frame.height} in ${(System.nanoTime() - started) / 1_000_000} ms: ${outcome.match?.let { "match %.2f°/%.2f° err %.3f°".format(it.correction.heading, it.correction.pitch, it.errorDeg) } ?: outcome.problem}")
         synchronized(this) {
             if (gen != generation) return  // reset or restarted while this frame was being analysed
             lastPose = pose

@@ -51,7 +51,7 @@ class RealTerrainMatchingTest {
                     val heading = random.nextDouble() * 360
                     val truth = CameraPose(heading, random.nextDouble(-4.0, 6.0), random.nextDouble(-8.0, 8.0))
                     val t0 = System.nanoTime()
-                    val samples = AlignmentHorizon.sector(Observer(spot, ground), terrain, heading, hfov / 2 + 25, pack.radiusM, .1)
+                    val samples = AlignmentHorizon.sector(Observer(spot, ground), terrain, heading, hfov / 2 + 25, pack.radiusM, .2)  // production settings
                     horizonMs += (System.nanoTime() - t0) / 1_000_000
                     val predicted = TerrainSkyline(samples)
                     // Observed outline: true far-field skyline projected through the true pose, with noise and gaps.

@@ -38,7 +38,7 @@ class CameraAlignmentFlowTest {
         }
     private fun groundFrame() = UprightFrame.sample(0, 0, viewW, viewH, 0, 320) { x, y -> (0xff shl 24) or ((80 + (x * y).mod(30)) shl 16) or (70 shl 8) or 50 }
 
-    private fun controller(now: () -> Long) = CameraAlignmentController(CoroutineScope(Dispatchers.Default), Dispatchers.Default, now,
+    private fun controller(now: () -> Long) = CameraAlignmentController(CoroutineScope(Dispatchers.Default), Dispatchers.Default, now, log = { println("FLOW $it") },
         skylineSource = { _, heading, half, _ -> List((2 * half / .1).toInt() + 1) { i -> (heading - half + i * .1).let { b -> HorizonSample(Geography.wrap360(b), skyline(b), 30_000.0, true) } } })
     private val identity: (Double, Double) -> Pair<Double, Double>? = { x, y -> if (x in 0.0..viewW.toDouble() && y in 0.0..viewH.toDouble()) x to y else null }
 

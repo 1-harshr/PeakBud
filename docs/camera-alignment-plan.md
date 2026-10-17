@@ -22,4 +22,17 @@ Goal: attach peak names to their real positions in the camera by registering a m
 
 ## Progress
 
-Plan written before alignment implementation. Research and real-image acquisition are available; implementation and acceptance gates remain open.
+Implemented (see [validation results](camera-alignment-validation.md)):
+
+- Core: `SkylineExtractor` (adaptive per-column sky model), `AlignmentHorizon` (far-field sector prediction from location and
+  terrain only, refraction, near-field exclusion), `SkylineMatcher`, `AlignmentSession`, `CameraRays`, `UprightFrame`.
+- Android: CameraX ImageAnalysis bound with the preview in one ViewPort, bounded worker, every frame closed;
+  `CameraAlignmentController` in the ViewModel, apart from raw sensor state; Align with camera / Aligning / Aligned /
+  Couldn't match this view / Alignment lost with reasons; aligned anchors marked; foreground-covered labels withheld;
+  manual nudge preserved as fallback.
+- Performance: HGT cursors; prediction cached and prefetched; peak results published progressively nearest-first.
+- Tests: synthetic recovery and rejection, real-photo extraction and negatives, end-to-end controller flow, opt-in
+  real-terrain accuracy and a real photo registered from its recorded location.
+
+Still open: outdoor physical-phone validation, cloudy-sky support, a learned sky segmenter with a suitable licence, and
+performance on low-end phones.
