@@ -293,4 +293,19 @@
     <string name="tutorial_example_area_detail">12 km away · 18 MB · peaks up to 25 km away</string>
     <string name="advanced">Advanced</string>
     <string name="standing_height_detail">How high your phone is above the ground. Raise it if you\'re on a viewing tower or rooftop; it can change which nearby peaks count as in view.</string>
+    <!-- Home explainer -->
+    <string name="home_info_title">What you\'re seeing</string>
+    <string name="home_info_intro">A drawing of the mountains around you, made from the downloaded map. It is not a photo, so it works indoors and without the camera.</string>
+    <string name="home_info_strip_title">Strip along the top</string>
+    <string name="home_info_strip">The direction you\'re looking. N is north and the numbers are compass bearings; the small mark in the middle is straight ahead.</string>
+    <string name="home_info_lines_title">Lines on the left</string>
+    <string name="home_info_lines">How high above level something appears. 0° is eye level; 10° is about a fist held at arm\'s length. On gentle terrain heights are stretched so hills stay visible (the caption shows "heights ×2" for example); the angle lines always show true angles.</string>
+    <string name="home_info_labels_title">Peak labels</string>
+    <string name="home_info_labels">Name, height and distance. A ? means a nearer ridge might hide it. Tap a label for details.</string>
+    <string name="home_info_controls_title">Controls</string>
+    <string name="home_info_controls">Drag sideways to look around and pinch to zoom. The round buttons: locate puts you at your GPS position, the compass turns the view as you turn your phone, and the pin lets you look from another spot in the area. A filled button is on.</string>
+    <string name="got_it">Got it</string>
+    <string name="use_my_location_chip">Use my location</string>
+    <string name="follow_phone">Follow phone</string>
+    <string name="heights_stretched_caption">%1$s · heights ×%2$s</string>
 </resources>

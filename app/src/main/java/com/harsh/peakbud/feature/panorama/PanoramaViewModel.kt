@@ -101,6 +101,10 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                     if (!mutable.value.initialized || previous.shareDiagnostics != value.shareDiagnostics) Telemetry.setEnabled(value.shareDiagnostics)
                     Telemetry.key("demo_mode", value.demoMode.toString())
                     mutable.update { it.copy(preferences = value) }
+                    // Switching Demo mode on without an area shows the made-up landscape from its own viewpoint;
+                    // the phone's real position lies outside it.
+                    if (!previous.demoMode && value.demoMode && mutable.value.activePack == null)
+                        mutable.update { it.copy(point = DemoTerrain.VIEWPOINT, groundOverrideM = null, followingGps = false, gpsStatus = null, message = null) }
                     if (previous.phoneHeightM != value.phoneHeightM || previous.demoMode != value.demoMode) recalculate()
                 }
         }

@@ -182,16 +182,16 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                     BoxWithConstraints(Modifier.weight(1f)) {
                         if (maxWidth > maxHeight) {
                             Row(horizontalArrangement = Arrangement.spacedBy(TrailSpace.lg)) {
-                                PanoramaPanel(state, model, Modifier.weight(1f).fillMaxHeight(), { tab = 3 }) { selectedPeak = it }
-                                Column(Modifier.width(TrailSize.sidePanel).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
-                                    if (compact) ObservationStatus(state, false, null, true, ::gps, model::startCameraTracking)
-                                    ViewControls(state, model, { manual = true }, ::gps)
+                                PanoramaPanel(state, model, Modifier.weight(1f).fillMaxHeight(), { tab = 3 }, ::gps, { manual = true }) { selectedPeak = it }
+                                if (compact) Column(Modifier.width(TrailSize.sidePanel).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
+                                    ObservationStatus(state, false, null, true, ::gps, model::startCameraTracking)
+                                    HomeNotes(state)
                                 }
                             }
                         } else {
                             Column(verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
-                                PanoramaPanel(state, model, Modifier.fillMaxWidth().weight(1f), { tab = 3 }) { selectedPeak = it }
-                                ViewControls(state, model, { manual = true }, ::gps)
+                                PanoramaPanel(state, model, Modifier.fillMaxWidth().weight(1f), { tab = 3 }, ::gps, { manual = true }) { selectedPeak = it }
+                                HomeNotes(state)
                             }
                         }
                     }
@@ -633,8 +633,8 @@ private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraF
                     Text(bearing, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Text(listOfNotNull(directionSummary, gpsSummary).joinToString(" · "), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                if (!state.followingGps) TextButton(onClick = onGps, contentPadding = PaddingValues(horizontal = TrailSpace.sm)) { Text(strings(R.string.locate)) }
-                if (!state.followingCompass) TextButton(onClick = onCompass, contentPadding = PaddingValues(horizontal = TrailSpace.sm)) { Text(strings(R.string.compass)) }
+                if (cameraMode && !state.followingGps) TextButton(onClick = onGps, contentPadding = PaddingValues(horizontal = TrailSpace.sm)) { Text(strings(R.string.locate)) }
+                if (cameraMode && !state.followingCompass) TextButton(onClick = onCompass, contentPadding = PaddingValues(horizontal = TrailSpace.sm)) { Text(strings(R.string.compass)) }
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(painterResource(if (expanded) R.drawable.ic_expand_less else R.drawable.ic_expand_more), contentDescription = if (expanded) strings(R.string.hide_details) else strings(R.string.show_details), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -661,11 +661,26 @@ private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraF
 }
 
 @Composable
-private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifier: Modifier, onRegions: () -> Unit, onPeak: (PeakView) -> Unit) {
+private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifier: Modifier, onRegions: () -> Unit, onGps: () -> Unit,
+                          onViewpoint: () -> Unit, onPeak: (PeakView) -> Unit) {
     val strings = rememberTrailStrings()
+    var info by rememberSaveable { mutableStateOf(false) }
     Card(modifier, shape = MaterialTheme.shapes.large) {
         Box(Modifier.fillMaxSize()) {
-            PanoramaCanvas(state, Modifier.fillMaxSize(), model::pan, onPeak)
+            // Drag turns the view, pinch zooms (replaces the old Width slider).
+            PanoramaCanvas(state, Modifier.fillMaxSize(), model::pan, onPeak, onZoom = { zoom -> model.setFov(state.fov / zoom) })
+            // Small, quiet "what am I looking at?" in the top-left corner, beside the direction strip.
+            if (state.scene != null) IconButton(onClick = { info = true }, modifier = Modifier.align(Alignment.TopStart).size(TrailSize.touchTarget)) {
+                Icon(painterResource(R.drawable.ic_info), contentDescription = strings(R.string.home_info_title),
+                    modifier = Modifier.size(TrailSize.iconSmall), tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .8f))
+            }
+            // Map-style round buttons instead of chips: locate me, follow the phone's direction, look from another spot.
+            if (state.scene != null || !state.noRegion) Column(Modifier.align(Alignment.BottomEnd).padding(end = TrailSpace.sm, bottom = TrailCanvas.footerClearance + TrailSpace.xs),
+                verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
+                MapButton(R.drawable.ic_pin_drop, strings(R.string.choose_spot), active = !state.followingGps && !state.isDemo, onClick = onViewpoint)
+                MapButton(R.drawable.ic_explore, strings(R.string.follow_phone), active = state.followingCompass, onClick = model::toggleCompass)
+                MapButton(R.drawable.ic_my_location, strings(R.string.use_my_location_chip), active = state.followingGps, onClick = onGps)
+            }
             if (state.calculating && state.scene == null) Surface(Modifier.align(Alignment.Center), shape = MaterialTheme.shapes.medium) {
                 Row(Modifier.padding(TrailSpace.lg), horizontalArrangement = Arrangement.spacedBy(TrailSpace.md), verticalAlignment = Alignment.CenterVertically) {
                     CircularProgressIndicator(Modifier.size(TrailSize.icon), strokeWidth = TrailStroke.normal)
@@ -680,29 +695,50 @@ private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifi
             }
         }
     }
+    if (info) HomeInfoDialog { info = false }
 }
 
+/** Plain-language key to the Home skyline: what it is and what each part means. */
 @Composable
-private fun ViewControls(state: PanoramaState, model: PanoramaViewModel, onViewpoint: () -> Unit, onGps: () -> Unit) {
+private fun HomeInfoDialog(onDismiss: () -> Unit) {
     val strings = rememberTrailStrings()
-    Column(verticalArrangement = Arrangement.spacedBy(TrailSpace.xxs)) {
-        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(TrailSpace.sm), verticalArrangement = Arrangement.spacedBy(TrailSpace.xs)) {
-            FilterChip(selected = state.followingGps, onClick = onGps, label = { Text(strings(R.string.my_location)) },
-                leadingIcon = { Icon(painterResource(R.drawable.ic_my_location), null, Modifier.size(TrailSize.iconSmall)) })
-            FilterChip(selected = state.followingCompass, onClick = model::toggleCompass, label = { Text(strings(R.string.compass)) },
-                leadingIcon = { Icon(painterResource(R.drawable.ic_explore), null, Modifier.size(TrailSize.iconSmall)) })
-            TextButton(onClick = onViewpoint, contentPadding = PaddingValues(horizontal = TrailSpace.md)) { Text(strings(R.string.choose_spot), maxLines = 1, softWrap = false) }
-        }
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(TrailSpace.md)) {
-            Text(strings(R.string.width), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            TrailSlider(state.fov.toFloat(), { model.setFov(it.toDouble()) }, 35f..120f, Modifier.weight(1f))
-            Text(strings(R.string.angle_degrees , state.fov.toInt()), style = MaterialTheme.typography.labelMedium, modifier = Modifier.widthIn(min = TrailSize.readout), maxLines = 1, softWrap = false)
-        }
-        listOfNotNull(
-            state.compassStatus,
-            state.scene?.horizon?.count { !it.complete }?.takeIf { it > 0 }?.let { strings(R.string.some_directions_have_no_map_data_so_peaks_there_may_be_missing) },
-        ).firstOrNull()?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+    AlertDialog(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surface,
+        icon = { Icon(painterResource(R.drawable.ic_landscape), null) },
+        title = { Text(strings(R.string.home_info_title)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(TrailSpace.md)) {
+                Text(strings(R.string.home_info_intro), style = MaterialTheme.typography.bodyMedium)
+                listOf(R.string.home_info_strip_title to R.string.home_info_strip, R.string.home_info_lines_title to R.string.home_info_lines,
+                    R.string.home_info_labels_title to R.string.home_info_labels, R.string.home_info_controls_title to R.string.home_info_controls).forEach { (title, body) ->
+                    Column(verticalArrangement = Arrangement.spacedBy(TrailSpace.xxs)) {
+                        Text(strings(title), style = MaterialTheme.typography.titleSmall)
+                        Text(strings(body), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(strings(R.string.got_it)) } })
+}
+
+/** Round floating button in the style of map apps; filled when its mode is on. */
+@Composable
+private fun MapButton(icon: Int, description: String, active: Boolean, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = CircleShape, shadowElevation = TrailSpace.xs,
+        color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+        contentColor = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.size(TrailSize.touchTarget).semantics { contentDescription = description; selected = active }) {
+        Box(contentAlignment = Alignment.Center) { Icon(painterResource(icon), null, Modifier.size(TrailSize.iconMedium)) }
     }
+}
+
+/** A single short note under the skyline, only when something needs attention. */
+@Composable
+private fun HomeNotes(state: PanoramaState) {
+    val strings = rememberTrailStrings()
+    listOfNotNull(
+        state.compassStatus,
+        state.scene?.horizon?.count { !it.complete }?.takeIf { it > 0 }?.let { strings(R.string.some_directions_have_no_map_data_so_peaks_there_may_be_missing) },
+    ).firstOrNull()?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary, maxLines = 2, overflow = TextOverflow.Ellipsis) }
 }
 
 @Composable
