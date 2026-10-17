@@ -48,7 +48,7 @@ class TerrainEngine {
         val distance = Geography.distance(observer.point, peak.point)
         val bearing = Geography.bearing(observer.point, peak.point)
         val summit = terrain.sample(peak.point) as? TerrainSample.Valid
-            ?: return PeakView(peak, distance, bearing, null, null, Visibility.UNKNOWN, reason = "There's no map data at the summit.")
+            ?: return PeakView(peak, distance, bearing, null, null, Visibility.UNKNOWN, reason = PeakReason.NO_SUMMIT_DATA)
         val angle = Geography.elevationAngle(observer.heightM, summit.heightM, distance)
         val step = (terrain.resolutionM / 3).coerceAtLeast(1.0)
         var maximum = Double.NEGATIVE_INFINITY
@@ -87,14 +87,14 @@ class TerrainEngine {
         val inconsistentHeight = heightDifference != null && heightDifference > max(100.0, terrain.heightErrorM * 3)
         val state = if (inconsistentHeight && geometricState != Visibility.UNKNOWN) Visibility.UNCERTAIN else geometricState
         val reason = if (inconsistentHeight && state != Visibility.UNKNOWN)
-            "The official height and the map differ by ${heightDifference!!.toInt()} m, so the summit position may be off."
+            PeakReason.HEIGHT_MISMATCH
         else when (state) {
-            Visibility.TERRAIN_VISIBLE -> "Nothing in the landscape blocks it, though clouds or trees still might."
-            Visibility.OCCLUDED -> "A closer ridge blocks your view of the summit."
-            Visibility.UNCERTAIN -> "It sits close to the skyline, so small errors could hide it."
-            Visibility.UNKNOWN -> "Map data between you and the peak is missing."
+            Visibility.TERRAIN_VISIBLE -> PeakReason.VISIBLE
+            Visibility.OCCLUDED -> PeakReason.OCCLUDED
+            Visibility.UNCERTAIN -> PeakReason.BORDERLINE
+            Visibility.UNKNOWN -> PeakReason.MISSING_TERRAIN
         }
         return PeakView(peak, distance, bearing, angle, summit.heightM, state,
-            (angle - maximum).takeIf { it.isFinite() }, blocker, reason)
+            (angle - maximum).takeIf { it.isFinite() }, blocker, reason, heightDifference?.toInt())
     }
 }

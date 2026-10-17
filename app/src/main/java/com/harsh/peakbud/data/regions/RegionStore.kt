@@ -70,12 +70,12 @@ class RegionStore(private val root: File) {
         }
     }
 
-    fun install(stream: InputStream, checkpoint: () -> Unit = {}, progress: (String) -> Unit = {}): RegionPack {
+    fun install(stream: InputStream, checkpoint: () -> Unit = {}, progress: (InstallProgress) -> Unit = {}): RegionPack {
         val token = UUID.randomUUID().toString()
         val archive = root.resolve(".$token.zip")
         val staging = root.resolve(".$token.staging")
         try {
-            progress("Saving…")
+            progress(InstallProgress(InstallStage.SAVE))
             archive.outputStream().use { output -> copyBounded(stream, output, MAX_BYTES, checkpoint) }
             check(staging.mkdir())
             val parsed = ZipFile(archive).use { zip ->
@@ -95,7 +95,7 @@ class RegionStore(private val root: File) {
                 require(entries.all { it.isDirectory || it.name == "manifest.json" || it.name in expected }) { "Archive contains unlisted files" }
                 pack.files.forEachIndexed { index, file ->
                     checkpoint()
-                    progress("Checking files (${index + 1} of ${pack.files.size})…")
+                    progress(InstallProgress(InstallStage.CHECK_FILES, current = index + 1, total = pack.files.size))
                     val entry = zip.getEntry(file.path) ?: error("Missing ${file.path}")
                     require(!entry.isDirectory && entry.size == file.size) { "Size mismatch: ${file.path}" }
                     val target = staging.resolve(file.path)

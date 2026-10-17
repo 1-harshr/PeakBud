@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.PeakBud" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.PeakBud" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/peakbud_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 
     <!-- Shown by the system while the process starts; handed off to Theme.PeakBud by installSplashScreen(). -->
     <style name="Theme.PeakBud.Starting" parent="Theme.SplashScreen">

@@ -1,5 +1,7 @@
 package com.harsh.peakbud.feature.panorama
 
+import com.harsh.peakbud.R
+import com.harsh.peakbud.ui.text.TrailStrings
 import android.app.Application
 import android.hardware.GeomagneticField
 import androidx.lifecycle.AndroidViewModel
@@ -58,7 +60,10 @@ data class PanoramaState(
     val noRegion: Boolean get() = activePack == null && !preferences.demoMode
 }
 
+private class ObservationMessage(message: String) : IllegalArgumentException(message)
+
 class PanoramaViewModel(application: Application) : AndroidViewModel(application) {
+    private val strings = TrailStrings(application.resources)
     private val mutable = MutableStateFlow(PanoramaState())
     val state: StateFlow<PanoramaState> = mutable.asStateFlow()
     private val store = RegionStore(File(application.noBackupFilesDir, "regions"))
@@ -79,7 +84,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
 
     init {
         viewModelScope.launch {
-            settings.preferences.catch { e -> Telemetry.error("settings read", e); mutable.update { it.copy(message = "Couldn't load your settings, so the defaults are in use.") }; emit(Preferences()) }
+            settings.preferences.catch { e -> Telemetry.error("settings read", e); mutable.update { it.copy(message = strings(R.string.settings_read_failed)) }; emit(Preferences()) }
                 .collect { value ->
                     val previous = mutable.value.preferences
                     if (!mutable.value.initialized || previous.shareDiagnostics != value.shareDiagnostics) Telemetry.setEnabled(value.shareDiagnostics)
@@ -110,12 +115,12 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                 val scene = withContext(Dispatchers.IO) {
                     val context = currentCoroutineContext()
                     val pack = input.activePack
-                    require(pack == null || pack.observerBounds.contains(input.point)) { "You're outside this hiking area. Pick an area that covers where you are, or choose a spot inside it on Home." }
+                    if (pack != null && !pack.observerBounds.contains(input.point)) throw ObservationMessage(strings(R.string.you_re_outside_this_hiking_area_pick_an_area_that_covers_where_you_are_or_ch))
                     if (pack != null) store.verify(pack) { context.ensureActive() }
                     val terrain: Terrain = if (pack == null) DemoTerrain() else HgtTerrain(pack.directory.resolve("terrain"), pack.bounds)
                     terrain.use {
                         val sample = it.sample(input.point) as? TerrainSample.Valid
-                            ?: error("There's no map data for this spot. Choose a spot inside the hiking area.")
+                            ?: throw ObservationMessage(strings(R.string.there_s_no_map_data_for_this_spot_choose_a_spot_inside_the_hiking_area))
                         val observer = Observer(input.point, input.groundOverrideM ?: sample.heightM,
                             input.preferences.phoneHeightM, it.datum, if (input.followingGps) gpsAccuracyM else 0.0,
                             if (pack == null) 0.0 else 10.0)
@@ -141,7 +146,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                 // Outside-area and no-data cases are expected (require/error); anything else is a bug worth reporting.
                 if (error is IllegalArgumentException || error is IllegalStateException) Telemetry.log("view not calculated: ${error.message}")
                 else Telemetry.error("calculate view", error)
-                mutable.update { it.copy(calculating = false, scene = null, message = error.message ?: "Couldn't work out the view from here. Please try again.") }
+                mutable.update { it.copy(calculating = false, scene = null, message = (error as? ObservationMessage)?.message ?: strings(R.string.couldn_t_work_out_the_view_from_here_please_try_again)) }
             }
         }
     }
@@ -209,13 +214,13 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     fun startGps() {
         lastGpsPoint = null
         lastFixElapsedMs = null
-        mutable.update { it.copy(followingGps = true, gpsFresh = false, gpsStatus = "Finding your location…") }
+        mutable.update { it.copy(followingGps = true, gpsFresh = false, gpsStatus = strings(R.string.finding_your_location)) }
     }
-    fun locationDenied() { mutable.update { it.copy(followingGps = false, message = "PeakBud needs precise location to line up peaks. Turn it on in Android settings, or choose a spot on Home.") } }
+    fun locationDenied() { mutable.update { it.copy(followingGps = false, message = strings(R.string.peakbud_needs_precise_location_to_line_up_peaks_turn_it_on_in_android_settin)) } }
     fun refreshFixAge() {
         val elapsed = lastFixElapsedMs ?: return
         val age = (android.os.SystemClock.elapsedRealtime() - elapsed) / 1000
-        if (age > 30) mutable.update { it.copy(gpsFresh = false, gpsStatus = "Location is ${age}s old · updating…") }
+        if (age > 30) mutable.update { it.copy(gpsFresh = false, gpsStatus = strings(R.string.location_is_s_old_updating , age)) }
     }
     fun stopGps() { mutable.update { it.copy(followingGps = false) } }
     fun gps(status: LocationStatus) {
@@ -224,10 +229,10 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
             is LocationStatus.Message -> { Telemetry.log("location: ${status.text}"); mutable.update { it.copy(gpsFresh = false, gpsStatus = status.text) } }
             is LocationStatus.Fix -> {
                 val fix = status.value
-                if (fix.ageSeconds > 30) { mutable.update { it.copy(gpsFresh = false, gpsStatus = "Location is out of date · updating…") }; return }
+                if (fix.ageSeconds > 30) { mutable.update { it.copy(gpsFresh = false, gpsStatus = strings(R.string.location_is_out_of_date_updating)) }; return }
                 gpsAccuracyM = fix.accuracyM.toDouble()
                 lastFixElapsedMs = android.os.SystemClock.elapsedRealtime() - fix.ageSeconds * 1000
-                mutable.update { it.copy(gpsFix = fix, gpsFresh = true, gpsStatus = "Location accurate to ${fix.accuracyM.toInt()} m") }
+                mutable.update { it.copy(gpsFix = fix, gpsFresh = true, gpsStatus = strings(R.string.location_accurate_to_m , fix.accuracyM.toInt())) }
                 // Look the place name up again only after moving about half a kilometre.
                 val named = namedPoint
                 if (named == null || Geography.distance(named, fix.point) >= 500.0) {
@@ -254,22 +259,29 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         if (old.demoMode != value.demoMode) Telemetry.event("demo_mode", "enabled" to value.demoMode)
         if (old.useFeet != value.useFeet) Telemetry.event("units", "imperial" to value.useFeet)
         if (old.shareDiagnostics && !value.shareDiagnostics) Telemetry.event("diagnostics_off")  // last event before collection stops
-        viewModelScope.launch { runCatching { settings.update(value) }.onFailure { e -> Telemetry.error("settings write", e); mutable.update { s -> s.copy(message = "Couldn't save your settings. Please try again.") } } }
+        viewModelScope.launch { runCatching { settings.update(value) }.onFailure { e -> Telemetry.error("settings write", e); mutable.update { s -> s.copy(message = strings(R.string.settings_write_failed)) } } }
     }
     fun clearMessage() { mutable.update { it.copy(message = null) } }
 
+    private fun progressText(value: InstallProgress): String = when (value.stage) {
+        InstallStage.DOWNLOAD -> strings(R.string.progress_download, value.name, value.receivedBytes / 1_048_576, value.downloadBytes / 1_048_576, value.current, value.total)
+        InstallStage.CHECK_TERRAIN -> strings(R.string.progress_check_terrain, value.current, value.total)
+        InstallStage.PREPARE -> strings(R.string.progress_prepare, value.name)
+        InstallStage.SAVE -> strings(R.string.progress_save)
+        InstallStage.CHECK_FILES -> strings(R.string.progress_check_files, value.current, value.total)
+    }
     fun downloadRegion(region: CatalogRegion) {
         if (importJob?.isCompleted == false) return
         val trusted = mutable.value.catalog.firstOrNull { it.id == region.id } ?: return
         importJob = viewModelScope.launch {
-            mutable.update { it.copy(importing = "Starting download of ${trusted.name}…", downloadingRegionId = trusted.id, message = null) }
+            mutable.update { it.copy(importing = strings(R.string.starting_download_of , trusted.name), downloadingRegionId = trusted.id, message = null) }
             Telemetry.event("region_download_start", "region" to trusted.id, "size_mb" to trusted.downloadBytes / 1_048_576)
             try {
                 val pack = withContext(Dispatchers.IO) {
                     val context = currentCoroutineContext()
                     CatalogInstaller(File(getApplication<Application>().noBackupFilesDir, "preparing"), store, downloader) {
                         getApplication<Application>().assets.open(it)
-                    }.install(trusted, { context.ensureActive() }) { progress -> mutable.update { it.copy(importing = progress) } }
+                    }.install(trusted, { context.ensureActive() }) { progress -> mutable.update { it.copy(importing = progressText(progress)) } }
                 }
                 Telemetry.event("region_download_complete", "region" to trusted.id)
                 mutable.update { it.copy(packs = (it.packs + pack).sortedBy { p -> p.name }, importing = null, downloadingRegionId = null) }
@@ -280,14 +292,14 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                 Telemetry.event("region_download_failed", "region" to trusted.id, "reason" to error.javaClass.simpleName)
                 // Network drops and full storage are normal on the trail; only unexpected failures become non-fatal reports.
                 if (error !is java.io.IOException) Telemetry.error("download ${trusted.id}", error)
-                mutable.update { it.copy(importing = null, downloadingRegionId = null, message = error.message ?: "The download didn't finish. Tap Resume to try again.") }
+                mutable.update { it.copy(importing = null, downloadingRegionId = null, message = strings(R.string.region_download_failed)) }
                 refreshDownloads()
             }
         }
     }
     fun cancelImport() {
         val job = importJob ?: return
-        mutable.update { it.copy(importing = "Cancelling…") }
+        mutable.update { it.copy(importing = strings(R.string.cancelling)) }
         job.invokeOnCompletion {
             mutable.update { it.copy(importing = null, downloadingRegionId = null) }
             viewModelScope.launch { refreshDownloads() }
@@ -304,7 +316,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                     database.withTransaction { database.peaks().deletePeaks(pack.key); database.peaks().deleteRegion(pack.key) }
                 }
                 mutable.update { it.copy(packs = it.packs.filterNot { p -> p.key == pack.key }) }
-            } catch (error: Exception) { Telemetry.error("delete ${pack.id}", error); mutable.update { it.copy(message = error.message ?: "Couldn't delete this hiking area. Please try again.") } }
+            } catch (error: Exception) { Telemetry.error("delete ${pack.id}", error); mutable.update { it.copy(message = strings(R.string.region_delete_failed)) } }
         }
     }
     suspend fun attribution(pack: RegionPack): String = withContext(Dispatchers.IO) { store.attribution(pack) }
@@ -315,12 +327,12 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     fun discardDownload(region: CatalogRegion) {
         if (importJob?.isCompleted == false) return
         importJob = viewModelScope.launch {
-            mutable.update { it.copy(importing = "Removing paused download…") }
+            mutable.update { it.copy(importing = strings(R.string.removing_paused_download)) }
             try {
                 withContext(Dispatchers.IO) { region.tiles.forEach { downloader.discard(it.url) } }
                 refreshDownloads()
             } catch (cancelled: CancellationException) { throw cancelled }
-            catch (error: Exception) { Telemetry.error("discard ${region.id}", error); mutable.update { it.copy(message = error.message ?: "Couldn't remove the paused download. Please try again.") } }
+            catch (error: Exception) { Telemetry.error("discard ${region.id}", error); mutable.update { it.copy(message = strings(R.string.download_discard_failed)) } }
             finally { mutable.update { it.copy(importing = null) } }
         }
     }

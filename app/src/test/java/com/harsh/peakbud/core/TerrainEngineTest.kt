@@ -84,7 +84,7 @@ class TerrainEngineTest {
         val view = TerrainEngine().visibility(observer, peak.copy(publishedHeightM = 8000.0), terrain())
         assertEquals(Visibility.UNCERTAIN, view.visibility)
         assertEquals(2000.0, view.geometryHeightM!!, 0.0)
-        assertTrue(view.reason.contains("differ"))
+        assertEquals(PeakReason.HEIGHT_MISMATCH, view.reason)
         assertEquals(Geography.elevationAngle(observer.heightM, 2000.0, view.distanceM), view.elevationDeg!!, 0.0001)
     }
     @Test fun smallPublishedHeightDifferencesDoNotHideClearTerrain() {

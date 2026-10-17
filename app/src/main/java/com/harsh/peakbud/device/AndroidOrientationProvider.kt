@@ -1,5 +1,7 @@
 package com.harsh.peakbud.device
 
+import com.harsh.peakbud.R
+import com.harsh.peakbud.ui.text.TrailStrings
 import android.content.Context
 import android.hardware.*
 import android.view.Surface
@@ -8,16 +10,17 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlin.math.*
 
-data class DevicePose(val magneticHeading: Double, val pitch: Double, val reliable: Boolean, val message: String? = null, val available: Boolean = true, val roll: Double = 0.0, val cameraUsable: Boolean = true, val source: String = "phone sensors")
+data class DevicePose(val magneticHeading: Double, val pitch: Double, val reliable: Boolean, val message: String? = null, val available: Boolean = true, val roll: Double = 0.0, val cameraUsable: Boolean = true, val source: String = "")
 
 class AndroidOrientationProvider(context: Context) {
+    private val strings = TrailStrings(context.resources)
     private val manager = context.getSystemService(SensorManager::class.java)
     fun poses(displayRotation: Int) = callbackFlow<DevicePose> {
         val rotation = manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
         val acceleration = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         val magnetic = manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         if (rotation == null && (acceleration == null || magnetic == null)) {
-            trySend(DevicePose(0.0, 0.0, false, "This phone has no compass. Drag the view on Home to look around.", available = false))
+            trySend(DevicePose(0.0, 0.0, false, strings(R.string.this_phone_has_no_compass_drag_the_view_on_home_to_look_around), available = false))
             close(); return@callbackFlow
         }
         var gravity: FloatArray? = null
@@ -53,7 +56,7 @@ class AndroidOrientationProvider(context: Context) {
                 val heading = Geography.wrap360(Math.toDegrees(atan2(east, north)))
                 val pitch = if (flat) 0.0 else Math.toDegrees(asin((-remapped[8]).toDouble().coerceIn(-1.0, 1.0)))
                 trySend(DevicePose(heading, pitch, accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM,
-                    if (accuracy < SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) "Compass is unsteady. Wave your phone in a figure eight, away from metal." else null, roll = Math.toDegrees(atan2(remapped[6].toDouble(), remapped[7].toDouble())), cameraUsable = !flat, source = if (rotation != null) "compass and motion sensors" else "compass and tilt sensor"))
+                    if (accuracy < SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) strings(R.string.compass_is_unsteady_wave_your_phone_in_a_figure_eight_away_from_metal) else null, roll = Math.toDegrees(atan2(remapped[6].toDouble(), remapped[7].toDouble())), cameraUsable = !flat, source = if (rotation != null) strings(R.string.compass_and_motion_sensors) else strings(R.string.compass_and_tilt_sensor)))
             }
         }
         val registered = if (rotation != null) manager.registerListener(listener, rotation, SensorManager.SENSOR_DELAY_GAME)
@@ -63,7 +66,7 @@ class AndroidOrientationProvider(context: Context) {
             accelerometerRegistered && magnetometerRegistered
         }
         if (!registered) {
-            trySend(DevicePose(0.0, 0.0, false, "Couldn't start the compass. Drag the view on Home to look around.", available = false))
+            trySend(DevicePose(0.0, 0.0, false, strings(R.string.couldn_t_start_the_compass_drag_the_view_on_home_to_look_around), available = false))
             manager.unregisterListener(listener)
             close(); return@callbackFlow
         }

@@ -45,7 +45,7 @@ object RegionCatalog {
 /** Downloads only pinned catalog sources, then uses the existing validated atomic installer. */
 class CatalogInstaller(private val workRoot: File, private val store: RegionStore, private val downloader: RegionDownloader,
                        private val openAsset: (String) -> InputStream) {
-    fun install(region: CatalogRegion, checkpoint: () -> Unit = {}, progress: (String) -> Unit = {}): RegionPack {
+    fun install(region: CatalogRegion, checkpoint: () -> Unit = {}, progress: (InstallProgress) -> Unit = {}): RegionPack {
         workRoot.mkdirs()
         require(workRoot.usableSpace > region.installedBytes * 4 + region.downloadBytes + 16_000_000) { "Not enough space on your phone. Free up some storage and try again." }
         val work = workRoot.resolve(region.id)
@@ -56,9 +56,9 @@ class CatalogInstaller(private val workRoot: File, private val store: RegionStor
             region.tiles.forEachIndexed { index, tile ->
                 checkpoint()
                 val compressed = downloader.download(tile.url, checkpoint) { received, total ->
-                    progress("Downloading ${region.name} · ${received / 1_048_576} of ${(total ?: tile.downloadBytes) / 1_048_576} MB" + if (region.tiles.size > 1) " (part ${index + 1} of ${region.tiles.size})" else "")
+                    progress(InstallProgress(InstallStage.DOWNLOAD, region.name, index + 1, region.tiles.size, received, total ?: tile.downloadBytes))
                 }
-                progress("Checking the download…")
+                progress(InstallProgress(InstallStage.CHECK_TERRAIN, current = index + 1, total = region.tiles.size))
                 if (compressed.length() != tile.downloadBytes || hash(compressed, checkpoint) != tile.downloadSha256) {
                     downloader.discard(tile.url)
                     error("The download didn't match what we expected. Please try again later.")
@@ -80,7 +80,7 @@ class CatalogInstaller(private val workRoot: File, private val store: RegionStor
                 checkpoint()
                 openAsset("${region.assetDirectory}/$name").use { input -> work.resolve(name).outputStream().use { input.copyTo(it) } }
             }
-            progress("Getting ${region.name} ready to use offline…")
+            progress(InstallProgress(InstallStage.PREPARE, name = region.name))
             val archive = work.resolve("region.zip")
             ZipOutputStream(archive.outputStream().buffered()).use { zip ->
                 zip.setLevel(0) // Already compressed on the wire; avoid expensive mobile recompression.

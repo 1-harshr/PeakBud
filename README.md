@@ -3,20 +3,22 @@
 An Android hiking companion that identifies mountain peaks from local elevation
 and peak data. Kotlin, Jetpack Compose, CameraX, coroutines, Room, and DataStore.
 
-The app opens in **Live camera** mode. Allow foreground location, enable the rear camera, then open **Regions**,
+The app opens on **Home**, with a terrain panorama. Open **Camera**, allow foreground location and rear-camera access, then open **Regions**,
 choose a hiking area, and tap **Download**. Peak labels use terrain
 visibility, GPS, true-north heading, pitch, roll, and the camera preview transform.
-The built-in catalogue starts with Poon Hill, Gokyo, and Auli. Peak names
+The built-in catalogue includes Poon Hill, Gokyo, Auli, and other hiking areas. Peak names
 and trusted terrain links are bundled; terrain downloads on demand.
 
 - Tap **Full screen** in camera mode for an edge-to-edge preview with location metadata.
   Use **Exit full screen** or Android Back to return.
 - Tap a peak label for its elevation, distance, and visibility estimate.
 - Use **−1° / +1° / Reset** to adjust compass alignment.
-- Switch to **Panorama** to explore terrain without the camera or with a manual viewpoint.
-- The **Explorer demo** contains fictional peaks and never overlays them on live video.
+- Switch to **Home** to explore terrain without the camera or use **Choose spot** for a manual viewpoint.
+- **Settings → Demo mode** adds fictional peaks to Home; they never overlay live video.
 - Open **Regions** to download a named area, resume, open it offline, or delete it.
-- View heading, coordinates, GPS accuracy, altitude/source, and camera view angles in the status panel.
+- View heading, coordinates, GPS accuracy, altitude, and camera view angles in the position details.
+- **Settings → Appearance** follows the device theme or saves a Light/Dark override.
+  Shared spacing, shapes, scalable typography, and unit formatting keep the screens consistent.
 
 Labels are sensor-based estimates, without image recognition. Compass interference,
 lens metadata, GPS error, clouds, and vegetation can affect alignment or visibility.
@@ -33,4 +35,4 @@ python3 tools/check-room-schema.py
 ```
 
 See [the implementation plan](docs/plan.md), [region preparation instructions](docs/region-packs.md),
-[built-in region catalogue](docs/region-catalog.md), and [current implementation and verification status](docs/implementation-status.md).
+[built-in region catalogue](docs/region-catalog.md), [design system and UX review](docs/design-system.md), and [current implementation and verification status](docs/implementation-status.md).

@@ -1,5 +1,7 @@
 package com.harsh.peakbud.feature.camera
 
+import com.harsh.peakbud.ui.text.*
+import com.harsh.peakbud.R
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -36,7 +38,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
+import com.harsh.peakbud.ui.theme.*
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -54,8 +56,9 @@ import kotlin.math.hypot
 /** Camera permission is requested only by the explicit Enable camera action. */
 @Composable
 fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit, onGps: () -> Unit, onTrack: () -> Unit, onFov: (Pair<Double, Double>?) -> Unit,
-                fullScreen: Boolean = false, safeTop: androidx.compose.ui.unit.Dp = 0.dp, safeBottom: androidx.compose.ui.unit.Dp = 0.dp,
+                fullScreen: Boolean = false, safeTop: androidx.compose.ui.unit.Dp = TrailSpace.none, safeBottom: androidx.compose.ui.unit.Dp = TrailSpace.none,
                 onBackgroundTap: () -> Unit = {}, onDragNudge: (Double) -> Unit = {}, onDragEnd: () -> Unit = {}, onPeak: (PeakView) -> Unit) {
+    val strings = rememberTrailStrings()
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     fun granted() = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
@@ -71,20 +74,20 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     LaunchedEffect(lens, viewport) { onFov(lens?.takeIf { viewport.width > 0 && viewport.height > 0 }?.fieldOfView(viewport.width, viewport.height)) }
     DisposableEffect(Unit) { onDispose { onFov(null) } }
-    var cameraStatus by remember { mutableStateOf<String?>("Starting camera…") }
+    var cameraStatus by remember { mutableStateOf<String?>(strings(R.string.starting_camera)) }
     val notice = when {
-        !permission -> "Turn on the camera to see peak names over the view in front of you."
+        !permission -> strings(R.string.turn_on_the_camera_to_see_peak_names_over_the_view_in_front_of_you)
         cameraStatus != null -> cameraStatus
-        state.noRegion -> "Download a hiking area to see the names of peaks around you."
-        state.isDemo -> "This is a made-up demo landscape. Download a hiking area to name real peaks."
-        !state.followingGps -> "Share your location so peaks appear in the right place."
-        !state.gpsFresh -> state.gpsStatus ?: "Finding your location…"
-        !state.followingCompass -> "Turn on the compass so labels follow where you point."
-        state.cameraPose == null -> "Point the back of your phone toward the mountains."
-        !state.poseReliable && !fullScreen -> state.compassStatus ?: "Compass is unsteady. Move away from metal and wave your phone in a figure eight."
-        state.calculating -> "Finding the peaks you can see…"
-        state.scene == null -> "This hiking area doesn't cover where you are. Pick one that does."
-        lens == null -> "This phone's camera can't place labels accurately. Use Home instead."
+        state.noRegion -> strings(R.string.download_a_hiking_area_to_see_the_names_of_peaks_around_you)
+        state.isDemo -> strings(R.string.this_is_a_made_up_demo_landscape_download_a_hiking_area_to_name_real_peaks)
+        !state.followingGps -> strings(R.string.share_your_location_so_peaks_appear_in_the_right_place)
+        !state.gpsFresh -> state.gpsStatus ?: strings(R.string.finding_your_location)
+        !state.followingCompass -> strings(R.string.turn_on_the_compass_so_labels_follow_where_you_point)
+        state.cameraPose == null -> strings(R.string.point_the_back_of_your_phone_toward_the_mountains)
+        !state.poseReliable && !fullScreen -> state.compassStatus ?: strings(R.string.compass_is_unsteady_move_away_from_metal_and_wave_your_phone_in_a_figure_eig)
+        state.calculating -> strings(R.string.finding_the_peaks_you_can_see)
+        state.scene == null -> strings(R.string.this_hiking_area_doesn_t_cover_where_you_are_pick_one_that_does)
+        lens == null -> strings(R.string.this_phone_s_camera_can_t_place_labels_accurately_use_home_instead)
         else -> null
     }
     Box(modifier.onSizeChanged { viewport = it }.clipToBounds().background(Color.Black)) {
@@ -96,29 +99,29 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
             val action: (@Composable () -> Unit)? = when {
                 !permission -> { { Button(onClick = {
                     if (denied) context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}")))
-                    else request.launch(Manifest.permission.CAMERA) }) { Text(if (denied) "Open settings" else "Turn on camera") } } }
+                    else request.launch(Manifest.permission.CAMERA) }) { Text(if (denied) strings(R.string.open_settings) else strings(R.string.turn_on_camera)) } } }
                 cameraStatus != null -> null
-                state.isDemo || state.noRegion -> { { Button(onClick = onRegions) { Text("Choose region") } } }
-                !state.followingGps -> { { Button(onClick = onGps) { Text("Use my location") } } }
-                !state.followingCompass -> { { Button(onClick = onTrack) { Text("Turn on compass") } } }
+                state.isDemo || state.noRegion -> { { Button(onClick = onRegions) { Text(strings(R.string.choose_region)) } } }
+                !state.followingGps -> { { Button(onClick = onGps) { Text(strings(R.string.use_my_location)) } } }
+                !state.followingCompass -> { { Button(onClick = onTrack) { Text(strings(R.string.turn_on_compass)) } } }
                 else -> null
             }
             // A notice with an action blocks use, so it sits centre stage; progress notes stay small near the top.
             val blocking = action != null
-            Surface(Modifier.align(if (blocking && fullScreen) Alignment.Center else Alignment.TopCenter).widthIn(max = 340.dp)
-                .padding(start = 16.dp, end = 16.dp, top = if (fullScreen && !blocking) safeTop + 8.dp else 12.dp, bottom = 12.dp),
-                shape = RoundedCornerShape(if (blocking) 24.dp else 50.dp),
-                color = if (blocking) MaterialTheme.colorScheme.surface.copy(alpha = .94f) else Color.Black.copy(alpha = .55f),
+            Surface(Modifier.align(if (blocking && fullScreen) Alignment.Center else Alignment.TopCenter).widthIn(max = TrailSize.noticeWidth)
+                .padding(start = TrailSpace.lg, end = TrailSpace.lg, top = if (fullScreen && !blocking) safeTop + TrailSpace.sm else TrailSpace.md, bottom = TrailSpace.md),
+                shape = if (blocking) MaterialTheme.shapes.large else androidx.compose.foundation.shape.CircleShape,
+                color = if (blocking) MaterialTheme.colorScheme.surface.copy(alpha = .94f) else TrailCameraColors.scrim,
                 contentColor = if (blocking) MaterialTheme.colorScheme.onSurface else Color.White) {
-                Column(Modifier.padding(horizontal = if (blocking) 20.dp else 16.dp, vertical = if (blocking) 20.dp else 10.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp), horizontalAlignment = if (blocking) Alignment.Start else Alignment.CenterHorizontally) {
+                Column(Modifier.padding(horizontal = if (blocking) TrailSpace.sheet else TrailSpace.lg, vertical = if (blocking) TrailSpace.sheet else TrailSpace.md),
+                    verticalArrangement = Arrangement.spacedBy(TrailSpace.lg), horizontalAlignment = if (blocking) Alignment.Start else Alignment.CenterHorizontally) {
                     Text(notice, style = if (blocking) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.labelLarge)
                     action?.invoke()
                 }
             }
         }
-        if (notice == null && !fullScreen) Surface(Modifier.align(Alignment.BottomCenter).padding(10.dp), shape = RoundedCornerShape(12.dp), color = Color(0xCC132A24), contentColor = Color.White) {
-            Text("Labels off? Use Nudge labels to line them up.", Modifier.padding(8.dp), style = MaterialTheme.typography.labelSmall)
+        if (notice == null && !fullScreen) Surface(Modifier.align(Alignment.BottomCenter).padding(TrailSpace.md), shape = MaterialTheme.shapes.small, color = TrailCameraColors.scrim, contentColor = Color.White) {
+            Text(strings(R.string.labels_off_use_nudge_labels_to_line_them_up), Modifier.padding(TrailSpace.sm), style = MaterialTheme.typography.labelSmall)
         }
     }
 }
@@ -126,6 +129,7 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
 @androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
 @Composable
 private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onStatus: (String?) -> Unit) {
+    val strings = rememberTrailStrings()
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     val view = remember(context) { PreviewView(context).apply {
@@ -137,7 +141,7 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
     var optics by remember { mutableStateOf<Triple<Double, Double, Pair<Float, Float>>?>(null) }
     var streaming by remember { mutableStateOf(false) }
     var focalLength by remember { mutableStateOf<Float?>(null) }
-    AndroidView(factory = { view }, modifier = modifier.semantics { contentDescription = if (streaming) "Live rear camera preview" else "Camera preview starting" })
+    AndroidView(factory = { view }, modifier = modifier.semantics { contentDescription = if (streaming) strings(R.string.live_rear_camera_preview) else strings(R.string.camera_preview_starting) })
     DisposableEffect(view, owner) {
         var disposed = false
         var provider: ProcessCameraProvider? = null
@@ -164,7 +168,7 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
         future.addListener({
             if (!disposed) try {
                 provider = future.get()
-                check(provider!!.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) { "This phone has no rear camera. Use Home instead." }
+                check(provider!!.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) { strings(R.string.this_phone_has_no_rear_camera_use_home_instead) }
                 preview.setSurfaceProvider(view.surfaceProvider)
                 val camera = provider!!.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview)
                 val info = Camera2CameraInfo.from(camera.cameraInfo)
@@ -176,12 +180,12 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
                         active.exactCenterX() to active.exactCenterY()) else null
                 camera.cameraInfo.cameraState.observe(owner, object : Observer<androidx.camera.core.CameraState> {
                     override fun onChanged(value: androidx.camera.core.CameraState) {
-                        if (!disposed && value.error != null) { Telemetry.log("camera error ${value.error?.code}"); streaming = false; statusCallback("The camera stopped. Switch to Home and back to restart it.") }
+                        if (!disposed && value.error != null) { Telemetry.log("camera error ${value.error?.code}"); streaming = false; statusCallback(strings(R.string.the_camera_stopped_switch_to_home_and_back_to_restart_it)) }
                     }
                 }.also { cameraObserver = it; observedCamera = camera })
             } catch (error: Exception) {
                 Telemetry.error("camera start", error)
-                statusCallback(error.message ?: "Couldn't start the camera. Check camera access in Android settings, or use Home.")
+                statusCallback(strings(R.string.couldn_t_start_the_camera_check_camera_access_in_android_settings_or_use_hom))
             }
         }, ContextCompat.getMainExecutor(context))
         onDispose {
@@ -217,50 +221,58 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
 @Composable
 private fun CameraLabels(state: PanoramaState, lens: CameraLens, modifier: Modifier, safeTop: androidx.compose.ui.unit.Dp, safeBottom: androidx.compose.ui.unit.Dp,
                          onBackgroundTap: () -> Unit, onDragNudge: (Double) -> Unit, onDragEnd: () -> Unit, onPeak: (PeakView) -> Unit) {
+    val strings = rememberTrailStrings()
+    val type = peakLabelTypography()
     val hits = remember { mutableListOf<Pair<RectF, PeakView>>() }
     val selected by rememberUpdatedState(onPeak)
     val background by rememberUpdatedState(onBackgroundTap)
     val nudge by rememberUpdatedState(onDragNudge)
     val dragEnd by rememberUpdatedState(onDragEnd)
-    Canvas(modifier.semantics { contentDescription = "Live mountain peak labels. Details are also available in Peaks." }
+    Canvas(modifier.semantics { contentDescription = strings(R.string.live_mountain_peak_labels_details_are_also_available_in_peaks) }
         .pointerInput(Unit) { detectTapGestures { p -> hits.lastOrNull { it.first.contains(p.x, p.y) }?.let { selected(it.second) } ?: background() } }
         // Drag sideways to line labels up with the real ridges; degrees follow the lens's horizontal scale.
         .pointerInput(lens) { detectHorizontalDragGestures(onDragEnd = { dragEnd() }) { change, dx -> change.consume(); nudge(-Math.toDegrees(kotlin.math.atan(dx / lens.fx))) } }) {
         hits.clear()
         val pose = state.cameraPose ?: return@Canvas
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 15 * density; color = android.graphics.Color.WHITE; typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
-            setShadowLayer(4 * density, 0f, 1 * density, 0x99000000.toInt()) }
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = type.titlePx; color = android.graphics.Color.WHITE; typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
+            setShadowLayer(TrailCanvas.shadowRadius.toPx(), 0f, TrailStroke.thin.toPx(), 0x99000000.toInt()) }
         val occupied = mutableListOf<RectF>()
         val peaks = state.scene?.peaks.orEmpty().filter { it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN }
         for (peak in peaks.sortedBy { it.distanceM }) {
             val point = CameraProjector.project(peak.bearingDeg, peak.elevationDeg ?: continue, pose, lens) ?: continue
             // Overlays cover the top and bottom; keep labels and their anchors inside the clear area.
-            val clearTop = safeTop.toPx() + 8 * density
+            val clearTop = safeTop.toPx() + TrailCanvas.labelMargin.toPx()
             val clearBottom = size.height - safeBottom.toPx()
             if (point.x !in 0f..size.width || point.y !in clearTop..clearBottom) continue
             val label = peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else ""
-            val detail = "${peak.peak.publishedHeightM?.let { height(it, state) } ?: peak.geometryHeightM?.let { "~${height(it, state)}" } ?: "Height unknown"} · ${distance(peak.distanceM, state)}"
-            val width = maxOf(paint.measureText(label), paint.measureText(detail)).coerceAtMost(size.width - 32 * density) + 16 * density
-            val left = (point.x - width / 2).coerceIn(8 * density, maxOf(8 * density, size.width - width - 8 * density))
-            val boxHeight = 44 * density
+            val heightText = peak.peak.publishedHeightM?.let { height(it, state, strings) }
+                ?: peak.geometryHeightM?.let { strings(R.string.approximate_height, height(it, state, strings)) }
+                ?: strings(R.string.height_unknown)
+            val detail = strings(R.string.peak_label_detail, heightText, distance(peak.distanceM, state, strings))
+            val width = maxOf(paint.measureText(label), paint.measureText(detail)).coerceAtMost(size.width - TrailSpace.xxl.toPx()) + TrailSpace.lg.toPx()
+            val left = (point.x - width / 2).coerceIn(TrailCanvas.labelMargin.toPx(), maxOf(TrailCanvas.labelMargin.toPx(), size.width - width - TrailCanvas.labelMargin.toPx()))
+            val boxHeight = type.cardHeight
             var rect: RectF? = null
             for (lane in 0..3) {
-                val top = (point.y - (65 + lane * 48) * density).coerceAtLeast(clearTop)
+                val top = (point.y - (TrailCanvas.anchorGap.toPx() + boxHeight + lane * (boxHeight + TrailSpace.sm.toPx()))).coerceAtLeast(clearTop)
                 val candidate = RectF(left, top, left + width, top + boxHeight)
-                if (candidate.bottom < clearBottom - 8 * density && occupied.none { RectF.intersects(it, candidate) }) { rect = candidate; break }
+                if (candidate.bottom < clearBottom - TrailCanvas.labelMargin.toPx() && occupied.none { RectF.intersects(it, candidate) }) { rect = candidate; break }
             }
             val box = rect ?: continue
             occupied += box
-            // No box: shadowed text keeps the ridgeline visible. A faint dark leader under the white one keeps it legible on snow.
-            drawLine(Color.Black.copy(alpha = .35f), Offset(point.x, point.y), Offset(box.centerX(), box.bottom), 3 * density)
-            drawLine(Color.White, Offset(point.x, point.y), Offset(box.centerX(), box.bottom), density)
-            drawCircle(Color.Black.copy(alpha = .35f), 6 * density, Offset(point.x, point.y))
-            drawCircle(Color.White, 4 * density, Offset(point.x, point.y))
-            val text = android.text.TextUtils.ellipsize(label, android.text.TextPaint(paint), width - 16 * density, android.text.TextUtils.TruncateAt.END).toString()
-            drawContext.canvas.nativeCanvas.drawText(text, box.left + 8 * density, box.top + 17 * density, paint)
-            paint.textSize = 11 * density; paint.alpha = 220
-            drawContext.canvas.nativeCanvas.drawText(detail, box.left + 8 * density, box.top + 34 * density, paint)
-            paint.textSize = 15 * density; paint.alpha = 255
+            // A shared dark backing keeps labels legible over both snow and dark rock.
+            drawRoundRect(TrailCameraColors.labelSurface, Offset(box.left, box.top),
+                androidx.compose.ui.geometry.Size(box.width(), box.height()), androidx.compose.ui.geometry.CornerRadius(TrailCanvas.labelCorner.toPx()))
+            drawLine(Color.Black.copy(alpha = .35f), Offset(point.x, point.y), Offset(box.centerX(), box.bottom), TrailStroke.heavy.toPx())
+            drawLine(Color.White, Offset(point.x, point.y), Offset(box.centerX(), box.bottom), TrailStroke.thin.toPx())
+            drawCircle(Color.Black.copy(alpha = .35f), TrailCanvas.markerHalo.toPx(), Offset(point.x, point.y))
+            drawCircle(Color.White, TrailCanvas.marker.toPx(), Offset(point.x, point.y))
+            val text = android.text.TextUtils.ellipsize(label, android.text.TextPaint(paint), width - TrailSpace.lg.toPx(), android.text.TextUtils.TruncateAt.END).toString()
+            drawContext.canvas.nativeCanvas.drawText(text, box.left + TrailCanvas.labelMargin.toPx(), box.top + type.titleBaseline, paint)
+            paint.textSize = type.detailPx; paint.alpha = 220
+            val detailText = android.text.TextUtils.ellipsize(detail, android.text.TextPaint(paint), width - TrailSpace.lg.toPx(), android.text.TextUtils.TruncateAt.END).toString()
+            drawContext.canvas.nativeCanvas.drawText(detailText, box.left + TrailCanvas.labelMargin.toPx(), box.top + type.detailBaseline, paint)
+            paint.textSize = type.titlePx; paint.alpha = 255
             hits += box to peak
         }
     }

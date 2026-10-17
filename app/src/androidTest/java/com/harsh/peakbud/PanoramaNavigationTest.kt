@@ -43,46 +43,29 @@ class PanoramaNavigationTest {
             compose.activity.setContent { PeakBudTheme { PeakBudApp(readings = readings) } }
         }
     }
-    private fun tap(text: String) { compose.onNodeWithText(text).performClick() }
+    private fun tab(id: Int) { compose.onNodeWithContentDescription(compose.activity.getString(id)).performClick() }
 
-    @Test fun cameraIsDefaultAndPanoramaRemainsAvailable() {
-        compose.onNodeWithText("Live camera").assertIsDisplayed()
-        compose.onNodeWithText("Align labels").assertIsDisplayed()
-        tap("Panorama")
-        compose.onNodeWithText("Viewpoint").assertIsDisplayed()
-        tap("Live camera")
-        compose.onNodeWithText("Align labels").assertIsDisplayed()
+    @Test fun homeIsDefaultAndCameraRemainsAvailable() {
+        compose.onNodeWithContentDescription(compose.activity.getString(R.string.home)).assertIsDisplayed()
+        compose.onNodeWithText("Choose spot").assertIsDisplayed()
+        tab(R.string.camera)
+        compose.onNodeWithContentDescription("Full screen").assertIsDisplayed()
+        tab(R.string.home)
+        compose.onNodeWithText("Choose spot").assertIsDisplayed()
     }
 
-    @Test fun fullScreenCameraKeepsMetadataAndReturnsWithButtonOrBack() {
-        tap("Full screen")
-        compose.onNodeWithText("Exit full screen").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Camera location metadata").assertIsDisplayed()
-        compose.onNodeWithText("Settings").assertDoesNotExist()
-        compose.onNodeWithText("Regions").assertDoesNotExist()
-        tap("Exit full screen")
-        compose.onNodeWithText("Live camera").assertIsDisplayed()
-        compose.onNodeWithText("Settings").assertIsDisplayed()
-        tap("Full screen")
-        Espresso.pressBack()
-        compose.onNodeWithText("Live camera").assertIsDisplayed()
-        compose.onNodeWithText("Exit full screen").assertDoesNotExist()
-    }
-
-    @Test fun manualDemoAndOfflineRegionEntryPointsRemainAvailable() {
-        compose.onNodeWithText("Find your horizon.").assertIsDisplayed()
-        tap("Peaks")
-        compose.onNodeWithText("Know your mountains.").assertIsDisplayed()
-        tap("Regions")
-        compose.onNodeWithText("Choose your hiking area").assertIsDisplayed()
-        compose.onNodeWithText("Poon Hill · Annapurna").assertIsDisplayed()
+    @Test fun manualViewpointAndCuratedRegionEntryPointsRemainAvailable() {
+        compose.onNodeWithText("Choose spot").performClick()
+        compose.onNodeWithText("Choose a spot").assertIsDisplayed()
+        compose.onNodeWithText("Cancel").performClick()
+        tab(R.string.regions)
+        compose.onNodeWithText("Search places, countries or ranges").assertIsDisplayed()
+        compose.onNodeWithText("Poon Hill · Annapurna").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Import region ZIP").assertDoesNotExist()
         compose.onNodeWithText("Download from URL").assertDoesNotExist()
-        compose.onNodeWithText("Explore demo").performScrollTo().performClick()
-        tap("Viewpoint")
-        compose.onNodeWithText("Choose your viewpoint").assertIsDisplayed()
-        tap("Cancel")
-        tap("Settings")
-        compose.onNodeWithText("Trail settings").assertIsDisplayed()
+        Espresso.pressBack()
+        compose.onNodeWithText("Choose spot").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Settings").performClick()
+        compose.onNodeWithText("Appearance").assertIsDisplayed()
     }
 }

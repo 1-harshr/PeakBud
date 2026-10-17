@@ -64,6 +64,8 @@ interface Terrain : AutoCloseable {
 
 enum class Visibility { TERRAIN_VISIBLE, OCCLUDED, UNCERTAIN, UNKNOWN }
 
+enum class PeakReason { NO_SUMMIT_DATA, HEIGHT_MISMATCH, VISIBLE, OCCLUDED, BORDERLINE, MISSING_TERRAIN }
+
 data class PeakView(
     val peak: Peak,
     val distanceM: Double,
@@ -73,7 +75,8 @@ data class PeakView(
     val visibility: Visibility,
     val clearanceDeg: Double? = null,
     val blockerDistanceM: Double? = null,
-    val reason: String,
+    val reason: PeakReason,
+    val heightDifferenceM: Int? = null,
 )
 
 data class HorizonSample(val bearingDeg: Double, val elevationDeg: Double?, val distanceM: Double?, val complete: Boolean)

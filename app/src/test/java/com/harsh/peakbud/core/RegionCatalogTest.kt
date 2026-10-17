@@ -94,7 +94,7 @@ class RegionCatalogTest {
     @Test fun cancelledPreparationKeepsDownloadedTerrainForRetry() = fixture { root, store, region, downloader, assets, requests ->
         val installer = CatalogInstaller(root.resolve("work"),store,downloader) { assets.getValue(it).inputStream() }
         var cancel = false
-        assertTrue(runCatching { installer.install(region, { if (cancel) throw InterruptedException() }) { if (it.startsWith("Getting")) cancel = true } }.isFailure)
+        assertTrue(runCatching { installer.install(region, { if (cancel) throw InterruptedException() }) { if (it.stage == InstallStage.PREPARE) cancel = true } }.isFailure)
         assertTrue(store.installed().isEmpty())
         assertEquals(1,downloader.pending().size)
         installer.install(region)
