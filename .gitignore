@@ -18,3 +18,6 @@ __pycache__/
 /region-output/
 
 .kotlin/
+
+# Firebase config: project-specific, keep out of the public repo (see docs/firebase.md)
+app/google-services.json

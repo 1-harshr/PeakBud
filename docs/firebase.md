@@ -12,7 +12,7 @@ Without it the app builds normally and logs to Logcat under the `PeakBud` tag.
 3. Download `google-services.json` and place it at `app/google-services.json`.
 4. Build. The Google Services and Crashlytics Gradle plugins apply automatically when that file is present.
 
-Keep `google-services.json` out of public repositories if the repo is public; it is not secret, but it
+`app/google-services.json` is listed in `.gitignore` because this repository is public. It is not secret, but it
 identifies your project. Release builds also upload R8 mapping files to Crashlytics once minification is on.
 
 ## Check it works

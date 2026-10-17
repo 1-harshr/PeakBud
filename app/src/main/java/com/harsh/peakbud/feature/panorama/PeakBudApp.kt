@@ -378,7 +378,7 @@ private fun FloatingTabBar(selected: Int, overCamera: Boolean, onSelect: (Int) -
     // Over the camera the bar turns translucent so the scene shows through; elsewhere it is solid forest green.
     Surface(modifier, shape = CircleShape, color = if (overCamera) Color.Black.copy(alpha = .55f) else Color(0xFF16352A), contentColor = Color.White, shadowElevation = if (overCamera) 0.dp else 12.dp) {
         Row(Modifier.padding(6.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-            tabs.forEachIndexed { index, (label, icon) ->
+            tabs.forEachIndexed { index, (label, icon) -> key(label) {
                 val active = index == selected
                 Row(Modifier.clip(CircleShape)
                     .background(if (active) (if (overCamera) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer) else Color.Transparent)
@@ -389,12 +389,13 @@ private fun FloatingTabBar(selected: Int, overCamera: Boolean, onSelect: (Int) -
                     verticalAlignment = Alignment.CenterVertically) {
                     Icon(painterResource(icon), contentDescription = null, Modifier.size(22.dp),
                         tint = if (active) (if (overCamera) Color.White else MaterialTheme.colorScheme.onPrimaryContainer) else Color.White.copy(alpha = .72f))
-                    if (active) {
-                        Spacer(Modifier.width(8.dp))
-                        Text(label, style = MaterialTheme.typography.labelLarge, color = if (overCamera) Color.White else MaterialTheme.colorScheme.onPrimaryContainer)
-                    }
+                    // The label is always composed and collapses to zero width when inactive. Adding and removing it
+                    // on every switch changed the row's structure mid-animation and crashed Compose on rapid taps.
+                    Text(label, Modifier.then(if (active) Modifier.padding(start = 8.dp) else Modifier.width(0.dp)),
+                        style = MaterialTheme.typography.labelLarge, maxLines = 1, softWrap = false, overflow = TextOverflow.Clip,
+                        color = if (overCamera) Color.White else MaterialTheme.colorScheme.onPrimaryContainer)
                 }
-            }
+            } }
         }
     }
 }
