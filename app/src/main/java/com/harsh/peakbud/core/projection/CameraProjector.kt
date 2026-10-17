@@ -8,6 +8,11 @@ data class CameraPose(val heading: Double, val pitch: Double, val roll: Double)
 /** Intrinsics in preview pixels, after CameraX rotation and center cropping. */
 data class CameraLens(val fx: Double, val fy: Double, val cx: Double, val cy: Double) {
     init { require(listOf(fx, fy, cx, cy).all { it.isFinite() } && fx > 0 && fy > 0) }
+    fun fieldOfView(width: Int, height: Int): Pair<Double, Double> {
+        require(width > 0 && height > 0)
+        return Math.toDegrees(atan(cx / fx) + atan((width - cx) / fx)) to
+            Math.toDegrees(atan(cy / fy) + atan((height - cy) / fy))
+    }
 }
 
 object CameraProjector {

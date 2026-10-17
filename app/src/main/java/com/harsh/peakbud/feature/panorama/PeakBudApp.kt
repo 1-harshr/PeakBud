@@ -1,6 +1,9 @@
 package com.harsh.peakbud.feature.panorama
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.content.pm.PackageManager
 import android.os.Build
 import android.view.WindowManager
@@ -17,6 +20,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -29,56 +33,67 @@ import com.harsh.peakbud.feature.camera.CameraPanel
 import com.harsh.peakbud.core.geo.Geography
 import com.harsh.peakbud.core.model.*
 import com.harsh.peakbud.data.regions.RegionPack
+import com.harsh.peakbud.data.regions.CatalogRegion
 import com.harsh.peakbud.device.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import java.util.Locale
 
 @Composable
-fun PeakBudApp(model: PanoramaViewModel = viewModel()) {
+fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings? = null) {
     val state by model.state.collectAsStateWithLifecycle()
+    val configuration = LocalConfiguration.current
+    val compact = configuration.screenWidthDp > configuration.screenHeightDp
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var cameraMode by rememberSaveable { mutableStateOf(true) }
+    var cameraFov by remember { mutableStateOf<Pair<Double, Double>?>(null) }
+    var askedLocation by rememberSaveable { mutableStateOf(false) }
     var manual by rememberSaveable { mutableStateOf(false) }
     var settings by rememberSaveable { mutableStateOf(false) }
     var selectedPeak by remember { mutableStateOf<PeakView?>(null) }
     var attribution by remember { mutableStateOf<String?>(null) }
     var deletePack by remember { mutableStateOf<RegionPack?>(null) }
-    var download by rememberSaveable { mutableStateOf(false) }
-    var downloadUrl by rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val device = remember(context, readings) { readings ?: AndroidDeviceReadings(context.applicationContext) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) model.importRegion(uri) }
     val permissions = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
         if (result[Manifest.permission.ACCESS_FINE_LOCATION] == true) model.startGps()
         else model.locationDenied()
     }
+    LaunchedEffect(state.initialized) {
+        if (!state.initialized) return@LaunchedEffect
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) model.startGps()
+        else if (!askedLocation) {
+            askedLocation = true
+            permissions.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+        }
+    }
     @Suppress("DEPRECATION")
     val rotation = if (Build.VERSION.SDK_INT >= 30) context.display?.rotation ?: 0
         else (context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
-    LaunchedEffect(state.followingGps, lifecycle, tab) {
+    LaunchedEffect(state.followingGps, lifecycle, tab, device) {
         if (state.followingGps && tab == 0) lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             model.refreshFixAge()
-            launch { AndroidLocationProvider(context.applicationContext).fixes().collect(model::gps) }
+            launch { device.fixes().collect(model::gps) }
             launch { while (true) { delay(5000); model.refreshFixAge() } }
         }
     }
-    LaunchedEffect(state.followingCompass, rotation, lifecycle, tab) {
+    LaunchedEffect(state.followingCompass, rotation, lifecycle, tab, device) {
         if (state.followingCompass && tab == 0) lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            AndroidOrientationProvider(context.applicationContext).poses(rotation).collect(model::pose)
+            device.poses(rotation).collect(model::pose)
         }
     }
-    LaunchedEffect(cameraMode, tab, state.activePack?.key) {
-        if (cameraMode && tab == 0 && !state.isDemo) {
+    LaunchedEffect(cameraMode, tab, state.activePack?.key, state.initialized) {
+        if (cameraMode && tab == 0 && state.initialized) {
             model.startCameraTracking()
-            if (!state.isDemo && !state.followingGps && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) model.startGps()
+            if (!state.followingGps && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) model.startGps()
         }
     }
     LaunchedEffect(state.scene) { selectedPeak = null }
     fun gps() {
         if (state.followingGps) { model.stopGps(); return }
-        if (!state.isDemo && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             permissions.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
         else model.startGps()
     }
@@ -92,11 +107,11 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel()) {
             }
         }
     }) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(if (compact) 3.dp else 10.dp)) {
             Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("PEAKBUD", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                    Text(when (tab) { 1 -> "Know your mountains."; 2 -> "Ready for the trail."; else -> "Find your horizon." }, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
+                    if (!compact) Text(when (tab) { 1 -> "Know your mountains."; 2 -> "Ready for the trail."; else -> "Find your horizon." }, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
                 }
                 TextButton(onClick = { settings = true }) { Text("Settings") }
             }
@@ -110,27 +125,34 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel()) {
             }
             when (tab) {
                 0 -> {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    if (!compact) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Text(state.activePack?.name ?: "Explorer demo · fictional terrain", Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
-                        Text("${state.heading.toInt().toString().padStart(3, '0')}° ${cardinal(state.heading)}", fontWeight = FontWeight.Bold)
+                        Text(if (state.isDemo) "Demo" else "Offline", style = MaterialTheme.typography.labelMedium)
                     }
+                    if (!compact) ObservationStatus(state, cameraMode, cameraFov, false, ::gps, model::startCameraTracking)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(selected = cameraMode, onClick = { cameraMode = true }, label = { Text("Live camera") })
                         FilterChip(selected = !cameraMode, onClick = { cameraMode = false }, label = { Text("Panorama") })
                     }
                     if (cameraMode) {
-                        CameraPanel(state, Modifier.weight(1f).fillMaxWidth(), { tab = 2 }, ::gps, model::startCameraTracking) { selectedPeak = it }
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-                            TextButton(onClick = { model.trimCompass(-1.0) }) { Text("−1°") }
-                            Text("Align labels", style = MaterialTheme.typography.labelSmall)
-                            TextButton(onClick = model::resetTrim) { Text("Reset") }
-                            TextButton(onClick = { model.trimCompass(1.0) }) { Text("+1°") }
+                        if (compact) {
+                            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                CameraPanel(state, Modifier.weight(1f).fillMaxHeight(), { tab = 2 }, ::gps, model::startCameraTracking, { cameraFov = it }) { selectedPeak = it }
+                                Column(Modifier.width(300.dp).fillMaxHeight().verticalScroll(rememberScrollState())) {
+                                    ObservationStatus(state, true, cameraFov, true, ::gps, model::startCameraTracking)
+                                    AlignmentControls(model)
+                                }
+                            }
+                        } else {
+                            CameraPanel(state, Modifier.weight(1f).fillMaxWidth(), { tab = 2 }, ::gps, model::startCameraTracking, { cameraFov = it }) { selectedPeak = it }
+                            AlignmentControls(model)
                         }
                     } else BoxWithConstraints(Modifier.weight(1f)) {
                         if (maxWidth > maxHeight) {
                             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                                 PanoramaPanel(state, model, Modifier.weight(1f).fillMaxHeight()) { selectedPeak = it }
                                 Column(Modifier.width(270.dp).fillMaxHeight().verticalScroll(rememberScrollState())) {
+                                    if (compact) ObservationStatus(state, false, null, true, ::gps, model::startCameraTracking)
                                     ViewControls(state, model, { manual = true }, ::gps)
                                 }
                             }
@@ -143,25 +165,20 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel()) {
                     }
                 }
                 1 -> PeakList(state, Modifier.weight(1f)) { selectedPeak = it }
-                2 -> Regions(state, Modifier.weight(1f), { importer.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream")) }, { download = true },
+                2 -> Regions(state, Modifier.weight(1f), model::downloadRegion,
                     { model.selectRegion(it); if (it == null) cameraMode = false; tab = 0 }, { deletePack = it }, { pack -> scope.launch { attribution = runCatching { model.attribution(pack) }.getOrDefault("Credits unavailable") } }, model::cancelImport,
-                    model::downloadRegion, model::discardDownload)
+                    model::discardDownload)
             }
         }
     }
     if (manual) ViewpointDialog(state, { manual = false }) { point, ground -> model.manualViewpoint(point, ground); manual = false }
     if (settings) SettingsDialog(state, model) { settings = false }
-    if (download) AlertDialog(onDismissRequest = { download = false }, title = { Text("Download a region") }, text = {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Paste an HTTPS link to a prepared PeakBud region ZIP from a source you trust. Download before your hike. Interrupted downloads resume when the server supports it.")
-            OutlinedTextField(downloadUrl, { downloadUrl = it }, label = { Text("HTTPS region URL") }, singleLine = true)
-        }
-    }, confirmButton = { TextButton(enabled = downloadUrl.startsWith("https://"), onClick = { model.downloadRegion(downloadUrl.trim()); download = false }) { Text("Download") } }, dismissButton = { TextButton(onClick = { download = false }) { Text("Cancel") } })
     selectedPeak?.let { peak ->
         AlertDialog(onDismissRequest = { selectedPeak = null }, title = { Text(peak.peak.name) }, text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(peak.peak.publishedHeightM?.let { height(it, state) } ?: "Published elevation unavailable", style = MaterialTheme.typography.headlineSmall)
                 Text("${distance(peak.distanceM, state)} away · ${peak.bearingDeg.toInt()}° ${cardinal(peak.bearingDeg)}")
+                peak.elevationDeg?.let { Text("Elevation angle: ${String.format(Locale.US, "%.1f", it)}° above the horizon") }
                 Text(visibilityName(peak.visibility), fontWeight = FontWeight.Bold)
                 Text(peak.reason)
                 Text("${coordinate(peak.peak.point.latitude)}, ${coordinate(peak.peak.point.longitude)}\nSource: ${peak.peak.source}", style = MaterialTheme.typography.bodySmall)
@@ -171,6 +188,53 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel()) {
     }
     attribution?.let { text -> AlertDialog(onDismissRequest = { attribution = null }, title = { Text("Data credits") }, text = { Text(text, Modifier.verticalScroll(rememberScrollState())) }, confirmButton = { TextButton(onClick = { attribution = null }) { Text("Done") } }) }
     deletePack?.let { pack -> AlertDialog(onDismissRequest = { deletePack = null }, title = { Text("Delete ${pack.name}?") }, text = { Text("Its offline terrain and peak catalogue will be removed from this device.") }, confirmButton = { TextButton(onClick = { model.deleteRegion(pack); deletePack = null }) { Text("Delete") } }, dismissButton = { TextButton(onClick = { deletePack = null }) { Text("Keep") } }) }
+}
+
+@Composable
+private fun AlignmentControls(model: PanoramaViewModel) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+        TextButton(onClick = { model.trimCompass(-1.0) }) { Text("−1°") }
+        Text("Align labels", style = MaterialTheme.typography.labelSmall)
+        TextButton(onClick = model::resetTrim) { Text("Reset") }
+        TextButton(onClick = { model.trimCompass(1.0) }) { Text("+1°") }
+    }
+}
+
+@Composable
+private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraFov: Pair<Double, Double>?, compact: Boolean, onGps: () -> Unit, onCompass: () -> Unit) {
+    val context = LocalContext.current
+    val fix = state.gpsFix
+    val heading = if (cameraMode) state.cameraPose?.heading else state.heading
+    val bearing = heading?.let { "${it.toInt().toString().padStart(3, '0')}° ${cardinal(it)}" } ?: "Direction unavailable"
+    val fov = cameraFov
+    Surface(color = MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(if (compact) 6.dp else 12.dp), verticalArrangement = Arrangement.spacedBy(if (compact) 0.dp else 3.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(bearing, fontWeight = FontWeight.Bold)
+                Text(if (cameraMode) fov?.let { "View ${it.first.toInt()}° H × ${it.second.toInt()}° V" } ?: "View angle: waiting for camera" else "Panorama view ${state.fov.toInt()}° H", style = MaterialTheme.typography.labelMedium)
+            }
+            Text(if (state.followingCompass) "${if (fix != null || !state.isDemo) "True north" else "Magnetic north · GPS needed"} · ${state.compassSource ?: "Waiting for compass"}" else "Manual direction · compass off", style = MaterialTheme.typography.labelSmall)
+            if (fix != null) {
+                Text("Lat ${coordinate(fix.point.latitude)}  ·  Lon ${coordinate(fix.point.longitude)}", style = MaterialTheme.typography.bodySmall)
+                val altitude = fix.seaLevelAltitudeM ?: fix.ellipsoidAltitudeM
+                Text(altitude?.let { "Altitude ${height(it, state)} · ${if (fix.seaLevelAltitudeM != null) "GPS sea level" else "GPS ellipsoid"}${fix.verticalAccuracyM?.let { a -> " · ±${kotlin.math.ceil(a.toDouble()).toInt().coerceAtLeast(1)} m vertical" } ?: ""}" } ?: "Altitude unavailable from GPS", style = MaterialTheme.typography.bodySmall)
+            } else {
+                Text("Latitude / longitude: waiting for GPS", style = MaterialTheme.typography.bodySmall)
+                Text("Altitude: waiting for GPS", style = MaterialTheme.typography.bodySmall)
+            }
+            if (!state.isDemo) state.scene?.observer?.let { Text("Ground ${height(it.groundHeightM, state)} · terrain model (EGM96)", style = MaterialTheme.typography.labelSmall) }
+            if (!cameraMode && !compact) Text("Viewpoint ${coordinate(state.point.latitude)}, ${coordinate(state.point.longitude)} · ${if (state.isDemo) "fictional demo" else if (state.followingGps) "GPS" else "manual"}", style = MaterialTheme.typography.labelSmall)
+            Text(if (!state.followingGps) "GPS off${if (fix != null) " · last known position above" else ""}" else state.gpsStatus ?: "Waiting for GPS…", style = MaterialTheme.typography.labelSmall)
+            state.compassStatus?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error) }
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                if (!state.followingGps) TextButton(onClick = onGps, contentPadding = PaddingValues(4.dp)) { Text("Enable GPS") }
+                if (!state.followingCompass) TextButton(onClick = onCompass, contentPadding = PaddingValues(4.dp)) { Text("Enable compass") }
+                if (state.gpsStatus?.contains("turned off") == true) TextButton(onClick = { context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) }, contentPadding = PaddingValues(4.dp)) { Text("Location settings") }
+                if (!state.followingGps && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                    TextButton(onClick = { context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}"))) }, contentPadding = PaddingValues(4.dp)) { Text("Permissions") }
+            }
+        }
+    }
 }
 
 @Composable
@@ -233,7 +297,8 @@ private fun PeakList(state: PanoramaState, modifier: Modifier, onPeak: (PeakView
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(peak.peak.name, fontWeight = FontWeight.SemiBold)
                         Text("${peak.peak.publishedHeightM?.let { height(it, state) } ?: "Elevation unknown"} · ${distance(peak.distanceM, state)}", style = MaterialTheme.typography.bodySmall)
-                        Text(visibilityName(peak.visibility), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
+                        peak.elevationDeg?.let { Text("Elevation angle: ${String.format(Locale.US, "%.1f", it)}° above the horizon") }
+                Text(visibilityName(peak.visibility), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
                     }
                     Text("${peak.bearingDeg.toInt()}°", style = MaterialTheme.typography.labelLarge)
                 }
@@ -243,33 +308,52 @@ private fun PeakList(state: PanoramaState, modifier: Modifier, onPeak: (PeakView
 }
 
 @Composable
-private fun Regions(state: PanoramaState, modifier: Modifier, onImport: () -> Unit, onDownload: () -> Unit, onSelect: (RegionPack?) -> Unit, onDelete: (RegionPack) -> Unit, onAttribution: (RegionPack) -> Unit, onCancel: () -> Unit,
-                    onResume: (String) -> Unit, onDiscard: (String) -> Unit) {
+private fun Regions(state: PanoramaState, modifier: Modifier, onDownload: (CatalogRegion) -> Unit, onSelect: (RegionPack?) -> Unit, onDelete: (RegionPack) -> Unit, onAttribution: (RegionPack) -> Unit, onCancel: () -> Unit,
+                    onDiscard: (CatalogRegion) -> Unit) {
     LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(14.dp), contentPadding = PaddingValues(bottom = 20.dp)) {
         item {
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("Mountains, without a signal.", style = MaterialTheme.typography.titleLarge)
-                    Text("Install a terrain region before heading out. Each pack includes elevation tiles, peak names, and data credits.")
-                    Button(onClick = onImport, enabled = state.importing == null) { Text("Import region ZIP") }
-                    OutlinedButton(onClick = onDownload, enabled = state.importing == null) { Text("Download from URL") }
-                    state.importing?.let { LinearProgressIndicator(Modifier.fillMaxWidth()); Text(it, style = MaterialTheme.typography.bodySmall); TextButton(onClick = onCancel) { Text("Cancel import") } }
+            Text("Choose your hiking area", style = MaterialTheme.typography.titleLarge)
+            Text("Download once before your hike. Terrain and peak names work offline after that.", style = MaterialTheme.typography.bodyMedium)
+            state.importing?.let {
+                LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 12.dp))
+                Text(it, Modifier.padding(top = 8.dp), style = MaterialTheme.typography.bodySmall)
+                TextButton(onClick = onCancel) { Text("Cancel download") }
+            }
+        }
+        items(state.catalog, key = { it.id }) { region ->
+            val installed = state.packs.lastOrNull { it.id == region.id && it.version == region.version }
+            val saved = state.pendingDownloads.any { transfer -> region.tiles.any { it.url == transfer.address } }
+            OutlinedCard(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(region.name, style = MaterialTheme.typography.titleMedium)
+                    Text("${region.country} · ${region.description}", style = MaterialTheme.typography.bodyMedium)
+                    Text("${(region.downloadBytes + 1_048_575) / 1_048_576} MB download · ${region.installedBytes / 1_048_576} MB offline · ${region.radiusKm} km view range", style = MaterialTheme.typography.bodySmall)
+                    Text(if (installed != null) "Ready offline" else if (saved) "Download saved · resume anytime" else "Not downloaded", color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.labelMedium)
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        if (installed != null) {
+                            Button(onClick = { onSelect(installed) }) { Text("Open") }
+                            TextButton(onClick = { onAttribution(installed) }) { Text("Credits") }
+                            TextButton(enabled = state.importing == null, onClick = { onDelete(installed) }) { Text("Delete") }
+                        } else {
+                            Button(enabled = state.importing == null, onClick = { onDownload(region) }) {
+                                Text(if (state.downloadingRegionId == region.id) "Downloading…" else if (saved) "Resume" else "Download")
+                            }
+                            if (saved) TextButton(enabled = state.importing == null, onClick = { onDiscard(region) }) { Text("Discard") }
+                        }
+                    }
                 }
             }
         }
-        items(state.pendingDownloads, key = { "pending:${it.address}" }) { transfer ->
+        // Previously installed custom packs remain usable after upgrading, without exposing import tools.
+        items(state.packs.filter { pack -> state.catalog.none { it.id == pack.id && it.version == pack.version } }, key = { it.key }) { pack ->
             OutlinedCard(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Unfinished download", style = MaterialTheme.typography.titleMedium)
-                    Text(transfer.host, style = MaterialTheme.typography.bodyMedium)
-                    val amount = "${transfer.receivedBytes / 1_048_576} MiB saved" +
-                        (transfer.totalBytes?.let { " of ${it / 1_048_576} MiB" } ?: "")
-                    Text(amount, style = MaterialTheme.typography.bodySmall)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(enabled = state.importing == null, onClick = { onResume(transfer.address) }) {
-                            Text(if (transfer.canResume) "Resume" else "Restart")
-                        }
-                        TextButton(enabled = state.importing == null, onClick = { onDiscard(transfer.address) }) { Text("Discard") }
+                Column(Modifier.padding(18.dp)) {
+                    Text(pack.name, style = MaterialTheme.typography.titleMedium)
+                    Text("Ready offline", style = MaterialTheme.typography.labelMedium)
+                    Row {
+                        Button(onClick = { onSelect(pack) }) { Text("Open") }
+                        TextButton(onClick = { onAttribution(pack) }) { Text("Credits") }
+                        TextButton(enabled = state.importing == null, onClick = { onDelete(pack) }) { Text("Delete") }
                     }
                 }
             }
@@ -278,22 +362,8 @@ private fun Regions(state: PanoramaState, modifier: Modifier, onImport: () -> Un
             OutlinedCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Explorer demo", style = MaterialTheme.typography.titleMedium)
-                    Text("Fictional terrain and peaks to try the controls. This does not identify real mountains.", style = MaterialTheme.typography.bodySmall)
+                    Text("Fictional panorama for trying the controls. Camera identification uses a downloaded region.", style = MaterialTheme.typography.bodySmall)
                     TextButton(onClick = { onSelect(null) }) { Text("Explore demo") }
-                }
-            }
-        }
-        if (state.packs.isEmpty()) item { Text("No real regions installed. Import a prepared region ZIP to identify peaks in its covered area.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
-        items(state.packs, key = { it.key }) { pack ->
-            OutlinedCard(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(pack.name, style = MaterialTheme.typography.titleMedium)
-                    Text("Installed · ${pack.files.sumOf { it.size } / 1_048_576} MiB · ${(pack.radiusM / 1000).toInt()} km · v${pack.version}", style = MaterialTheme.typography.bodySmall)
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Button(onClick = { onSelect(pack) }) { Text("Open") }
-                        TextButton(onClick = { onAttribution(pack) }) { Text("Credits") }
-                        TextButton(onClick = { onDelete(pack) }) { Text("Delete") }
-                    }
                 }
             }
         }

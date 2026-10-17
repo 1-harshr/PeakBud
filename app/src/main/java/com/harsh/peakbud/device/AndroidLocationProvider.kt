@@ -7,6 +7,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Build
 import android.os.Looper
 import android.os.SystemClock
 import androidx.core.content.ContextCompat
@@ -14,7 +15,9 @@ import com.harsh.peakbud.core.model.GeoPoint
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 
-data class PositionFix(val point: GeoPoint, val accuracyM: Float, val ageSeconds: Long)
+data class PositionFix(val point: GeoPoint, val accuracyM: Float, val ageSeconds: Long,
+                       val ellipsoidAltitudeM: Double? = null, val seaLevelAltitudeM: Double? = null,
+                       val verticalAccuracyM: Float? = null)
 sealed interface LocationStatus {
     data class Fix(val value: PositionFix) : LocationStatus
     data class Message(val text: String) : LocationStatus
@@ -32,7 +35,12 @@ class AndroidLocationProvider(private val context: Context) {
             override fun onLocationChanged(location: Location) {
                 val age = ((SystemClock.elapsedRealtimeNanos() - location.elapsedRealtimeNanos) / 1_000_000_000).coerceAtLeast(0)
                 val accuracy = if (location.hasAccuracy() && location.accuracy.isFinite() && location.accuracy > 0) location.accuracy else 500f
-                trySend(LocationStatus.Fix(PositionFix(GeoPoint(location.latitude, location.longitude), accuracy, age)))
+                trySend(LocationStatus.Fix(PositionFix(GeoPoint(location.latitude, location.longitude), accuracy, age,
+                    location.altitude.takeIf { location.hasAltitude() && it.isFinite() },
+                    if (Build.VERSION.SDK_INT >= 34 && location.hasMslAltitude()) location.mslAltitudeMeters.takeIf { it.isFinite() } else null,
+                    if (Build.VERSION.SDK_INT >= 34 && location.hasMslAltitude()) {
+                        if (location.hasMslAltitudeAccuracy()) location.mslAltitudeAccuracyMeters.takeIf { it.isFinite() && it > 0 } else null
+                    } else location.verticalAccuracyMeters.takeIf { location.hasVerticalAccuracy() && it.isFinite() && it > 0 })))
             }
             override fun onProviderDisabled(provider: String) { trySend(LocationStatus.Message("GPS is turned off. Enable location in Android settings.")) }
             override fun onProviderEnabled(provider: String) { trySend(LocationStatus.Message("Waiting for a satellite fix…")) }
@@ -42,7 +50,7 @@ class AndroidLocationProvider(private val context: Context) {
         try {
             if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) trySend(LocationStatus.Message("GPS is turned off. Enable location in Android settings."))
             else trySend(LocationStatus.Message("Waiting for a satellite fix. Keep a clear view of the sky."))
-            manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 10f, listener, Looper.getMainLooper())
+            manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 0f, listener, Looper.getMainLooper())
         } catch (_: SecurityException) {
             trySend(LocationStatus.Message("Location permission was revoked. Choose a manual viewpoint."))
         } catch (_: IllegalArgumentException) {

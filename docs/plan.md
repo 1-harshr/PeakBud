@@ -7,6 +7,11 @@
 > phases below describe the terrain foundation; camera integration has been
 > brought forward. See [camera-overlay.md](camera-overlay.md) for the implemented
 > pipeline, limits, and validation status.
+> Region UX update: users select a built-in hiking area and tap Download. Remove
+> import/file-picker and pasted URL flows. Peak snapshots, terrain URLs, hashes,
+> sizes, and recipes ship in the app. GPS/compass status, location, altitude, and
+> field of view must be visible; see [region-catalog.md](region-catalog.md).
+
 
 
 Research date: 2026-10-17.

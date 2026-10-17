@@ -39,4 +39,5 @@ with tempfile.TemporaryDirectory(prefix='peakbud-tests-') as out:
                     '-d', out, *map(str, sources)], check=True)
     subprocess.run([java, '-cp', out + os.pathsep + test_cp, 'org.junit.runner.JUnitCore',
                     'com.harsh.peakbud.core.TerrainEngineTest', 'com.harsh.peakbud.core.RegionStoreTest',
-                    'com.harsh.peakbud.core.RegionDownloaderTest'], check=True)
+                    'com.harsh.peakbud.core.RegionDownloaderTest', 'com.harsh.peakbud.core.CameraProjectorTest',
+                    'com.harsh.peakbud.core.RegionCatalogTest'], check=True)

@@ -48,7 +48,7 @@ class RegionStore(private val root: File) {
             checkpoint()
             val target = pack.directory.resolve(file.path)
             require(target.isFile && target.length() == file.size && sha256(target, checkpoint) == file.sha256) {
-                "Offline region verification failed: ${file.path}. Delete this region and import it again."
+                "Offline region verification failed: ${file.path}. Delete this region and download it again."
             }
         }
         verifiedKeys += pack.key
@@ -75,7 +75,7 @@ class RegionStore(private val root: File) {
         val archive = root.resolve(".$token.zip")
         val staging = root.resolve(".$token.staging")
         try {
-            progress("Copying region archive…")
+            progress("Saving offline region…")
             archive.outputStream().use { output -> copyBounded(stream, output, MAX_BYTES, checkpoint) }
             check(staging.mkdir())
             val parsed = ZipFile(archive).use { zip ->

@@ -6,11 +6,11 @@ is not required for the initial camera experience.
 
 ## Pipeline
 
-1. Install/select a real offline region. Existing HGT terrain, peak records, and
+1. Choose a hiking area from Regions and download it. Existing HGT terrain, peak records, and
    line-of-sight checks determine visible and uncertain candidate summits.
 2. Enable the camera with its runtime permission. CameraX binds a rear-camera
    Preview to the screen lifecycle; leaving the view unbinds only that use case.
-3. Choose Use my location. Android foreground GPS supplies a fresh observer
+3. Allow the first-use location prompt or choose Enable GPS. Android foreground GPS supplies a fresh observer
    position; terrain provides the ground altitude. Permission denial leaves the
    panorama and manual viewpoint available. Region selection automatically starts
    GPS if precise permission has already been granted.
@@ -25,7 +25,8 @@ is not required for the initial camera experience.
    leader lines and tap targets. Skip overlapping callouts; the Peaks list retains
    access to details. Uncertain peaks carry a question mark when enabled.
 
-Camera mode starts compass tracking when a real region is selected. Its overlay uses current unsmoothed pose to
+Camera mode starts compass tracking. Location is requested at first use, even
+before a terrain download; coordinates, GPS altitude, and sensor status are visible. Its overlay uses current unsmoothed pose to
 avoid the panorama's smoothing lag. The −1° / +1° / Reset controls adjust heading
 without detaching tracking. Camera mode has no panorama FOV or zoom slider.
 
@@ -44,8 +45,8 @@ errors. There is no zoom interaction, visual skyline matching, or per-device len
 calibration yet. Heading trim corrects a horizontal offset only. Compass reliability
 and fresh GPS are prerequisites, not guarantees of correct peak identity.
 
-Real terrain is not bundled. Import a prepared region using
-[region-packs.md](region-packs.md), then test in that region outdoors. The fictional
+Choose a built-in hiking region and tap Download; see
+[region-catalog.md](region-catalog.md). Test in that region outdoors. The fictional
 demo deliberately cannot put fabricated mountain names over the camera image.
 
 ## Verification

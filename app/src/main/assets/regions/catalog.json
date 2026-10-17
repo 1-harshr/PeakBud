@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "regions": [
+    {
+      "id": "poon-hill",
+      "country": "Nepal",
+      "description": "Poon Hill and Ghorepani viewpoints",
+      "assetDirectory": "regions/poon-hill",
+      "tiles": [
+        {
+          "path": "terrain/N28E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E083.hgt.gz",
+          "downloadBytes": 18840942,
+          "downloadSha256": "81ffb7c4ba700610523c260376eaf7cbbcba39dcd925c6fc0ae00d75d99c6fbc"
+        },
+        {
+          "path": "terrain/N28E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E084.hgt.gz",
+          "downloadBytes": 18407524,
+          "downloadSha256": "83f19d50f954ea7e277bc28cdbe5310f2bd701cae066be3408d6bd2d2acdcce6"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "poon-hill",
+        "name": "Poon Hill · Annapurna",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 28.38,
+          "west": 83.63,
+          "north": 28.46,
+          "east": 83.78
+        },
+        "terrainBounds": {
+          "south": 28,
+          "west": 83,
+          "north": 29,
+          "east": 85
+        },
+        "radiusM": 40000,
+        "viewpoint": {
+          "latitude": 28.4,
+          "longitude": 83.69,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N28E083.hgt",
+            "size": 25934402,
+            "sha256": "e844c5cc8cd1d2251b958c1ad7a75329f4e4732aa79f9f84f7e1c0c8ee2e279c"
+          },
+          {
+            "path": "terrain/N28E084.hgt",
+            "size": 25934402,
+            "sha256": "3f74ed8dfadee1039306f43bdf5c8f8f2ec80f8016e5d7bb9ed999e120dacf2f"
+          },
+          {
+            "path": "peaks.json",
+            "size": 41355,
+            "sha256": "467b8426ebb278ed8f68e9147fb8eec8c4aada9e95b822e840da10659ada6e11"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1360,
+            "sha256": "f3dc03a0194678baa465b6d593d920295ca6748571530f2db717f039bccfb206"
+          }
+        ]
+      }
+    },
+    {
+      "id": "gokyo",
+      "country": "Nepal",
+      "description": "Gokyo valley viewpoints",
+      "assetDirectory": "regions/gokyo",
+      "tiles": [
+        {
+          "path": "terrain/N27E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E086.hgt.gz",
+          "downloadBytes": 18934204,
+          "downloadSha256": "0e95b43508321ee2b3d9454797130bf1c972737377eff4cb07b4cf912138aad1"
+        },
+        {
+          "path": "terrain/N28E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E086.hgt.gz",
+          "downloadBytes": 16133363,
+          "downloadSha256": "492bbef252dc022aa91d7a80d0f1bd913c69b86cc57157e251f77549f1260f0c"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "gokyo",
+        "name": "Gokyo · Everest",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 27.92,
+          "west": 86.64,
+          "north": 28.02,
+          "east": 86.7
+        },
+        "terrainBounds": {
+          "south": 27,
+          "west": 86,
+          "north": 29,
+          "east": 87
+        },
+        "radiusM": 25000,
+        "viewpoint": {
+          "latitude": 27.95,
+          "longitude": 86.68,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N27E086.hgt",
+            "size": 25934402,
+            "sha256": "150d99a7cee9472de347cf7c5d2baf95b70b8c87d0f9ac992976774d94c8e717"
+          },
+          {
+            "path": "terrain/N28E086.hgt",
+            "size": 25934402,
+            "sha256": "4064c147cdcab39bd992757443f359a12f2385499f43bf7a0c90df0ca8f07249"
+          },
+          {
+            "path": "peaks.json",
+            "size": 22094,
+            "sha256": "cc50e47d8d9a92cd87479b68e5bd83d025c713c2e6ff1854b43cce3661f4c83a"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1354,
+            "sha256": "2e221228ff7637528ff178dc7d341683b695817732108ebe47d40f3fd3796fea"
+          }
+        ]
+      }
+    },
+    {
+      "id": "auli",
+      "country": "India",
+      "description": "Auli and Gorson viewpoints",
+      "assetDirectory": "regions/auli",
+      "tiles": [
+        {
+          "path": "terrain/N30E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E079.hgt.gz",
+          "downloadBytes": 19206975,
+          "downloadSha256": "a54c8361799d729820f939ef91e4ce35bd181924d53cb2fd3747bef7e532d5d4"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "auli",
+        "name": "Auli · Garhwal",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 30.5,
+          "west": 79.55,
+          "north": 30.55,
+          "east": 79.6
+        },
+        "terrainBounds": {
+          "south": 30,
+          "west": 79,
+          "north": 31,
+          "east": 80
+        },
+        "radiusM": 30000,
+        "viewpoint": {
+          "latitude": 30.53,
+          "longitude": 79.57,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N30E079.hgt",
+            "size": 25934402,
+            "sha256": "f1652f5e39e98b153ed2837ac79ee58428a09da777332dcbf246b7c4dc7b60e3"
+          },
+          {
+            "path": "peaks.json",
+            "size": 25586,
+            "sha256": "a7df8f3a796cf51ddf742802ff2a904be0dfbb0595b637d93375c9bd844954a2"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 1282,
+            "sha256": "81c0e3c56f5306948bd4e50cd27b361044686ebb224c3a414956c23bd2fa4a48"
+          }
+        ]
+      }
+    }
+  ]
+}

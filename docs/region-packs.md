@@ -1,7 +1,8 @@
 # Preparing and Installing Offline Regions
 
 PeakBud reads real 1 arc-second SRTM HGT elevation files and a named peak catalogue.
-The included Explorer demo is fictional. No real mountain region is bundled yet.
+The Explorer demo is fictional. The built-in catalogue supplies real peak
+snapshots and terrain download links; see [region-catalog.md](region-catalog.md).
 
 ## Prepare the source files
 
@@ -71,36 +72,20 @@ away from the poles/date line, and the maximum viewing radius is 50 km. A pack i
 limited to 512 MiB unpacked and 20,000 peaks. DEM samples may include voids; the
 app must report incomplete directions and unknown visibility for affected paths.
 
-## Install in PeakBud
+## Product installation flow
 
-Open **Regions → Import region ZIP** and select the archive through Android's
-file picker. PeakBud validates paths, schema, terrain coverage, file sizes, peak
-records, and SHA-256 hashes before atomically activating the new directory.
-Cancellation or invalid data cannot replace an already installed pack. Multiple
-versions can coexist; select the new one and delete an old version when desired.
-Before first use in a new app process, installed payload hashes are checked again.
-If stored bytes have changed, delete the damaged region and reimport it.
+Users choose a named area under **Regions** and tap **Download**. There is no
+file-picker import or URL field. See [region-catalog.md](region-catalog.md) for the
+built-in source links, bundled peak snapshots, and automated installation.
 
-Alternatively, host the complete archive on an HTTPS endpoint and use **Regions →
-Download from URL**. HTTPS redirects are supported; HTTP downgrade redirects are
-rejected. Interrupted downloads resume using byte ranges only when a strong ETag
-and matching response protect the existing bytes. A server returning a complete
-response restarts the download instead. If the app process ends, saved transfers
-appear under **Regions → Unfinished download**. Use **Resume**, **Restart** when a
-safe byte-range resume is unavailable, or **Discard** to remove the saved bytes.
-There is no curated hosted region catalogue or automatic background
-scheduler yet. Only install data from a publisher you trust: self-contained file
-hashes detect corruption but do not establish the publisher's identity.
+The preparation instructions above are developer utilities. They are not steps
+that hikers need to follow. Existing manually installed packs remain readable
+for upgrade compatibility. Pack files, download fragments, and Room metadata stay
+in app-private storage, with the selected pack persisted by DataStore.
 
-Packs and download fragments live under app-private `noBackupFilesDir`. Room
-indexes peak metadata; it does not store the height grid. DataStore remembers the
-selected pack and preferences. The selected pack is reopened after process death;
-the initial version resets its viewpoint to the pack's default.
-
-Before hiking, cold-start the app in airplane mode, open the installed region,
-check the supported viewpoint area, and inspect its data credits. GPS uses satellite
-fixes when precise location permission is granted; it does not require a live
-terrain service. Manual viewpoint and direction controls remain available.
+Before hiking, cold-start the app in airplane mode and open a downloaded region.
+Verify that your viewpoint is inside its advertised coverage. GPS satellite
+fixes and camera/compass use do not require a terrain web service.
 
 ## Archive contract
 

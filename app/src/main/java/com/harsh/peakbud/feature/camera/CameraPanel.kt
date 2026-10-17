@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -48,7 +50,7 @@ import kotlin.math.hypot
 
 /** Camera permission is requested only by the explicit Enable camera action. */
 @Composable
-fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit, onGps: () -> Unit, onTrack: () -> Unit, onPeak: (PeakView) -> Unit) {
+fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit, onGps: () -> Unit, onTrack: () -> Unit, onFov: (Pair<Double, Double>?) -> Unit, onPeak: (PeakView) -> Unit) {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     fun granted() = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
@@ -61,11 +63,14 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
         onDispose { owner.lifecycle.removeObserver(observer) }
     }
     var lens by remember { mutableStateOf<CameraLens?>(null) }
+    var viewport by remember { mutableStateOf(IntSize.Zero) }
+    LaunchedEffect(lens, viewport) { onFov(lens?.takeIf { viewport.width > 0 && viewport.height > 0 }?.fieldOfView(viewport.width, viewport.height)) }
+    DisposableEffect(Unit) { onDispose { onFov(null) } }
     var cameraStatus by remember { mutableStateOf<String?>("Starting camera…") }
     val notice = when {
         !permission -> "Enable the camera to see peak labels over your surroundings."
         cameraStatus != null -> cameraStatus
-        state.isDemo -> "Install an offline region to identify real peaks. Demo peaks are shown only in Panorama."
+        state.isDemo -> "Choose a hiking area in Regions and download it to identify real peaks. The panorama demo is fictional."
         !state.followingGps -> "Use your GPS location to place peaks in the camera view."
         !state.gpsFresh -> state.gpsStatus ?: "Waiting for a fresh GPS position…"
         !state.followingCompass -> "Enable direction tracking to align the peak labels."
@@ -76,7 +81,7 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
         lens == null -> "Camera calibration unavailable on this device. Panorama is still available."
         else -> null
     }
-    Box(modifier.clipToBounds().background(Color.Black)) {
+    Box(modifier.onSizeChanged { viewport = it }.clipToBounds().background(Color.Black)) {
         if (permission) CameraPreview(Modifier.fillMaxSize(), { lens = it }, { cameraStatus = it })
         if (notice == null) CameraLabels(state, lens!!, Modifier.fillMaxSize(), onPeak)
         if (notice != null) Surface(Modifier.align(Alignment.TopCenter).padding(12.dp), color = Color(0xDD132A24), contentColor = Color.White) {
@@ -87,7 +92,7 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
                         Button(onClick = { request.launch(Manifest.permission.CAMERA) }) { Text("Enable camera") }
                         if (denied) TextButton(onClick = { context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}"))) }) { Text("Open app settings") }
                     }
-                    state.isDemo -> Button(onClick = onRegions) { Text("Get offline region") }
+                    state.isDemo -> Button(onClick = onRegions) { Text("Choose region") }
                     !state.followingGps -> Button(onClick = onGps) { Text("Use my location") }
                     !state.followingCompass -> Button(onClick = onTrack) { Text("Track direction") }
                 }
@@ -204,7 +209,7 @@ private fun CameraLabels(state: PanoramaState, lens: CameraLens, modifier: Modif
             val point = CameraProjector.project(peak.bearingDeg, peak.elevationDeg ?: continue, pose, lens) ?: continue
             if (point.x !in 0f..size.width || point.y !in 0f..size.height) continue
             val label = peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else ""
-            val detail = "${peak.peak.publishedHeightM?.let { height(it, state) } ?: "Height unknown"} · ${distance(peak.distanceM, state)}"
+            val detail = "${peak.peak.publishedHeightM?.let { height(it, state) } ?: peak.geometryHeightM?.let { "~${height(it, state)} terrain" } ?: "Height unknown"} · ${distance(peak.distanceM, state)}"
             val width = maxOf(paint.measureText(label), paint.measureText(detail)).coerceAtMost(size.width - 32 * density) + 16 * density
             val left = (point.x - width / 2).coerceIn(8 * density, maxOf(8 * density, size.width - width - 8 * density))
             val boxHeight = 44 * density

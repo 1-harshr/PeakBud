@@ -16,3 +16,5 @@ local.properties
 __pycache__/
 *.pyc
 /region-output/
+
+.kotlin/

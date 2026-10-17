@@ -28,6 +28,11 @@ class CameraProjectorTest {
         val result = point(10.0, 0.0, r = 90.0)
         assertEquals(300f, result.x, .001f); assertTrue(result.y > 400f)
     }
+    @Test fun fieldOfViewMatchesVisibleCropRatherThanFullSensor() {
+        val (horizontal, vertical) = CameraLens(500.0, 500.0, 500.0, 250.0).fieldOfView(1000, 500)
+        assertEquals(90.0, horizontal, .0001)
+        assertEquals(53.1301, vertical, .0001)
+    }
     @Test fun rejectsBehindCameraAndInvalidPose() {
         assertNull(CameraProjector.project(180.0, 0.0, CameraPose(0.0, 0.0, 0.0), lens))
         assertNull(CameraProjector.project(90.0, 0.0, CameraPose(0.0, 0.0, 0.0), lens))
