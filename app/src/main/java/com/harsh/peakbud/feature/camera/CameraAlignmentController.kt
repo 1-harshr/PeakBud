@@ -37,6 +37,8 @@ class CameraAlignmentController(
     private val io: CoroutineDispatcher = Dispatchers.IO,
     private val clock: () -> Long = { System.nanoTime() / 1_000_000 },
     private val log: (String) -> Unit = {},
+    /** Predicts the far-field skyline for a sector; reads the region's terrain files by default. Replaceable in tests. */
+    private val skylineSource: (Target, Double, Double, () -> Unit) -> List<HorizonSample>? = ::terrainSector,
 ) {
     /** Where and how to predict the skyline. [groundM] null means take it from the terrain at [point]. */
     data class Target(val pack: RegionPack, val point: GeoPoint, val groundM: Double?, val phoneHeightM: Double, val hfovDeg: Double)
@@ -196,12 +198,7 @@ class CameraAlignmentController(
         sectorJob = scope.launch(io) {
             val startMs = clock()
             val built = try {
-                HgtTerrain(target.pack.directory.resolve("terrain"), target.pack.bounds).use { terrain ->
-                    val ground = target.groundM ?: (terrain.sample(target.point) as? TerrainSample.Valid)?.heightM
-                    if (ground == null) null
-                    else Sector(target.pack.key, target.point, heading, halfWidth, TerrainSkyline(AlignmentHorizon.sector(
-                        Observer(target.point, ground, target.phoneHeightM), terrain, heading, halfWidth, target.pack.radiusM, .2) { ensureActive() }))
-                }
+                skylineSource(target, heading, halfWidth) { ensureActive() }?.let { Sector(target.pack.key, target.point, heading, halfWidth, TerrainSkyline(it)) }
             } catch (cancelled: CancellationException) { throw cancelled } catch (error: Exception) { log("alignment terrain failed: ${error.javaClass.simpleName}"); null }
             log("alignment terrain sector ${halfWidth * 2}° to ${(target.pack.radiusM / 1000).toInt()} km in ${clock() - startMs} ms")
             synchronized(this@CameraAlignmentController) {
@@ -226,3 +223,10 @@ class CameraAlignmentController(
             hiddenByForeground = if (s.phase == AlignmentPhase.ALIGNED) hidden else emptySet())
     }
 }
+
+/** Default skyline source: far-field sector traced through the downloaded region's terrain. */
+private fun terrainSector(target: CameraAlignmentController.Target, heading: Double, halfWidth: Double, checkpoint: () -> Unit): List<HorizonSample>? =
+    HgtTerrain(target.pack.directory.resolve("terrain"), target.pack.bounds).use { terrain ->
+        val ground = target.groundM ?: (terrain.sample(target.point) as? TerrainSample.Valid)?.heightM ?: return@use null
+        AlignmentHorizon.sector(Observer(target.point, ground, target.phoneHeightM), terrain, heading, halfWidth, target.pack.radiusM, .2, checkpoint = checkpoint)
+    }
