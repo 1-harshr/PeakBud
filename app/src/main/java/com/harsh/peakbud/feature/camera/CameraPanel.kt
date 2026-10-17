@@ -83,7 +83,7 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
         !state.poseReliable && !fullScreen -> state.compassStatus ?: "Compass is unsteady. Move away from metal and wave your phone in a figure eight."
         state.calculating -> "Finding the peaks you can see…"
         state.scene == null -> "This hiking area doesn't cover where you are. Pick one that does."
-        lens == null -> "This phone's camera can't place labels accurately. Try Panorama instead."
+        lens == null -> "This phone's camera can't place labels accurately. Use Home instead."
         else -> null
     }
     Box(modifier.onSizeChanged { viewport = it }.clipToBounds().background(Color.Black)) {
@@ -163,7 +163,7 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
         future.addListener({
             if (!disposed) try {
                 provider = future.get()
-                check(provider!!.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) { "This phone has no rear camera. Try Panorama instead." }
+                check(provider!!.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) { "This phone has no rear camera. Use Home instead." }
                 preview.setSurfaceProvider(view.surfaceProvider)
                 val camera = provider!!.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview)
                 val info = Camera2CameraInfo.from(camera.cameraInfo)
@@ -175,11 +175,11 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
                         active.exactCenterX() to active.exactCenterY()) else null
                 camera.cameraInfo.cameraState.observe(owner, object : Observer<androidx.camera.core.CameraState> {
                     override fun onChanged(value: androidx.camera.core.CameraState) {
-                        if (!disposed && value.error != null) { streaming = false; statusCallback("The camera stopped. Switch to Panorama and back to restart it.") }
+                        if (!disposed && value.error != null) { streaming = false; statusCallback("The camera stopped. Switch to Home and back to restart it.") }
                     }
                 }.also { cameraObserver = it; observedCamera = camera })
             } catch (error: Exception) {
-                statusCallback(error.message ?: "Couldn't start the camera. Check camera access in Android settings, or try Panorama.")
+                statusCallback(error.message ?: "Couldn't start the camera. Check camera access in Android settings, or use Home.")
             }
         }, ContextCompat.getMainExecutor(context))
         onDispose {

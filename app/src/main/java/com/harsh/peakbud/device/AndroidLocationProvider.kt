@@ -28,7 +28,7 @@ class AndroidLocationProvider(private val context: Context) {
         val manager = context.getSystemService(LocationManager::class.java)
         val precise = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (!precise) {
-            trySend(LocationStatus.Message("Turn on precise location so peak labels line up. You can also choose a spot in Panorama."))
+            trySend(LocationStatus.Message("Turn on precise location so peak labels line up. You can also choose a spot on Home."))
             close(); return@callbackFlow
         }
         val listener = object : LocationListener {
@@ -52,9 +52,9 @@ class AndroidLocationProvider(private val context: Context) {
             else trySend(LocationStatus.Message("Finding your location. Open sky helps."))
             manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 0f, listener, Looper.getMainLooper())
         } catch (_: SecurityException) {
-            trySend(LocationStatus.Message("Location access was turned off. You can still choose a spot in Panorama."))
+            trySend(LocationStatus.Message("Location access was turned off. You can still choose a spot on Home."))
         } catch (_: IllegalArgumentException) {
-            trySend(LocationStatus.Message("This phone has no GPS. Choose a spot in Panorama instead."))
+            trySend(LocationStatus.Message("This phone has no GPS. Choose a spot on Home instead."))
         }
         awaitClose { manager.removeUpdates(listener) }
     }

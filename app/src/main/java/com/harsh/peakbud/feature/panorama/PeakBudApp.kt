@@ -61,8 +61,8 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
     val configuration = LocalConfiguration.current
     val compact = configuration.screenWidthDp > configuration.screenHeightDp
     var tab by rememberSaveable { mutableIntStateOf(0) }
-    // Tabs: 0 Camera (always full screen), 1 Panorama, 2 Peaks, 3 Regions.
-    val cameraTab = tab == 0
+    // Tabs: 0 Home (landing: the drawn skyline), 1 Camera (always full screen), 2 Peaks, 3 Regions.
+    val cameraTab = tab == 1
     // Tapping the empty camera view hides every control; leaving the tab or pressing back brings them back.
     var immersive by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(tab) { immersive = false }
@@ -131,7 +131,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
         val barSpace = 84.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         if (cameraTab) CameraTab(state, model, cameraFov, barSpace, immersive, onImmersive = { immersive = it }, onFov = { cameraFov = it },
             onRegions = { tab = 3 }, onGps = ::gps, onSettings = { settings = true }, onPeak = { selectedPeak = it })
-        else Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 16.dp).padding(bottom = if (tab == 1) barSpace else 0.dp),
+        else Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 16.dp).padding(bottom = if (tab == 0) barSpace else 0.dp),
             verticalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 10.dp)) {
             AppHeader(compact, when (tab) {
                 2 -> if (state.noRegion) "Peaks · pick a hiking area to start" else if (state.isDemo) "Peaks · demo landscape" else "Peaks within ${(state.activePack?.radiusM ?: 0.0).toInt() / 1000} km of this spot"
@@ -147,7 +147,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                 }
             }
             when (tab) {
-                1 -> {
+                0 -> {
                     if (!compact) ObservationStatus(state, false, null, false, ::gps, model::startCameraTracking)
                     BoxWithConstraints(Modifier.weight(1f)) {
                         if (maxWidth > maxHeight) {
@@ -168,7 +168,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                 }
                 2 -> PeakList(state, Modifier.weight(1f), barSpace) { selectedPeak = it }
                 3 -> Regions(state, Modifier.weight(1f), barSpace, model::downloadRegion,
-                    { model.selectRegion(it); tab = if (it == null) 1 else 0 }, { deletePack = it }, { pack -> scope.launch { attribution = runCatching { model.attribution(pack) }.getOrDefault("Credits couldn't be loaded.") } }, model::cancelImport,
+                    { model.selectRegion(it); tab = 0 }, { deletePack = it }, { pack -> scope.launch { attribution = runCatching { model.attribution(pack) }.getOrDefault("Credits couldn't be loaded.") } }, model::cancelImport,
                     model::discardDownload)
             }
         }
@@ -199,7 +199,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                 Text("${coordinate(peak.peak.point.latitude)}, ${coordinate(peak.peak.point.longitude)}\nSource: ${peak.peak.source}", style = MaterialTheme.typography.bodySmall)
                 peak.geometryHeightM?.let { Text("The map puts the ground here at ${height(it, state)}. The official summit height may differ.", style = MaterialTheme.typography.bodySmall) }
             }
-        }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; tab = 1 }) { Text("Show in panorama") } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text("Close") } })
+        }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; tab = 0 }) { Text("Show on Home") } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text("Close") } })
     }
     attribution?.let { text -> AlertDialog(onDismissRequest = { attribution = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text("Map and peak credits") }, text = { Text(text, Modifier.verticalScroll(rememberScrollState())) }, confirmButton = { TextButton(onClick = { attribution = null }) { Text("Done") } }) }
     deletePack?.let { pack -> AlertDialog(onDismissRequest = { deletePack = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text("Delete ${pack.name}?") }, text = { Text("Its maps and peak names will be removed from this phone. You can download it again any time.") }, confirmButton = { TextButton(onClick = { model.deleteRegion(pack); deletePack = null }) { Text("Delete") } }, dismissButton = { TextButton(onClick = { deletePack = null }) { Text("Keep") } }) }
@@ -369,7 +369,7 @@ private fun AppHeader(compact: Boolean, context: String, onSettings: () -> Unit)
 /** Pill-shaped bar floating above content. The selected tab expands to show its label. */
 @Composable
 private fun FloatingTabBar(selected: Int, overCamera: Boolean, onSelect: (Int) -> Unit, modifier: Modifier) {
-    val tabs = listOf("Camera" to R.drawable.ic_photo_camera, "Panorama" to R.drawable.ic_panorama, "Peaks" to R.drawable.ic_landscape, "Regions" to R.drawable.ic_map)
+    val tabs = listOf("Home" to R.drawable.ic_home, "Camera" to R.drawable.ic_photo_camera, "Peaks" to R.drawable.ic_landscape, "Regions" to R.drawable.ic_map)
     // Over the camera the bar turns translucent so the scene shows through; elsewhere it is solid forest green.
     Surface(modifier, shape = CircleShape, color = if (overCamera) Color.Black.copy(alpha = .55f) else Color(0xFF16352A), contentColor = Color.White, shadowElevation = if (overCamera) 0.dp else 12.dp) {
         Row(Modifier.padding(6.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {

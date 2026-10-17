@@ -103,7 +103,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                 val scene = withContext(Dispatchers.IO) {
                     val context = currentCoroutineContext()
                     val pack = input.activePack
-                    require(pack == null || pack.observerBounds.contains(input.point)) { "You're outside this hiking area. Pick an area that covers where you are, or choose a spot inside it in Panorama." }
+                    require(pack == null || pack.observerBounds.contains(input.point)) { "You're outside this hiking area. Pick an area that covers where you are, or choose a spot inside it on Home." }
                     if (pack != null) store.verify(pack) { context.ensureActive() }
                     val terrain: Terrain = if (pack == null) DemoTerrain() else HgtTerrain(pack.directory.resolve("terrain"), pack.bounds)
                     terrain.use {
@@ -198,7 +198,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         lastFixElapsedMs = null
         mutable.update { it.copy(followingGps = true, gpsFresh = false, gpsStatus = "Finding your location…") }
     }
-    fun locationDenied() { mutable.update { it.copy(followingGps = false, message = "PeakBud needs precise location to line up peaks. Turn it on in Android settings, or choose a spot in Panorama.") } }
+    fun locationDenied() { mutable.update { it.copy(followingGps = false, message = "PeakBud needs precise location to line up peaks. Turn it on in Android settings, or choose a spot on Home.") } }
     fun refreshFixAge() {
         val elapsed = lastFixElapsedMs ?: return
         val age = (android.os.SystemClock.elapsedRealtime() - elapsed) / 1000

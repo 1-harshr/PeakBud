@@ -17,7 +17,7 @@ class AndroidOrientationProvider(context: Context) {
         val acceleration = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         val magnetic = manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         if (rotation == null && (acceleration == null || magnetic == null)) {
-            trySend(DevicePose(0.0, 0.0, false, "This phone has no compass. Drag the panorama to look around.", available = false))
+            trySend(DevicePose(0.0, 0.0, false, "This phone has no compass. Drag the view on Home to look around.", available = false))
             close(); return@callbackFlow
         }
         var gravity: FloatArray? = null
@@ -63,7 +63,7 @@ class AndroidOrientationProvider(context: Context) {
             accelerometerRegistered && magnetometerRegistered
         }
         if (!registered) {
-            trySend(DevicePose(0.0, 0.0, false, "Couldn't start the compass. Drag the panorama to look around.", available = false))
+            trySend(DevicePose(0.0, 0.0, false, "Couldn't start the compass. Drag the view on Home to look around.", available = false))
             manager.unregisterListener(listener)
             close(); return@callbackFlow
         }
