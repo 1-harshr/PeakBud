@@ -36,6 +36,16 @@ calibration/streaming is unavailable. Camera permission is requested by the Enab
 camera button; denial offers an Android settings shortcut. No photos are captured,
 stored, or uploaded.
 
+## Full-screen camera
+
+The Live camera screen offers **Full screen**. It hides the header, tabs, alignment
+controls, and system bars, retaining peak callouts and a compact translucent overlay
+with heading, latitude/longitude, GPS altitude/source, fix status, and view angles.
+**Exit full screen** and Android Back both return to the normal camera layout.
+System bars can be revealed temporarily with an edge swipe and are restored on
+exit. Controls respect safe screen insets; CameraX recomputes the projection for
+the larger preview. Full-screen selection survives configuration changes.
+
 ## Calibration limits
 
 This is a sensor-aligned prototype, not verified visual registration. Camera focal

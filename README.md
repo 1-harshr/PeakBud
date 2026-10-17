@@ -9,6 +9,8 @@ visibility, GPS, true-north heading, pitch, roll, and the camera preview transfo
 The built-in catalogue starts with Poon Hill, Gokyo, and Auli. Peak names
 and trusted terrain links are bundled; terrain downloads on demand.
 
+- Tap **Full screen** in camera mode for an edge-to-edge preview with location metadata.
+  Use **Exit full screen** or Android Back to return.
 - Tap a peak label for its elevation, distance, and visibility estimate.
 - Use **−1° / +1° / Reset** to adjust compass alignment.
 - Switch to **Panorama** to explore terrain without the camera or with a manual viewpoint.

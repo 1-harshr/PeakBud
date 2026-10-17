@@ -50,7 +50,7 @@ import kotlin.math.hypot
 
 /** Camera permission is requested only by the explicit Enable camera action. */
 @Composable
-fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit, onGps: () -> Unit, onTrack: () -> Unit, onFov: (Pair<Double, Double>?) -> Unit, onPeak: (PeakView) -> Unit) {
+fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit, onGps: () -> Unit, onTrack: () -> Unit, onFov: (Pair<Double, Double>?) -> Unit, fullScreen: Boolean = false, onPeak: (PeakView) -> Unit) {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     fun granted() = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
@@ -84,7 +84,7 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
     Box(modifier.onSizeChanged { viewport = it }.clipToBounds().background(Color.Black)) {
         if (permission) CameraPreview(Modifier.fillMaxSize(), { lens = it }, { cameraStatus = it })
         if (notice == null) CameraLabels(state, lens!!, Modifier.fillMaxSize(), onPeak)
-        if (notice != null) Surface(Modifier.align(Alignment.TopCenter).padding(12.dp), color = Color(0xDD132A24), contentColor = Color.White) {
+        if (notice != null) Surface(Modifier.align(Alignment.TopCenter).padding(start = 12.dp, end = 12.dp, top = if (fullScreen) 72.dp else 12.dp, bottom = 12.dp), color = Color(0xDD132A24), contentColor = Color.White) {
             Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(notice, style = MaterialTheme.typography.bodySmall)
                 when {
@@ -98,7 +98,7 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
                 }
             }
         }
-        if (notice == null) Surface(Modifier.align(Alignment.BottomCenter).padding(8.dp), color = Color(0xBB132A24), contentColor = Color.White) {
+        if (notice == null && !fullScreen) Surface(Modifier.align(Alignment.BottomCenter).padding(8.dp), color = Color(0xBB132A24), contentColor = Color.White) {
             Text("${state.gpsStatus.orEmpty()}\nSensor alignment · adjust below if labels drift", Modifier.padding(8.dp), style = MaterialTheme.typography.labelSmall)
         }
     }

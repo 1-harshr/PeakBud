@@ -3,6 +3,8 @@ package com.harsh.peakbud
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.test.espresso.Espresso
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.platform.app.InstrumentationRegistry
@@ -50,6 +52,21 @@ class PanoramaNavigationTest {
         compose.onNodeWithText("Viewpoint").assertIsDisplayed()
         tap("Live camera")
         compose.onNodeWithText("Align labels").assertIsDisplayed()
+    }
+
+    @Test fun fullScreenCameraKeepsMetadataAndReturnsWithButtonOrBack() {
+        tap("Full screen")
+        compose.onNodeWithText("Exit full screen").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Camera location metadata").assertIsDisplayed()
+        compose.onNodeWithText("Settings").assertDoesNotExist()
+        compose.onNodeWithText("Regions").assertDoesNotExist()
+        tap("Exit full screen")
+        compose.onNodeWithText("Live camera").assertIsDisplayed()
+        compose.onNodeWithText("Settings").assertIsDisplayed()
+        tap("Full screen")
+        Espresso.pressBack()
+        compose.onNodeWithText("Live camera").assertIsDisplayed()
+        compose.onNodeWithText("Exit full screen").assertDoesNotExist()
     }
 
     @Test fun manualDemoAndOfflineRegionEntryPointsRemainAvailable() {

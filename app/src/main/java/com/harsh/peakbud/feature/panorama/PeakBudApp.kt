@@ -7,6 +7,7 @@ import android.provider.Settings
 import android.content.pm.PackageManager
 import android.os.Build
 import android.view.WindowManager
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
@@ -30,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.harsh.peakbud.feature.camera.CameraPanel
+import com.harsh.peakbud.feature.camera.FullScreenCamera
 import com.harsh.peakbud.core.geo.Geography
 import com.harsh.peakbud.core.model.*
 import com.harsh.peakbud.data.regions.RegionPack
@@ -46,6 +48,8 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
     val compact = configuration.screenWidthDp > configuration.screenHeightDp
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var cameraMode by rememberSaveable { mutableStateOf(true) }
+    var fullScreenCamera by rememberSaveable { mutableStateOf(false) }
+    BackHandler(enabled = fullScreenCamera) { fullScreenCamera = false }
     var cameraFov by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     var askedLocation by rememberSaveable { mutableStateOf(false) }
     var manual by rememberSaveable { mutableStateOf(false) }
@@ -97,7 +101,10 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
             permissions.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
         else model.startGps()
     }
-    Scaffold(containerColor = MaterialTheme.colorScheme.background, bottomBar = {
+    if (fullScreenCamera) {
+        FullScreenCamera(state, { fullScreenCamera = false }, { fullScreenCamera = false; tab = 2 }, ::gps,
+            model::startCameraTracking, { cameraFov = it }) { selectedPeak = it }
+    } else Scaffold(containerColor = MaterialTheme.colorScheme.background, bottomBar = {
         Surface(tonalElevation = 2.dp) {
             Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(12.dp, 4.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
                 listOf("Camera", "Peaks", "Regions").forEachIndexed { index, name ->
@@ -130,9 +137,13 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                         Text(if (state.isDemo) "Demo" else "Offline", style = MaterialTheme.typography.labelMedium)
                     }
                     if (!compact) ObservationStatus(state, cameraMode, cameraFov, false, ::gps, model::startCameraTracking)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         FilterChip(selected = cameraMode, onClick = { cameraMode = true }, label = { Text("Live camera") })
                         FilterChip(selected = !cameraMode, onClick = { cameraMode = false }, label = { Text("Panorama") })
+                        if (cameraMode) {
+                            Spacer(Modifier.weight(1f))
+                            TextButton(onClick = { fullScreenCamera = true }) { Text("Full screen") }
+                        }
                     }
                     if (cameraMode) {
                         if (compact) {
@@ -184,7 +195,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                 Text("${coordinate(peak.peak.point.latitude)}, ${coordinate(peak.peak.point.longitude)}\nSource: ${peak.peak.source}", style = MaterialTheme.typography.bodySmall)
                 peak.geometryHeightM?.let { Text("Terrain height: ${height(it, state)}. Published summit elevation may differ.", style = MaterialTheme.typography.bodySmall) }
             }
-        }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; cameraMode = false; tab = 0 }) { Text("Look toward peak") } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text("Close") } })
+        }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; fullScreenCamera = false; cameraMode = false; tab = 0 }) { Text("Look toward peak") } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text("Close") } })
     }
     attribution?.let { text -> AlertDialog(onDismissRequest = { attribution = null }, title = { Text("Data credits") }, text = { Text(text, Modifier.verticalScroll(rememberScrollState())) }, confirmButton = { TextButton(onClick = { attribution = null }) { Text("Done") } }) }
     deletePack?.let { pack -> AlertDialog(onDismissRequest = { deletePack = null }, title = { Text("Delete ${pack.name}?") }, text = { Text("Its offline terrain and peak catalogue will be removed from this device.") }, confirmButton = { TextButton(onClick = { model.deleteRegion(pack); deletePack = null }) { Text("Delete") } }, dismissButton = { TextButton(onClick = { deletePack = null }) { Text("Keep") } }) }

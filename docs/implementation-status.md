@@ -8,6 +8,8 @@ labels; the panorama is an alternate reference and demo view. See
 
 - CameraX rear preview, runtime permission/denial/settings handling, lifecycle
   binding and cleanup, GPS/compass prerequisites, and manual heading alignment.
+- Optional full-screen camera with compact location/direction metadata, explicit
+  exit, Android Back handling, and system-bar restoration.
 - Pinhole peak projection with true-north heading, pitch, roll, actual capture
   focal length, sensor size, and CameraX sensor-to-preview crop/rotation mapping.
   Labels have peak names, height/distance, leader lines, and detail tap targets.
@@ -40,9 +42,10 @@ blockers have been removed; they are not outstanding build failures.
   projection tests (center/pitch, perspective, north wrap, roll, rejection, crop,
   and field of view). Four catalogue tests cover actual shipped assets/coverage,
   download-to-activation, cancellation/retry reuse, and changed-source rejection.
-- Three instrumentation tests pass on the API 36.1 arm64 emulator, covering camera
+- Four instrumentation tests pass on the API 36.1 arm64 emulator, covering camera
   as default, Panorama switching, demo/manual viewpoint, region entry points,
-  settings, and the original application-context check. Navigation tests inject
+  settings, full-screen entry/exit/button/Back and metadata visibility, and the
+  original application-context check. Navigation tests inject
   stable sensor observations; separate manual checks exercise the real providers.
 - Android lint passes with warnings; no lint errors. Warnings include existing
   dependency/style/localization recommendations.
