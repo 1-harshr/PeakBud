@@ -7,6 +7,10 @@ import com.harsh.peakbud.core.projection.*
 import com.harsh.peakbud.data.regions.RegionPack
 import com.harsh.peakbud.feature.camera.CameraAlignmentController
 import java.io.File
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.*
 import kotlinx.coroutines.*
 import org.junit.Assert.*
@@ -96,5 +100,58 @@ class CameraAlignmentFlowTest {
         c.reset()
         assertEquals(AlignmentPhase.SENSOR, c.ui.value.phase)
         assertFalse(c.wantsFrame())
+    }
+
+    @Test fun preparingTerrainDoesNotConsumeTheCameraMatchingAttempt() {
+        val clock = AtomicLong(1000L)
+        val entered = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        val c = CameraAlignmentController(scope, clock = clock::get, skylineSource = { _, heading, half, _ ->
+            entered.countDown()
+            check(release.await(5, TimeUnit.SECONDS))
+            List((2 * half / .1).toInt() + 1) { i -> (heading - half + i * .1).let { b ->
+                HorizonSample(Geography.wrap360(b), skyline(b), 30_000.0, true)
+            } }
+        })
+        try {
+            val truth = CameraPose(120.0, 3.0, 4.0)
+            val sensor = truth.copy(heading = 113.0, pitch = 5.0)
+            c.start(CameraAlignmentController.Target(pack, pack.viewpoint, 1000.0, 1.6, 66.0), sensor, null)
+            assertTrue(entered.await(5, TimeUnit.SECONDS))
+            clock.addAndGet(13_000)
+            runBlocking { delay(650) } // allow the controller's actual timer to inspect the slow prediction
+            assertEquals(AlignmentPhase.ALIGNING, c.ui.value.phase)
+            assertTrue(c.ui.value.preparing)
+            release.countDown()
+            awaitPrepared(c)
+            repeat(3) {
+                clock.addAndGet(350)
+                assertTrue(c.wantsFrame())
+                c.process(mountainFrame(truth), identity, lens, sensor, emptyList())
+            }
+            assertEquals(AlignmentPhase.ALIGNED, c.ui.value.phase)
+        } finally { release.countDown(); c.reset(); scope.cancel() }
+    }
+
+    @Test fun cachedSkylineIsRebuiltWhenGroundOrPhoneHeightChanges() {
+        val calls = AtomicInteger()
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        val c = CameraAlignmentController(scope, skylineSource = { _, _, _, _ ->
+            calls.incrementAndGet()
+            List(720) { HorizonSample(it * .5, 4.0, 1000.0, true) }
+        })
+        try {
+            val target = CameraAlignmentController.Target(pack, pack.viewpoint, 1000.0, 1.6, 66.0)
+            val pose = CameraPose(120.0, 3.0, 0.0)
+            fun prepare(t: CameraAlignmentController.Target) { c.reset(); c.start(t, pose, null); awaitPrepared(c) }
+            prepare(target)
+            prepare(target)
+            assertEquals("Same observer may reuse the prediction", 1, calls.get())
+            prepare(target.copy(groundM = 1200.0))
+            assertEquals(2, calls.get())
+            prepare(target.copy(groundM = 1200.0, phoneHeightM = 10.0))
+            assertEquals(3, calls.get())
+        } finally { c.reset(); scope.cancel() }
     }
 }

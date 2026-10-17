@@ -43,8 +43,9 @@ class CameraAlignmentController(
     /** Where and how to predict the skyline. [groundM] null means take it from the terrain at [point]. */
     data class Target(val pack: RegionPack, val point: GeoPoint, val groundM: Double?, val phoneHeightM: Double, val hfovDeg: Double)
 
-    private class Sector(val packKey: String, val point: GeoPoint, val centerDeg: Double, val halfWidthDeg: Double, val skyline: TerrainSkyline) {
-        fun covers(target: Target, heading: Double) = packKey == target.pack.key && Geography.distance(point, target.point) < 1.0 &&
+    private class Sector(val target: Target, val centerDeg: Double, val halfWidthDeg: Double, val skyline: TerrainSkyline) {
+        fun covers(target: Target, heading: Double) = this.target.pack.key == target.pack.key && Geography.distance(this.target.point, target.point) < 1.0 &&
+            this.target.groundM == target.groundM && this.target.phoneHeightM == target.phoneHeightM &&
             abs(Geography.wrap180(heading - centerDeg)) <= halfWidthDeg - target.hfovDeg / 2 - 3
     }
 
@@ -66,7 +67,8 @@ class CameraAlignmentController(
     /** Begin aligning, or explain immediately why it cannot start. */
     fun start(target: Target?, pose: CameraPose?, blocker: AlignmentProblem?) = synchronized(this) {
         generation++
-        sectorJob?.cancel(); sector = null; hidden = emptySet()
+        sectorJob?.cancel(); sector = null; hidden = emptySet(); lastPose = null
+        tickJob?.cancel(); tickJob = null
         cached?.takeIf { target != null && pose != null && it.covers(target, pose.heading) }?.let { sector = it }
         if (blocker != null || target == null || pose == null) {
             session.reset(); this.target = null
@@ -82,7 +84,9 @@ class CameraAlignmentController(
             while (isActive) {
                 delay(500)
                 synchronized(this@CameraAlignmentController) {
-                    session.tick(clock()); publish()
+                    // Terrain preparation is not a failed camera match; start the attempt clock after it is ready.
+                    if (sector != null || session.state.phase == AlignmentPhase.ALIGNED) session.tick(clock())
+                    publish()
                     if (session.state.phase != AlignmentPhase.ALIGNING && session.state.phase != AlignmentPhase.ALIGNED) cancel()
                 }
             }
@@ -200,12 +204,13 @@ class CameraAlignmentController(
         sectorJob = scope.launch(io) {
             val startMs = clock()
             val built = try {
-                skylineSource(target, heading, halfWidth) { ensureActive() }?.let { Sector(target.pack.key, target.point, heading, halfWidth, TerrainSkyline(it)) }
+                skylineSource(target, heading, halfWidth) { ensureActive() }?.let { Sector(target, heading, halfWidth, TerrainSkyline(it)) }
             } catch (cancelled: CancellationException) { throw cancelled } catch (error: Exception) { log("alignment terrain failed: ${error.javaClass.simpleName}"); null }
             log("alignment terrain sector ${halfWidth * 2}° to ${(target.pack.radiusM / 1000).toInt()} km in ${clock() - startMs} ms")
             synchronized(this@CameraAlignmentController) {
+                if (gen != generation) return@launch
                 if (built != null) cached = built
-                if (prefetchOnly || gen != generation) return@launch
+                if (prefetchOnly) return@launch
                 if (built == null) {
                     session.reset(); tickJob?.cancel()
                     mutable.value = AlignmentUi(AlignmentPhase.FAILED, problem = AlignmentProblem.NO_TERRAIN)

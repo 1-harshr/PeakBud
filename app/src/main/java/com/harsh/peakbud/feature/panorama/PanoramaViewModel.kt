@@ -120,6 +120,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun recalculate() {
+        alignment.reset()
         calculation?.cancel()
         val input = mutable.value
         if (input.noRegion) { mutable.update { it.copy(calculating = false, scene = null, message = null) }; return }
@@ -155,9 +156,13 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                         TerrainEngine().calculate(observer, it, peaks, CalculationSettings(pack?.radiusM ?: 50_000.0),
                             // Publish partial scenes so nearby labels appear while distant peaks are still being checked.
                             onProgress = { partial ->
-                                if (context.isActive) {
-                                    if (mutable.value.scene == null) Telemetry.log("first peaks ready in ${android.os.SystemClock.elapsedRealtime() - calculationStarted} ms: ${partial.peaks.size} so far")
-                                    mutable.update { s -> s.copy(scene = partial) }
+                                // Serialize the cancellation check and publication with viewpoint/region changes
+                                // on Main. An IO callback must not restore an old scene after recalculate clears it.
+                                viewModelScope.launch {
+                                    if (context.isActive) {
+                                        if (mutable.value.scene == null) Telemetry.log("first peaks ready in ${android.os.SystemClock.elapsedRealtime() - calculationStarted} ms: ${partial.peaks.size} so far")
+                                        mutable.update { s -> s.copy(scene = partial) }
+                                    }
                                 }
                             }) { context.ensureActive() }
                     }
@@ -180,15 +185,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     fun startAlignment(hfovDeg: Double?) {
         val input = mutable.value
         val pack = input.activePack
-        val fix = input.gpsFix
-        val blocker = when {
-            pack == null -> AlignmentProblem.NO_TERRAIN
-            hfovDeg == null || hfovDeg !in 20.0..120.0 -> AlignmentProblem.NO_CAMERA
-            input.followingGps && (!input.gpsFresh || fix == null || fix.accuracyM > 50) -> AlignmentProblem.ROUGH_LOCATION
-            input.cameraPose == null -> AlignmentProblem.HOLD_UPRIGHT
-            !pack.observerBounds.contains(input.point) -> AlignmentProblem.NO_TERRAIN
-            else -> null
-        }
+        val blocker = input.alignmentBlocker(hfovDeg)
         Telemetry.event("align_start", "blocked" to (blocker?.name?.lowercase() ?: "no"))
         val target = if (pack != null && hfovDeg != null) CameraAlignmentController.Target(pack, input.point,
             input.groundOverrideM ?: input.scene?.observer?.groundHeightM, input.preferences.phoneHeightM, hfovDeg) else null
@@ -236,7 +233,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     }
     fun setPitch(value: Double) { mutable.update { it.copy(pitch = value.coerceIn(-30.0, 30.0)) } }
     fun setFov(value: Double) { mutable.update { it.copy(fov = value.coerceIn(35.0, 120.0)) } }
-    fun toggleCompass() { lastSmoothedHeading = null; mutable.update { it.copy(followingCompass = !it.followingCompass, cameraPose = null, compassStatus = null) } }
+    fun toggleCompass() { alignment.reset(); lastSmoothedHeading = null; mutable.update { it.copy(followingCompass = !it.followingCompass, cameraPose = null, compassStatus = null) } }
     fun trimCompass(degrees: Double) {
         Telemetry.log("label nudge $degrees")
         alignment.reset()
@@ -253,6 +250,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     fun pose(value: DevicePose) {
         if (!mutable.value.followingCompass) return
         if (!value.available) {
+            alignment.reset()
             mutable.update { it.copy(followingCompass = false, cameraPose = null, compassStatus = value.message, poseReliable = false) }
             return
         }
@@ -273,29 +271,35 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
             cameraPose = if (value.cameraUsable) CameraPose(raw, value.pitch, value.roll) else null) }
     }
     fun startCameraTracking() {
+        alignment.reset()
         lastSmoothedHeading = null
         mutable.update { it.copy(followingCompass = true, cameraPose = null) }
     }
     fun startGps() {
         if (mutable.value.isDemo) return  // demo mode never uses the real location
+        alignment.reset()
         lastGpsPoint = null
         lastFixElapsedMs = null
         mutable.update { it.copy(followingGps = true, gpsFresh = false, gpsStatus = strings(R.string.finding_your_location)) }
     }
-    fun locationDenied() { mutable.update { it.copy(followingGps = false, message = strings(R.string.peakbud_needs_precise_location_to_line_up_peaks_turn_it_on_in_android_settin)) } }
+    fun locationDenied() { alignment.reset(); mutable.update { it.copy(followingGps = false, message = strings(R.string.peakbud_needs_precise_location_to_line_up_peaks_turn_it_on_in_android_settin)) } }
     fun refreshFixAge() {
         val elapsed = lastFixElapsedMs ?: return
         val age = (android.os.SystemClock.elapsedRealtime() - elapsed) / 1000
-        if (age > 30) mutable.update { it.copy(gpsFresh = false, gpsStatus = strings(R.string.location_is_s_old_updating , age)) }
+        if (age > 30) {
+            alignment.reset()
+            mutable.update { it.copy(gpsFresh = false, gpsStatus = strings(R.string.location_is_s_old_updating , age)) }
+        }
     }
-    fun stopGps() { mutable.update { it.copy(followingGps = false) } }
+    fun stopGps() { alignment.reset(); mutable.update { it.copy(followingGps = false) } }
     fun gps(status: LocationStatus) {
         if (!mutable.value.followingGps) return
         when (status) {
-            is LocationStatus.Message -> { Telemetry.log("location: ${status.text}"); mutable.update { it.copy(gpsFresh = false, gpsStatus = status.text) } }
+            is LocationStatus.Message -> { alignment.reset(); Telemetry.log("location: ${status.text}"); mutable.update { it.copy(gpsFresh = false, gpsStatus = status.text) } }
             is LocationStatus.Fix -> {
                 val fix = status.value
-                if (fix.ageSeconds > 30) { mutable.update { it.copy(gpsFresh = false, gpsStatus = strings(R.string.location_is_out_of_date_updating)) }; return }
+                if (fix.ageSeconds > 30) { alignment.reset(); mutable.update { it.copy(gpsFresh = false, gpsStatus = strings(R.string.location_is_out_of_date_updating)) }; return }
+                if (fix.accuracyM > 50) alignment.reset()
                 gpsAccuracyM = fix.accuracyM.toDouble()
                 lastFixElapsedMs = android.os.SystemClock.elapsedRealtime() - fix.ageSeconds * 1000
                 mutable.update { it.copy(gpsFix = fix, gpsFresh = true, gpsStatus = strings(R.string.location_accurate_to_m , fix.accuracyM.toInt())) }
@@ -420,4 +424,14 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
             finally { mutable.update { it.copy(importing = null) } }
         }
     }
+}
+
+/** The camera screen and the matcher must refer to a current, tracked observer and pose. */
+internal fun PanoramaState.alignmentBlocker(hfovDeg: Double?): AlignmentProblem? = when {
+    activePack == null -> AlignmentProblem.NO_TERRAIN
+    hfovDeg == null || hfovDeg !in 20.0..120.0 -> AlignmentProblem.NO_CAMERA
+    !followingGps || !gpsFresh || gpsFix == null || gpsFix.accuracyM > 50 -> AlignmentProblem.ROUGH_LOCATION
+    !followingCompass || cameraPose == null -> AlignmentProblem.HOLD_UPRIGHT
+    !activePack.observerBounds.contains(point) -> AlignmentProblem.NO_TERRAIN
+    else -> null
 }

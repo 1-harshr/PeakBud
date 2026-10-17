@@ -155,13 +155,13 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
     var streaming by remember { mutableStateOf(false) }
     var focalLength by remember { mutableStateOf<Float?>(null) }
     // Read by the analysis thread: preview geometry captured on the main thread.
-    val frameGeometry = remember { FrameGeometry() }
+    val frameGeometry = remember { java.util.concurrent.atomic.AtomicReference<CameraFrameGeometry?>(null) }
     val currentAlignment by rememberUpdatedState(alignment)
     val currentPose by rememberUpdatedState(rawPose)
     val currentPeaks by rememberUpdatedState(peaks)
     AndroidView(factory = { view }, modifier = modifier.semantics { contentDescription = if (streaming) strings(R.string.live_rear_camera_preview) else strings(R.string.camera_preview_starting) })
     DisposableEffect(view, owner) {
-        var disposed = false
+        val disposed = java.util.concurrent.atomic.AtomicBoolean(false)
         var provider: ProcessCameraProvider? = null
         var observedCamera: androidx.camera.core.Camera? = null
         var cameraObserver: Observer<androidx.camera.core.CameraState>? = null
@@ -172,7 +172,7 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
             object : android.hardware.camera2.CameraCaptureSession.CaptureCallback() {
                 override fun onCaptureCompleted(session: android.hardware.camera2.CameraCaptureSession, request: android.hardware.camera2.CaptureRequest, result: android.hardware.camera2.TotalCaptureResult) {
                     val focal = result.get(android.hardware.camera2.CaptureResult.LENS_FOCAL_LENGTH)
-                    ContextCompat.getMainExecutor(context).execute { if (!disposed && focal != null) focalLength = focal }
+                    ContextCompat.getMainExecutor(context).execute { if (!disposed.get() && focal != null) focalLength = focal }
                 }
             }
         )
@@ -190,7 +190,8 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
         analysis.setAnalyzer(analysisExecutor) { image ->
             try {
                 val controller = currentAlignment
-                if (!disposed && controller != null && controller.wantsFrame()) analyseFrame(image, frameGeometry, controller, currentPose(), currentPeaks())
+                val geometry = frameGeometry.get()
+                if (!disposed.get() && geometry != null && controller != null && controller.wantsFrame()) analyseFrame(image, geometry, controller, currentPose(), currentPeaks())
             } catch (error: Exception) {
                 Telemetry.error("alignment frame", error)
             } finally {
@@ -200,11 +201,26 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
         val streamObserver = Observer<PreviewView.StreamState> { value ->
             streaming = value == PreviewView.StreamState.STREAMING
             if (streaming) statusCallback(null)
+            else {
+                frameGeometry.set(null)
+                lensCallback(null)
+                currentAlignment?.reset()
+            }
         }
         view.previewStreamState.observe(owner, streamObserver)
+        // LiveData does not deliver IDLE while its owner is stopped. Clear camera-derived state immediately.
+        val stopObserver = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                streaming = false
+                frameGeometry.set(null)
+                lensCallback(null)
+                currentAlignment?.reset()
+            }
+        }
+        owner.lifecycle.addObserver(stopObserver)
         val future = ProcessCameraProvider.getInstance(context)
         future.addListener({
-            if (!disposed) try {
+            if (!disposed.get()) try {
                 provider = future.get()
                 check(provider!!.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) { strings(R.string.this_phone_has_no_rear_camera_use_home_instead) }
                 preview.setSurfaceProvider(view.surfaceProvider)
@@ -222,7 +238,7 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
                         active.exactCenterX() to active.exactCenterY()) else null
                 camera.cameraInfo.cameraState.observe(owner, object : Observer<androidx.camera.core.CameraState> {
                     override fun onChanged(value: androidx.camera.core.CameraState) {
-                        if (!disposed && value.error != null) { Telemetry.log("camera error ${value.error?.code}"); streaming = false; statusCallback(strings(R.string.the_camera_stopped_switch_to_home_and_back_to_restart_it)) }
+                        if (!disposed.get() && value.error != null) { Telemetry.log("camera error ${value.error?.code}"); streaming = false; statusCallback(strings(R.string.the_camera_stopped_switch_to_home_and_back_to_restart_it)) }
                     }
                 }.also { cameraObserver = it; observedCamera = camera })
             } catch (error: Exception) {
@@ -231,15 +247,16 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
             }
         }, ContextCompat.getMainExecutor(context))
         onDispose {
-            disposed = true
+            disposed.set(true)
             view.previewStreamState.removeObserver(streamObserver)
+            owner.lifecycle.removeObserver(stopObserver)
             cameraObserver?.let { observedCamera?.cameraInfo?.cameraState?.removeObserver(it) }
             cameraObserver = null; observedCamera = null
             analysis.clearAnalyzer()
             provider?.unbind(preview, analysis)
             analysisExecutor.shutdown()
             alignment?.reset()
-            frameGeometry.lens = null; frameGeometry.previewTransform = null
+            frameGeometry.set(null)
             lensCallback(null)
         }
     }
@@ -248,8 +265,6 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
             while (true) {
                 val o = optics
                 val transform = if (streaming) view.sensorToViewTransform else null
-                frameGeometry.previewTransform = if (streaming) view.outputTransform else null
-                frameGeometry.viewWidth = view.width; frameGeometry.viewHeight = view.height
                 val lens = if (o != null && transform != null && focalLength != null && focalLength!! > 0) {
                     // Transform sensor focal vectors to preview pixels. This incorporates
                     // sensor rotation, stream crop, and PreviewView's FILL_CENTER crop.
@@ -260,7 +275,8 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
                     val fy = hypot((points[3] - points[1]).toDouble(), (points[5] - points[1]).toDouble())
                     if (fx > 0 && fy > 0) CameraLens(fx, fy, points[0].toDouble(), points[1].toDouble()) else null
                 } else null
-                frameGeometry.lens = lens
+                frameGeometry.set(if (lens != null && transform != null && view.width > 0 && view.height > 0)
+                    CameraFrameGeometry(lens, view.width, view.height, transform) else null)
                 lensCallback(lens)
                 delay(100)
             }
@@ -283,6 +299,7 @@ private fun CameraLabels(state: PanoramaState, pose: CameraPose, aligned: Boolea
         // Drag sideways to line labels up with the real ridges; degrees follow the lens's horizontal scale.
         .pointerInput(lens) { detectHorizontalDragGestures(onDragEnd = { dragEnd() }) { change, dx -> change.consume(); nudge(-Math.toDegrees(kotlin.math.atan(dx / lens.fx))) } }) {
         hits.clear()
+        if (size.width <= TrailSpace.lg.toPx() * 2 || size.height <= 0) return@Canvas
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = type.titlePx; color = android.graphics.Color.WHITE; typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
             setShadowLayer(TrailCanvas.shadowRadius.toPx(), 0f, TrailStroke.thin.toPx(), 0x99000000.toInt()) }
         val occupied = mutableListOf<RectF>()
@@ -331,23 +348,11 @@ private fun CameraLabels(state: PanoramaState, pose: CameraPose, aligned: Boolea
 }
 
 
-/** Preview geometry written on the main thread and read by the analysis thread. */
-private class FrameGeometry {
-    @Volatile var lens: CameraLens? = null
-    @Volatile var previewTransform: androidx.camera.view.transform.OutputTransform? = null
-    @Volatile var viewWidth = 0
-    @Volatile var viewHeight = 0
-}
-
 /** Downsample the frame upright, then map boundary points to preview pixels through sensor coordinates. */
-@androidx.annotation.OptIn(androidx.camera.view.TransformExperimental::class)
-private fun analyseFrame(image: androidx.camera.core.ImageProxy, geometry: FrameGeometry, controller: CameraAlignmentController,
+private fun analyseFrame(image: androidx.camera.core.ImageProxy, geometry: CameraFrameGeometry, controller: CameraAlignmentController,
                          pose: CameraPose?, peaks: List<PeakView>) {
-    val target = geometry.previewTransform ?: return
-    val width = geometry.viewWidth; val height = geometry.viewHeight
-    if (width <= 0 || height <= 0) return
-    val toPreview = androidx.camera.view.transform.CoordinateTransform(
-        androidx.camera.view.transform.ImageProxyTransformFactory().getOutputTransform(image), target)
+    val width = geometry.width; val height = geometry.height
+    val toPreview = geometry.bufferToView(image.imageInfo.sensorToBufferTransformMatrix) ?: return
     val plane = image.planes[0]
     val buffer = plane.buffer; val rowStride = plane.rowStride; val pixelStride = plane.pixelStride
     val crop = image.cropRect

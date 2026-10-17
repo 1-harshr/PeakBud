@@ -87,6 +87,12 @@ class TerrainEngineTest {
         assertEquals(PeakReason.HEIGHT_MISMATCH, view.reason)
         assertEquals(Geography.elevationAngle(observer.heightM, 2000.0, view.distanceM), view.elevationDeg!!, 0.0001)
     }
+    @Test fun conflictingCatalogueHeightCannotMakeABlockedPeakDrawable() {
+        val view = TerrainEngine().visibility(observer, peak.copy(publishedHeightM = 8000.0), terrain(ridge = true))
+        assertEquals(Visibility.OCCLUDED, view.visibility)
+        assertEquals(PeakReason.OCCLUDED, view.reason)
+        assertEquals(6000, view.heightDifferenceM)
+    }
     @Test fun smallPublishedHeightDifferencesDoNotHideClearTerrain() {
         assertEquals(Visibility.TERRAIN_VISIBLE, TerrainEngine().visibility(observer, peak.copy(publishedHeightM = 2030.0), terrain()).visibility)
     }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -25,7 +26,8 @@ import com.harsh.peakbud.core.projection.inLabelPriority
 import kotlin.math.*
 
 @Composable
-fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> Unit, onPeak: (PeakView) -> Unit, onZoom: (Float) -> Unit = {}) {
+fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> Unit, onPeak: (PeakView) -> Unit, onZoom: (Float) -> Unit = {},
+                   compassStartInset: androidx.compose.ui.unit.Dp = TrailSpace.none) {
     val strings = rememberTrailStrings()
     val palette = LocalTrailSceneColors.current
     val type = peakLabelTypography()
@@ -34,11 +36,11 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
     val pan by rememberUpdatedState(onPan)
     val select by rememberUpdatedState(onPeak)
     val zoom by rememberUpdatedState(onZoom)
-    Canvas(modifier
+    Canvas(modifier.clipToBounds()
         .semantics { contentDescription = strings(R.string.mountain_panorama_drag_horizontally_to_look_around_peak_details_are_also_ava) }
         // One finger turns the view; two fingers pinch to zoom.
         .pointerInput(Unit) { detectTransformGestures { _, panBy, zoomBy, _ ->
-            if (panBy.x != 0f) pan(-panBy.x / size.width * currentState.fov)
+            if (panBy.x != 0f && size.width > 0) pan(-panBy.x / size.width * currentState.fov)
             if (zoomBy != 1f) zoom(zoomBy)
         } }
         .pointerInput(Unit) { detectTapGestures { point -> hits.lastOrNull { it.first.contains(point.x, point.y) }?.let { select(it.second) } } }
@@ -46,13 +48,15 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         val w = size.width
         val h = size.height
         hits.clear()
+        if (w <= 0 || h <= 0) return@Canvas
         drawRect(Brush.verticalGradient(listOf(palette.skyTop, palette.skyMiddle, palette.skyBottom)))
         // Without a landscape the compass strip, angle lines and range caption mean nothing; show only the sky.
         if (state.scene == null && !state.calculating) return@Canvas
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL); textSize = type.axisPx; color = palette.axis.toArgb() }
         val heading = state.heading
         // Relief of the skyline in view (plus peaks shown) decides how much to stretch heights.
-        val inView = state.scene?.horizon.orEmpty().filter { abs(Geography.wrap180(it.bearingDeg - heading)) <= state.fov / 2 }.mapNotNull { it.elevationDeg }
+        val inView = state.scene?.horizon.orEmpty().filter { it.complete && abs(Geography.wrap180(it.bearingDeg - heading)) <= state.fov / 2 }
+            .mapNotNull { it.elevationDeg?.takeIf(Double::isFinite) }
         val relief = if (inView.size > 2) inView.max() - min(inView.min(), 0.0) else 0.0
         val verticalScale = PanoramaProjector.autoScale(relief, state.fov, w, h)
         fun project(b: Double, e: Double) = PanoramaProjector.project(b, e, heading, state.pitch, w, h, state.fov, verticalScale)
@@ -79,37 +83,27 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         }
         for (b in 0 until 360 step 15) {
             val x = project(b.toDouble(), 0.0).x
-            if (x !in 0f..w) continue
+            if (x !in compassStartInset.toPx()..w) continue
             drawLine(palette.axis, Offset(x, 0f), Offset(x, (TrailSpace.md).toPx()), 1f)
             val label = when (b) { 0 -> strings(R.string.n); 90 -> strings(R.string.e); 180 -> strings(R.string.s); 270 -> strings(R.string.w); else -> strings(R.string.angle_degrees , b) }
             val half = paint.measureText(label) / 2
-            if (x - half < (TrailCanvas.marker).toPx() || x + half > w - (TrailCanvas.marker).toPx()) continue
+            if (x - half < compassStartInset.toPx() + TrailCanvas.marker.toPx() || x + half > w - TrailCanvas.marker.toPx()) continue
             val bounds = RectF(x - half, axisBaseline + axisMetrics.ascent, x + half, axisBaseline + axisMetrics.descent)
             if (compassLabels.any { RectF.intersects(it, bounds) }) continue
             compassLabels += RectF(bounds).apply { inset(-TrailSpace.xs.toPx(), 0f) }
             drawContext.canvas.nativeCanvas.drawText(label, x - half, axisBaseline, paint)
         }
-        val samples = state.scene?.horizon.orEmpty().mapNotNull { sample ->
-            val e = sample.elevationDeg ?: return@mapNotNull null
-            if (abs(Geography.wrap180(sample.bearingDeg - heading)) > state.fov / 2 + 2) null else sample to project(sample.bearingDeg, e)
-        }.sortedBy { it.second.x }
-        var path = Path()
-        var firstX = 0f
-        var lastX = 0f
-        var active = false
-        fun finish() {
-            if (!active) return
-            path.lineTo(lastX, h); path.lineTo(firstX, h); path.close()
+        val segments = PanoramaProjector.horizonSegments(state.scene?.horizon.orEmpty(), heading, state.fov)
+            .map { segment -> segment.map { sample -> sample to project(sample.bearingDeg, sample.elevationDeg!!) } }
+        for (segment in segments) {
+            if (segment.size < 2) continue
+            val path = Path()
+            path.moveTo(segment.first().second.x, segment.first().second.y)
+            segment.drop(1).forEach { (_, point) -> path.lineTo(point.x, point.y) }
+            path.lineTo(segment.last().second.x, h); path.lineTo(segment.first().second.x, h); path.close()
             drawPath(path, Brush.verticalGradient(listOf(palette.ridgeTop, palette.ridgeBottom), startY = h * .3f, endY = h))
-            path = Path(); active = false
         }
-        samples.forEach { (sample, point) ->
-            if (!sample.complete) { finish(); return@forEach }
-            if (!active) { firstX = point.x; path.moveTo(point.x, point.y); active = true }
-            else path.lineTo(point.x, point.y)
-            lastX = point.x
-        }
-        finish()
+        if (w <= TrailCanvas.labelPadding.toPx() * 2) return@Canvas
         drawLine(palette.axis, Offset(w / 2, (TrailSpace.xxl).toPx()), Offset(w / 2, (TrailCanvas.compassBand + TrailSpace.sm).toPx()), (TrailSpace.xxs).toPx())
         val occupied = mutableListOf<RectF>()
         val cardHeight = type.cardHeight
@@ -154,7 +148,9 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         paint.textSize = type.axisPx
         paint.color = palette.axis.toArgb()
         // Labels sit against the sky only: skip any covered by a card or by the terrain at the left edge.
-        val skylineAtEdge = samples.filter { it.first.complete }.minByOrNull { abs(it.second.x - (TrailSpace.md).toPx()) }?.second?.y ?: h
+        val edgeX = TrailSpace.md.toPx()
+        val skylineAtEdge = segments.firstOrNull { it.first().second.x <= edgeX && it.last().second.x >= edgeX }
+            ?.minByOrNull { abs(it.second.x - edgeX) }?.second?.y ?: h
         for ((y, text) in elevationLabels) {
             val baseline = y - TrailSpace.xs.toPx()
             val box = RectF(TrailSpace.xs.toPx(), baseline + axisMetrics.ascent, TrailSpace.md.toPx() + paint.measureText(text), baseline + axisMetrics.descent)

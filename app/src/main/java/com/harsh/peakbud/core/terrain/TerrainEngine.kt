@@ -116,8 +116,10 @@ class TerrainEngine {
         // A large discrepancy may mean a clipped summit, bad catalogue coordinates,
         // or a bad published height. Do not silently raise terrain to match a name.
         val inconsistentHeight = heightDifference != null && heightDifference > max(100.0, terrain.heightErrorM * 3)
-        val state = if (inconsistentHeight && geometricState != Visibility.UNKNOWN) Visibility.UNCERTAIN else geometricState
-        val reason = if (inconsistentHeight && state != Visibility.UNKNOWN)
+        // Catalogue disagreement may downgrade visibility, but cannot turn a proven blocker
+        // into a drawable UNCERTAIN peak at the same (hidden) DEM coordinates.
+        val state = if (inconsistentHeight && geometricState == Visibility.TERRAIN_VISIBLE) Visibility.UNCERTAIN else geometricState
+        val reason = if (inconsistentHeight && state == Visibility.UNCERTAIN)
             PeakReason.HEIGHT_MISMATCH
         else when (state) {
             Visibility.TERRAIN_VISIBLE -> PeakReason.VISIBLE
