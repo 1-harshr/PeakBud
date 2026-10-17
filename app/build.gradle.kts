@@ -38,6 +38,11 @@ android {
     }
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+    arg("room.generateKotlin", "true")
+}
+
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -67,6 +72,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.json.test)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)

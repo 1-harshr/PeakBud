@@ -18,10 +18,11 @@ Start with one curated Himalayan region, local SRTM elevation files, OSM peak
 records, and a manually chosen viewpoint. Add GPS, compass alignment, region
 downloads, and finally optional camera overlay after the geometry works.
 
-This document is a proposed architecture and implementation sequence. The current
-app still displays the Compose starter screen. Dependencies and manifest settings
-are configured, but the terrain engine, datasets, and feature screens are not yet
-implemented. Public projects below were inspected as references; they were not
+This document records the proposed architecture and implementation sequence.
+When it was written, the app displayed the Compose starter screen with dependencies
+and manifest settings configured. Current progress and remaining verification are
+tracked in [implementation-status.md](implementation-status.md). Public projects
+below were inspected as references; they were not
 built or field-tested during this research.
 
 ## 2. End-to-End Flow
@@ -322,7 +323,8 @@ alignment can follow after manual alignment and terrain projection are validated
 
 Keep one Android app module initially, with an Android-independent calculation
 package. Split Gradle modules only if reuse or build boundaries justify it.
-These are proposed paths, not files already implemented:
+These were the proposed paths; consult the implementation status and source tree
+for the current scaffold:
 
 ```text
 app/src/main/java/com/harsh/peakbud/
