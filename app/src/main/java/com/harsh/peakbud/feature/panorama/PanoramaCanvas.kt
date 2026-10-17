@@ -37,9 +37,10 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL); textSize = 11 * density; color = 0xFF526A60.toInt() }
         val heading = state.heading
         fun project(b: Double, e: Double) = PanoramaProjector.project(b, e, heading, state.pitch, w, h, state.fov)
+        val compassBand = 40 * density
         for (angle in -20..40 step 10) {
             val y = project(heading, angle.toDouble()).y
-            if (y in 50f..h) {
+            if (y in (compassBand + 14 * density)..(h - 28 * density)) {
                 drawLine(Color(0x18516B5A), Offset(0f, y), Offset(w, y), 1f)
                 drawContext.canvas.nativeCanvas.drawText("$angle°", 10 * density, y - 4 * density, paint)
             }
@@ -49,7 +50,9 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
             if (x !in 0f..w) continue
             drawLine(Color(0xFF8AA194), Offset(x, 0f), Offset(x, 10 * density), 1f)
             val label = when (b) { 0 -> "N"; 90 -> "E"; 180 -> "S"; 270 -> "W"; else -> "$b°" }
-            drawContext.canvas.nativeCanvas.drawText(label, x - paint.measureText(label) / 2, 26 * density, paint)
+            val half = paint.measureText(label) / 2
+            if (x - half < 4 * density || x + half > w - 4 * density) continue
+            drawContext.canvas.nativeCanvas.drawText(label, x - half, 26 * density, paint)
         }
         val samples = state.scene?.horizon.orEmpty().mapNotNull { sample ->
             val e = sample.elevationDeg ?: return@mapNotNull null
@@ -73,11 +76,12 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         }
         finish()
         drawLine(Color(0x99AE6945), Offset(w / 2, 32 * density), Offset(w / 2, 47 * density), 2 * density)
-        val laneEnd = FloatArray(((h / density - 100) / 48).toInt().coerceIn(1, 4)) { Float.NEGATIVE_INFINITY }
+        val occupied = mutableListOf<RectF>()
+        val cardHeight = 41 * density
         val peaks = state.scene?.peaks.orEmpty().filter {
             it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN
         }.mapNotNull { peak -> peak.elevationDeg?.let { peak to project(peak.bearingDeg, it) } }
-            .filter { it.second.x in 8f..(w - 8f) }.sortedBy { it.second.x }
+            .filter { it.second.x in 8f..(w - 8f) && it.second.y in compassBand..h }.sortedBy { it.first.distanceM }
         for ((peak, point) in peaks) {
             paint.textSize = 11 * density
             val label = peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else ""
@@ -86,23 +90,24 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
             val detail = "$heightText · ${distance(peak.distanceM, state)}"
             val labelWidth = min(max(paint.measureText(label), paint.measureText(detail)) + 20 * density, w - 16 * density)
             val left = (point.x - labelWidth / 2).coerceIn(8 * density, max(8 * density, w - labelWidth - 8 * density))
-            val lane = laneEnd.indexOfFirst { it + 10 * density <= left }
-            if (lane < 0) continue
-            laneEnd[lane] = left + labelWidth
-            val top = (56 + lane * 48) * density
-            val rect = RectF(left, top, left + labelWidth, top + 41 * density)
-            drawLine(Color(0x997D917B), Offset(point.x, point.y), Offset(left + labelWidth / 2, rect.bottom), density)
+            // Prefer rows above the summit (below the compass band); fall back to rows beneath it.
+            val tops = (0..3).map { point.y - (22 + it * 48) * density - cardHeight }.filter { it >= compassBand + 4 * density } +
+                (0..3).map { point.y + (22 + it * 48) * density }.filter { it + cardHeight <= h - 28 * density }
+            val card = tops.map { RectF(left, it, left + labelWidth, it + cardHeight) }
+                .firstOrNull { c -> occupied.none { RectF.intersects(it, c) } } ?: continue
+            occupied += card
+            drawLine(Color(0x997D917B), Offset(point.x, point.y), Offset(card.centerX(), if (card.bottom <= point.y) card.bottom else card.top), density)
             drawCircle(Color(0xFFF8F7E9), 4 * density, Offset(point.x, point.y))
             drawCircle(Color(0xFF315647), 4 * density, Offset(point.x, point.y), style = Stroke(density))
-            drawRoundRect(Color(0xF2FFFDF4), Offset(rect.left, rect.top), androidx.compose.ui.geometry.Size(rect.width(), rect.height()), androidx.compose.ui.geometry.CornerRadius(5 * density))
+            drawRoundRect(Color(0xF2FFFDF4), Offset(card.left, card.top), androidx.compose.ui.geometry.Size(card.width(), card.height()), androidx.compose.ui.geometry.CornerRadius(5 * density))
             paint.color = 0xFF234F43.toInt()
             var display = label
             while (paint.measureText(display) > labelWidth - 16 * density && display.length > 2) display = display.dropLast(2) + "…"
-            drawContext.canvas.nativeCanvas.drawText(display, left + 8 * density, top + 16 * density, paint)
+            drawContext.canvas.nativeCanvas.drawText(display, card.left + 8 * density, card.top + 16 * density, paint)
             paint.textSize = 9 * density
             paint.color = 0xFF647A6A.toInt()
-            drawContext.canvas.nativeCanvas.drawText(detail, left + 8 * density, top + 32 * density, paint)
-            hits += rect to peak
+            drawContext.canvas.nativeCanvas.drawText(detail, card.left + 8 * density, card.top + 32 * density, paint)
+            hits += card to peak
         }
         paint.textSize = 10 * density
         paint.color = 0xFF566F60.toInt()

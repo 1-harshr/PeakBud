@@ -2,4 +2,12 @@
 <resources>
 
     <style name="Theme.PeakBud" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Shown by the system while the process starts; handed off to Theme.PeakBud by installSplashScreen(). -->
+    <style name="Theme.PeakBud.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/peakbud_forest</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/peakbud_forest</item>
+        <item name="postSplashScreenTheme">@style/Theme.PeakBud</item>
+    </style>
 </resources>
