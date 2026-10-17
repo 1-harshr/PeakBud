@@ -46,7 +46,12 @@ data class PanoramaState(
     val compassStatus: String? = null,
     val importing: String? = null,
     val preferences: Preferences = Preferences(),
-) { val isDemo: Boolean get() = activePack == null }
+) {
+    /** Fictional terrain is shown only while demo mode is switched on in Settings. */
+    val isDemo: Boolean get() = activePack == null && preferences.demoMode
+    /** Nothing to show: no region selected and demo mode is off. */
+    val noRegion: Boolean get() = activePack == null && !preferences.demoMode
+}
 
 class PanoramaViewModel(application: Application) : AndroidViewModel(application) {
     private val mutable = MutableStateFlow(PanoramaState())
@@ -69,9 +74,9 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             settings.preferences.catch { mutable.update { it.copy(message = "Settings could not be read; using defaults") }; emit(Preferences()) }
                 .collect { value ->
-                    val heightChanged = mutable.value.preferences.phoneHeightM != value.phoneHeightM
+                    val previous = mutable.value.preferences
                     mutable.update { it.copy(preferences = value) }
-                    if (heightChanged) recalculate()
+                    if (previous.phoneHeightM != value.phoneHeightM || previous.demoMode != value.demoMode) recalculate()
                 }
         }
         viewModelScope.launch {
@@ -88,6 +93,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     fun recalculate() {
         calculation?.cancel()
         val input = mutable.value
+        if (input.noRegion) { mutable.update { it.copy(calculating = false, scene = null, message = null) }; return }
         calculation = viewModelScope.launch {
             mutable.update { it.copy(calculating = true, scene = null, message = null) }
             try {

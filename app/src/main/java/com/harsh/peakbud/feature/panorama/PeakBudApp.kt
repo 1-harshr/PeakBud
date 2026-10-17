@@ -124,9 +124,9 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                 Column(Modifier.weight(1f)) {
                     Text(when (tab) { 1 -> "Peaks"; 2 -> "Hiking areas"; else -> "PeakBud" }, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
                     if (!compact) Text(when (tab) {
-                        1 -> if (state.isDemo) "Fictional peaks · demo" else "Line of sight within ${(state.activePack?.radiusM ?: 0.0).toInt() / 1000} km"
+                        1 -> if (state.noRegion) "No hiking area selected" else if (state.isDemo) "Fictional peaks · demo" else "Line of sight within ${(state.activePack?.radiusM ?: 0.0).toInt() / 1000} km"
                         2 -> "Download once · works offline on the trail"
-                        else -> state.activePack?.name?.let { "$it · offline" } ?: "Explorer demo · fictional terrain"
+                        else -> state.activePack?.name?.let { "$it · offline" } ?: if (state.isDemo) "Explorer demo · fictional terrain" else "No hiking area selected"
                     }, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 IconButton(onClick = { settings = true }) { Icon(painterResource(R.drawable.ic_settings), contentDescription = "Settings", tint = MaterialTheme.colorScheme.onSurfaceVariant) }
@@ -167,7 +167,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                     } else BoxWithConstraints(Modifier.weight(1f)) {
                         if (maxWidth > maxHeight) {
                             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                                PanoramaPanel(state, model, Modifier.weight(1f).fillMaxHeight()) { selectedPeak = it }
+                                PanoramaPanel(state, model, Modifier.weight(1f).fillMaxHeight(), { tab = 2 }) { selectedPeak = it }
                                 Column(Modifier.width(270.dp).fillMaxHeight().verticalScroll(rememberScrollState())) {
                                     if (compact) ObservationStatus(state, false, null, true, ::gps, model::startCameraTracking)
                                     ViewControls(state, model, { manual = true }, ::gps)
@@ -175,7 +175,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                             }
                         } else {
                             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                PanoramaPanel(state, model, Modifier.fillMaxWidth().weight(1f)) { selectedPeak = it }
+                                PanoramaPanel(state, model, Modifier.fillMaxWidth().weight(1f), { tab = 2 }) { selectedPeak = it }
                                 ViewControls(state, model, { manual = true }, ::gps)
                             }
                         }
@@ -266,7 +266,7 @@ private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraF
 }
 
 @Composable
-private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifier: Modifier, onPeak: (PeakView) -> Unit) {
+private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifier: Modifier, onRegions: () -> Unit, onPeak: (PeakView) -> Unit) {
                     Card(modifier, shape = RoundedCornerShape(24.dp)) {
                         Box(Modifier.fillMaxSize()) {
                             PanoramaCanvas(state, Modifier.fillMaxSize(), model::pan, onPeak)
@@ -276,7 +276,12 @@ private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifi
                                     Text("Tracing the ridgelines…", style = MaterialTheme.typography.bodySmall)
                                 }
                             }
-                            if (!state.calculating && state.scene == null) Text("Choose a covered viewpoint to see the skyline", Modifier.align(Alignment.Center).padding(24.dp))
+                            if (!state.calculating && state.scene == null) Column(Modifier.align(Alignment.Center).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                if (state.noRegion) {
+                                    Text("Choose a hiking area to see its skyline", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Button(onClick = onRegions) { Text("Choose region") }
+                                } else Text("Choose a covered viewpoint to see the skyline", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
                         }
                     }
 }
@@ -312,7 +317,7 @@ private fun PeakList(state: PanoramaState, modifier: Modifier, onPeak: (PeakView
     Surface(modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surface) {
         LazyColumn(contentPadding = PaddingValues(vertical = 4.dp)) {
             if (peaks.isEmpty()) item {
-                Text(if (state.calculating) "Calculating nearby peaks…" else "No peaks at this viewpoint.", Modifier.padding(20.dp), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(if (state.calculating) "Calculating nearby peaks…" else if (state.noRegion) "Choose a hiking area in Regions to list its peaks." else "No peaks at this viewpoint.", Modifier.padding(20.dp), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             itemsIndexed(peaks, key = { _, it -> it.peak.id }) { index, peak ->
                 val tone = when (peak.visibility) {
@@ -396,7 +401,7 @@ private fun Regions(state: PanoramaState, modifier: Modifier, onDownload: (Catal
                 TextButton(enabled = state.importing == null, onClick = { onDelete(pack) }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Delete") }
             }
         }
-        item {
+        if (state.preferences.demoMode) item {
             Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).clickable { onSelect(null) }.padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Icon(painterResource(R.drawable.ic_explore), null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 Column(Modifier.weight(1f)) {
@@ -454,6 +459,13 @@ private fun SettingsDialog(state: PanoramaState, model: PanoramaViewModel, onDis
         Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) { Text("Feet and miles", Modifier.weight(1f)); Switch(state.preferences.useFeet, { model.updatePreferences(state.preferences.copy(useFeet = it)) }) }
             Row(verticalAlignment = Alignment.CenterVertically) { Text("Uncertain peak labels", Modifier.weight(1f)); Switch(state.preferences.showUncertain, { model.updatePreferences(state.preferences.copy(showUncertain = it)) }) }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Demo mode")
+                    Text("Fictional terrain for trying the app without a download", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(state.preferences.demoMode, { model.updatePreferences(state.preferences.copy(demoMode = it)) })
+            }
             Text("Phone height: ${String.format(Locale.US, "%.1f", phoneHeight)} m")
             Slider(phoneHeight, { phoneHeight = it }, onValueChangeFinished = { model.updatePreferences(state.preferences.copy(phoneHeightM = phoneHeight.toDouble())) }, valueRange = .5f..3f)
             Text("Vertical view: ${state.pitch.toInt()}°")

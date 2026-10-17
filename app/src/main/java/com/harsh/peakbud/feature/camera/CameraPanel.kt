@@ -70,6 +70,7 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
     val notice = when {
         !permission -> "Enable the camera to see peak labels over your surroundings."
         cameraStatus != null -> cameraStatus
+        state.noRegion -> "Choose a hiking area in Regions and download it to identify peaks around you."
         state.isDemo -> "Choose a hiking area in Regions and download it to identify real peaks. The panorama demo is fictional."
         !state.followingGps -> "Use your GPS location to place peaks in the camera view."
         !state.gpsFresh -> state.gpsStatus ?: "Waiting for a fresh GPS position…"
@@ -92,7 +93,7 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
                         Button(onClick = { request.launch(Manifest.permission.CAMERA) }) { Text("Enable camera") }
                         if (denied) TextButton(onClick = { context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}"))) }) { Text("Open app settings") }
                     }
-                    state.isDemo -> Button(onClick = onRegions) { Text("Choose region") }
+                    state.isDemo || state.noRegion -> Button(onClick = onRegions) { Text("Choose region") }
                     !state.followingGps -> Button(onClick = onGps) { Text("Use my location") }
                     !state.followingCompass -> Button(onClick = onTrack) { Text("Track direction") }
                 }
