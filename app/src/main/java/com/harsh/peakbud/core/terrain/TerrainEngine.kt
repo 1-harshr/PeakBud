@@ -41,9 +41,11 @@ class TerrainEngine {
             }
             HorizonSample(bearing, highest.takeIf { it.isFinite() }?.let { Math.toDegrees(atan(it)) }, distance, complete)
         }
-        // Nearest peaks first, so progressive results label the closest (usually most prominent) summits early.
+        // Tallest summits first (unknown heights last), so progressive results show the peaks people look for early.
         val candidates = peaks.map { it to Geography.distance(observer.point, it.point) }
-            .filter { it.second in 1.0..settings.radiusM }.sortedBy { it.second }.map { it.first }
+            .filter { it.second in 1.0..settings.radiusM }
+            .sortedWith(compareByDescending<Pair<Peak, Double>> { it.first.publishedHeightM ?: Double.NEGATIVE_INFINITY }.thenBy { it.second })
+            .map { it.first }
         val views = ArrayList<PeakView>(candidates.size)
         var lastProgress = System.nanoTime()
         for (peak in candidates) {
@@ -59,10 +61,13 @@ class TerrainEngine {
 
     fun visibility(observer: Observer, peak: Peak, terrain: Terrain, checkpoint: () -> Unit = {}): PeakView {
         require(observer.datum == terrain.datum)
-        val distance = Geography.distance(observer.point, peak.point)
-        val bearing = Geography.bearing(observer.point, peak.point)
+        // Gazetteer coordinates are often a few hundred metres off the true top. Use the highest terrain nearby as the
+        // summit, so the peak is not judged hidden by its own crest.
+        val top = snapToSummit(peak.point, terrain)
+        val distance = Geography.distance(observer.point, top?.first ?: peak.point)
+        val bearing = Geography.bearing(observer.point, top?.first ?: peak.point)
         val ray = TerrainRay(observer, bearing)
-        val summit = terrain.sample(peak.point) as? TerrainSample.Valid
+        val summit = top?.second
             ?: return PeakView(peak, distance, bearing, null, null, Visibility.UNKNOWN, reason = PeakReason.NO_SUMMIT_DATA)
         val angle = Geography.elevationAngle(observer.heightM, summit.heightM, distance)
         val step = (terrain.resolutionM / 3).coerceAtLeast(1.0)
@@ -73,10 +78,13 @@ class TerrainEngine {
         var stoppedAtBlocker = false
         val targetError = Math.toDegrees(atan2(terrain.heightErrorM + observer.heightUncertaintyM, max(distance, 1.0)))
         val angularPositionError = Math.toDegrees(atan2(observer.horizontalAccuracyM + terrain.resolutionM / 2, max(distance, 1.0)))
-        var d = step
-        // Last half-cell is the summit's own DEM footprint, not a separate ridge.
-        // Borderline approach geometry remains UNCERTAIN rather than self-occluding.
-        while (d < distance - terrain.resolutionM / 2) {
+        // Skip the ground at the observer's feet (GPS and 30 m cells make it noise) and the summit's own massif: the last
+        // 250 m before the top (the snapping radius) is the peak's flank, not a separate ridge in front of it.
+        // Very close peaks keep the original half-cell rule.
+        val nearSkip = min(60.0, distance / 4)
+        val summitSkip = if (distance > 1_000) 250.0 else terrain.resolutionM / 2
+        var d = max(step, nearSkip)
+        while (d < distance - summitSkip) {
             if ((d / step).toInt() % 128 == 0) checkpoint()
             when (val sample = terrain.sample(ray.pointAt(d))) {
                 is TerrainSample.Valid -> {
@@ -115,7 +123,8 @@ class TerrainEngine {
         val heightDifference = peak.publishedHeightM?.let { abs(it - summit.heightM) }
         // A large discrepancy may mean a clipped summit, bad catalogue coordinates,
         // or a bad published height. Do not silently raise terrain to match a name.
-        val inconsistentHeight = heightDifference != null && heightDifference > max(100.0, terrain.heightErrorM * 3)
+        // 30 m terrain rounds off sharp summits by a few hundred metres; only larger gaps suggest a wrong record.
+        val inconsistentHeight = heightDifference != null && heightDifference > max(max(250.0, terrain.heightErrorM * 3), (peak.publishedHeightM ?: 0.0) * .04)
         // Catalogue disagreement may downgrade visibility, but cannot turn a proven blocker
         // into a drawable UNCERTAIN peak at the same (hidden) DEM coordinates.
         val state = if (inconsistentHeight && geometricState == Visibility.TERRAIN_VISIBLE) Visibility.UNCERTAIN else geometricState
@@ -130,6 +139,27 @@ class TerrainEngine {
         return PeakView(peak, distance, bearing, angle, summit.heightM, state,
             (angle - maximum).takeIf { !stoppedAtBlocker && it.isFinite() }, blocker, reason, heightDifference?.toInt())
     }
+}
+
+/**
+ * Highest valid terrain within [radiusM] of [point], on a grid at the terrain's resolution. Ties keep the point
+ * closest to the original; returns null when there is no terrain there at all.
+ */
+internal fun snapToSummit(point: GeoPoint, terrain: Terrain, radiusM: Double = 250.0): Pair<GeoPoint, TerrainSample.Valid>? {
+    val origin = terrain.sample(point) as? TerrainSample.Valid
+    var best: Pair<GeoPoint, TerrainSample.Valid>? = origin?.let { point to it }
+    val step = terrain.resolutionM.coerceAtLeast(10.0)
+    val n = (radiusM / step).toInt()
+    val dLat = step / 111_320.0
+    val dLon = step / (111_320.0 * cos(Math.toRadians(point.latitude)).coerceAtLeast(.01))
+    for (i in -n..n) for (j in -n..n) {
+        if (i == 0 && j == 0 || (i * i + j * j) * step * step > radiusM * radiusM) continue
+        val candidate = GeoPoint((point.latitude + i * dLat).coerceIn(-90.0, 90.0), Geography.wrap180(point.longitude + j * dLon))
+        val sample = terrain.sample(candidate) as? TerrainSample.Valid ?: continue
+        // Move only for a clearly higher cell (1 m), so flat or synthetic terrain keeps the catalogue position.
+        if (best == null || sample.heightM > best.second.heightM + 1.0) best = candidate to sample
+    }
+    return best
 }
 
 /** Per-ray constants and arc trig are shared by destination and height projection.

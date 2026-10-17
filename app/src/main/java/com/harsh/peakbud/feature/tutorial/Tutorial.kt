@@ -193,28 +193,13 @@ internal fun DemoCamera(scene: MountainScene?, modifier: Modifier, mode: CameraD
                     px += 5f
                 }
             }
-            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = android.graphics.Color.WHITE; textSize = labelType.titlePx
-                typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
-            }
-            val placed = ArrayList<android.graphics.RectF>()
-            for (peak in visible.sortedBy { it.distanceM }) {
-                val px = x(peak.bearingDeg + offset); val py = y(peak.elevationDeg!!)
-                if (px !in 0f..w) continue
-                val name = peak.peak.name
-                val cardW = paint.measureText(name) + TrailSpace.lg.toPx()
-                val cardH = labelType.titlePx + TrailSpace.md.toPx()
-                // Keep the card inside the frame; its pointer still lands on the summit.
-                val left = (px - cardW / 2).coerceIn(TrailSpace.sm.toPx(), max(TrailSpace.sm.toPx(), w - cardW - TrailSpace.sm.toPx()))
-                var top = py - TrailCanvas.anchorGap.toPx() - cardH
-                var rect = android.graphics.RectF(left, top, left + cardW, top + cardH)
-                while (placed.any { android.graphics.RectF.intersects(it, rect) } && top > 0) { top -= cardH + TrailSpace.xs.toPx(); rect = android.graphics.RectF(left, top, left + cardW, top + cardH) }
-                placed += rect
-                drawLine(Color.White, Offset(px, py), Offset(px.coerceIn(rect.left, rect.right), rect.bottom), TrailStroke.thin.toPx())
-                drawCircle(Color.White, TrailCanvas.marker.toPx(), Offset(px, py))
-                if (aligned) drawCircle(TrailCameraColors.alignedRing, TrailCanvas.markerHalo.toPx(), Offset(px, py), style = Stroke(TrailStroke.heavy.toPx()))
-                drawRoundRect(TrailCameraColors.labelSurface, Offset(rect.left, rect.top), Size(rect.width(), rect.height()), CornerRadius(TrailCanvas.labelCorner.toPx()))
-                drawContext.canvas.nativeCanvas.drawText(name, rect.left + TrailSpace.sm.toPx(), rect.bottom - TrailSpace.sm.toPx(), paint)
+            // Same still pins as the real camera.
+            val style = PinStyle(stick = Color.White, dot = Color.White, nameSurface = Color.White, nameText = Color(0xFF1B2B25),
+                heightSurface = TrailCameraColors.pinHeight, heightText = Color.White, ring = if (aligned) TrailCameraColors.alignedRing else null)
+            val candidates = visible.sortedByDescending { it.peak.publishedHeightM ?: 0.0 }
+                .map { Triple(it, x(it.bearingDeg + offset), y(it.elevationDeg!!)) }.filter { it.second in 0f..w }
+            for ((peak, px, py) in PeakPins.place(this, candidates)) {
+                PeakPins.draw(this, px, py, peak.peak.name, peak.peak.publishedHeightM?.let { "${it.toInt()} m" }, style, labelType.detailPx * 1.05f, TrailSpace.xxl.toPx() * 2)
             }
         }
         if (showPill) DemoBadge(Modifier.align(Alignment.TopStart).padding(TrailSpace.md))

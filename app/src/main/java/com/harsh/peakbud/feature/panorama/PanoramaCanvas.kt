@@ -106,44 +106,20 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         if (w <= TrailCanvas.labelPadding.toPx() * 2) return@Canvas
         drawLine(palette.axis, Offset(w / 2, (TrailSpace.xxl).toPx()), Offset(w / 2, (TrailCanvas.compassBand + TrailSpace.sm).toPx()), (TrailSpace.xxs).toPx())
         val occupied = mutableListOf<RectF>()
-        val cardHeight = type.cardHeight
-        val peaks = state.scene?.peaks.orEmpty().filter {
+        val candidates = state.scene?.peaks.orEmpty().filter {
             it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN
-        }.inLabelPriority().mapNotNull { peak -> peak.elevationDeg?.let { peak to project(peak.bearingDeg, it) } }
-            .filter { it.second.x in TrailCanvas.labelMargin.toPx()..(w - TrailCanvas.labelMargin.toPx()) && it.second.y in compassBand..h }
-        val maxCards = 5
-        var secondaryMarkers = 0
-        for ((peak, point) in peaks) {
-            if (occupied.size >= maxCards) {
-                if (secondaryMarkers++ < 20) drawCircle(palette.marker, (TrailCanvas.secondaryMarker).toPx(), Offset(point.x, point.y))
-                continue
-            }
-            paint.textSize = type.titlePx
-            val label = peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else ""
+        }.inLabelPriority().mapNotNull { peak -> peak.elevationDeg?.let { e -> project(peak.bearingDeg, e).let { Triple(peak, it.x, it.y) } } }
+            .filter { it.second in TrailCanvas.labelMargin.toPx()..(w - TrailCanvas.labelMargin.toPx()) && it.third in compassBand..(h - footerClearance) }
+        // Same still pins as the camera: dot on the summit, vertical stick, tilted name/height pill.
+        val style = PinStyle(stick = palette.leader, dot = palette.marker, nameSurface = palette.labelSurface, nameText = palette.labelText,
+            heightSurface = TrailCameraColors.pinHeight, heightText = Color.White)
+        for ((peak, x, y) in PeakPins.place(this, candidates)) {
+            val name = peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else ""
             val heightText = peak.peak.publishedHeightM?.let { height(it, state, strings) }
-                ?: peak.geometryHeightM?.let { strings(R.string.approximate_height, height(it, state, strings)) } ?: strings(R.string.height_unknown)
-            val detail = strings(R.string.peak_label_detail, heightText, distance(peak.distanceM, state, strings))
-            val labelWidth = min(max(paint.measureText(label), paint.measureText(detail)) + TrailCanvas.labelPadding.toPx() * 2, w - TrailCanvas.labelMargin.toPx() * 2)
-            val left = (point.x - labelWidth / 2).coerceIn((TrailCanvas.labelMargin).toPx(), max((TrailCanvas.labelMargin).toPx(), w - labelWidth - (TrailCanvas.labelMargin).toPx()))
-            // Prefer rows above the summit (below the compass band); fall back to rows beneath it.
-            val tops = (0..3).map { point.y - (TrailCanvas.anchorGap.toPx() + it * (cardHeight + TrailSpace.sm.toPx())) - cardHeight }.filter { it >= compassBand + (TrailCanvas.marker).toPx() } +
-                (0..3).map { point.y + (TrailCanvas.anchorGap.toPx() + it * (cardHeight + TrailSpace.sm.toPx())) }.filter { it + cardHeight <= h - footerClearance }
-            val card = tops.filter { it >= compassBand + TrailCanvas.marker.toPx() && it + cardHeight <= h - footerClearance }
-                .map { RectF(left, it, left + labelWidth, it + cardHeight) }
-                .firstOrNull { c -> occupied.none { RectF.intersects(it, c) } } ?: continue
-            occupied += card
-            drawLine(palette.leader, Offset(point.x, point.y), Offset(card.centerX(), if (card.bottom <= point.y) card.bottom else card.top), TrailStroke.thin.toPx())
-            drawCircle(palette.marker, (TrailCanvas.marker).toPx(), Offset(point.x, point.y))
-            drawCircle(palette.labelText, (TrailCanvas.marker).toPx(), Offset(point.x, point.y), style = Stroke(TrailStroke.thin.toPx()))
-            drawRoundRect(palette.labelSurface, Offset(card.left, card.top), androidx.compose.ui.geometry.Size(card.width(), card.height()), androidx.compose.ui.geometry.CornerRadius(TrailCanvas.labelCorner.toPx()))
-            paint.color = palette.labelText.toArgb()
-            val display = android.text.TextUtils.ellipsize(label, android.text.TextPaint(paint), labelWidth - TrailSpace.lg.toPx(), android.text.TextUtils.TruncateAt.END).toString()
-            drawContext.canvas.nativeCanvas.drawText(display, card.left + (TrailCanvas.labelMargin).toPx(), card.top + type.titleBaseline, paint)
-            paint.textSize = type.detailPx
-            paint.color = palette.labelDetail.toArgb()
-            val detailText = android.text.TextUtils.ellipsize(detail, android.text.TextPaint(paint), labelWidth - TrailSpace.lg.toPx(), android.text.TextUtils.TruncateAt.END).toString()
-            drawContext.canvas.nativeCanvas.drawText(detailText, card.left + (TrailCanvas.labelMargin).toPx(), card.top + type.detailBaseline, paint)
-            hits += card to peak
+                ?: peak.geometryHeightM?.let { strings(R.string.approximate_height, height(it, state, strings)) }
+            val hit = PeakPins.draw(this, x, y, name, heightText, style, type.detailPx * 1.05f, compassBand + TrailSpace.xs.toPx())
+            occupied += hit
+            hits += hit to peak
         }
         paint.textSize = type.axisPx
         paint.color = palette.axis.toArgb()

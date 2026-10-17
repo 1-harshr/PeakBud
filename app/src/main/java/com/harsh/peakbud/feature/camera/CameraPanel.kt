@@ -300,49 +300,22 @@ private fun CameraLabels(state: PanoramaState, pose: CameraPose, aligned: Boolea
         .pointerInput(lens) { detectHorizontalDragGestures(onDragEnd = { dragEnd() }) { change, dx -> change.consume(); nudge(-Math.toDegrees(kotlin.math.atan(dx / lens.fx))) } }) {
         hits.clear()
         if (size.width <= TrailSpace.lg.toPx() * 2 || size.height <= 0) return@Canvas
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = type.titlePx; color = android.graphics.Color.WHITE; typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
-            setShadowLayer(TrailCanvas.shadowRadius.toPx(), 0f, TrailStroke.thin.toPx(), 0x99000000.toInt()) }
-        val occupied = mutableListOf<RectF>()
         val peaks = state.scene?.peaks.orEmpty().filter { it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN }
-        for (peak in peaks.inLabelPriority()) {
-            if (peak.peak.id in hiddenPeaks) continue  // the camera shows something nearer covering this summit
-            val point = CameraProjector.project(peak.bearingDeg, peak.elevationDeg ?: continue, pose, lens) ?: continue
-            // Overlays cover the top and bottom; keep labels and their anchors inside the clear area.
-            val clearTop = safeTop.toPx() + TrailCanvas.labelMargin.toPx()
-            val clearBottom = size.height - safeBottom.toPx()
-            if (point.x !in 0f..size.width || point.y !in clearTop..clearBottom) continue
-            val label = peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else ""
-            val heightText = peak.peak.publishedHeightM?.let { height(it, state, strings) }
-                ?: peak.geometryHeightM?.let { strings(R.string.approximate_height, height(it, state, strings)) }
-                ?: strings(R.string.height_unknown)
-            val detail = strings(R.string.peak_label_detail, heightText, distance(peak.distanceM, state, strings))
-            val width = maxOf(paint.measureText(label), paint.measureText(detail)).coerceAtMost(size.width - TrailSpace.xxl.toPx()) + TrailSpace.lg.toPx()
-            val left = (point.x - width / 2).coerceIn(TrailCanvas.labelMargin.toPx(), maxOf(TrailCanvas.labelMargin.toPx(), size.width - width - TrailCanvas.labelMargin.toPx()))
-            val boxHeight = type.cardHeight
-            var rect: RectF? = null
-            for (lane in 0..3) {
-                val top = (point.y - (TrailCanvas.anchorGap.toPx() + boxHeight + lane * (boxHeight + TrailSpace.sm.toPx()))).coerceAtLeast(clearTop)
-                val candidate = RectF(left, top, left + width, top + boxHeight)
-                if (candidate.bottom < clearBottom - TrailCanvas.labelMargin.toPx() && occupied.none { RectF.intersects(it, candidate) }) { rect = candidate; break }
-            }
-            val box = rect ?: continue
-            occupied += box
-            // A shared dark backing keeps labels legible over both snow and dark rock.
-            drawRoundRect(TrailCameraColors.labelSurface, Offset(box.left, box.top),
-                androidx.compose.ui.geometry.Size(box.width(), box.height()), androidx.compose.ui.geometry.CornerRadius(TrailCanvas.labelCorner.toPx()))
-            drawLine(Color.Black.copy(alpha = .35f), Offset(point.x, point.y), Offset(box.centerX(), box.bottom), TrailStroke.heavy.toPx())
-            drawLine(Color.White, Offset(point.x, point.y), Offset(box.centerX(), box.bottom), TrailStroke.thin.toPx())
-            drawCircle(Color.Black.copy(alpha = .35f), TrailCanvas.markerHalo.toPx(), Offset(point.x, point.y))
-            drawCircle(Color.White, TrailCanvas.marker.toPx(), Offset(point.x, point.y))
-            // Camera-aligned anchors get a green ring; sensor estimates stay plain white.
-            if (aligned) drawCircle(TrailCameraColors.alignedRing, TrailCanvas.markerHalo.toPx(), Offset(point.x, point.y), style = androidx.compose.ui.graphics.drawscope.Stroke(TrailStroke.heavy.toPx()))
-            val text = android.text.TextUtils.ellipsize(label, android.text.TextPaint(paint), width - TrailSpace.lg.toPx(), android.text.TextUtils.TruncateAt.END).toString()
-            drawContext.canvas.nativeCanvas.drawText(text, box.left + TrailCanvas.labelMargin.toPx(), box.top + type.titleBaseline, paint)
-            paint.textSize = type.detailPx; paint.alpha = 220
-            val detailText = android.text.TextUtils.ellipsize(detail, android.text.TextPaint(paint), width - TrailSpace.lg.toPx(), android.text.TextUtils.TruncateAt.END).toString()
-            drawContext.canvas.nativeCanvas.drawText(detailText, box.left + TrailCanvas.labelMargin.toPx(), box.top + type.detailBaseline, paint)
-            paint.textSize = type.titlePx; paint.alpha = 255
-            hits += box to peak
+        // Overlays cover the top and bottom; dots stay inside the clear area.
+        val clearTop = safeTop.toPx() + TrailCanvas.labelMargin.toPx()
+        val clearBottom = size.height - safeBottom.toPx()
+        val candidates = peaks.inLabelPriority().mapNotNull { peak ->
+            if (peak.peak.id in hiddenPeaks) return@mapNotNull null  // the camera shows something nearer covering this summit
+            val point = CameraProjector.project(peak.bearingDeg, peak.elevationDeg ?: return@mapNotNull null, pose, lens) ?: return@mapNotNull null
+            if (point.x !in 0f..size.width || point.y !in clearTop..clearBottom) null else Triple(peak, point.x, point.y)
+        }
+        // Still pins: dot on the summit, vertical stick, tilted name/height pill. Camera-aligned pins get a green ring.
+        val style = PinStyle(stick = Color.White, dot = Color.White, nameSurface = Color.White, nameText = Color(0xFF1B2B25),
+            heightSurface = TrailCameraColors.pinHeight, heightText = Color.White, ring = if (aligned) TrailCameraColors.alignedRing else null)
+        for ((peak, x, y) in PeakPins.place(this, candidates)) {
+            val name = peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else ""
+            val heightText = peak.peak.publishedHeightM?.let { height(it, state, strings) } ?: peak.geometryHeightM?.let { strings(R.string.approximate_height, height(it, state, strings)) }
+            hits += PeakPins.draw(this, x, y, name, heightText, style, type.detailPx * 1.05f, clearTop) to peak
         }
     }
 }

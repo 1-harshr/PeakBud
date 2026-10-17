@@ -7,7 +7,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class ProgressiveSceneTest {
-    @Test fun partialScenesGrowNearestFirstAndTheFinalSceneIsUnchanged() {
+    @Test fun partialScenesGrowTallestFirstAndTheFinalSceneIsUnchanged() {
         val observer = Observer(DemoTerrain.VIEWPOINT, (DemoTerrain().sample(DemoTerrain.VIEWPOINT) as TerrainSample.Valid).heightM, datum = VerticalDatum.SYNTHETIC)
         val plain = DemoTerrain().use { TerrainEngine().calculate(observer, it, DemoTerrain.peaks) }
         val partials = ArrayList<MountainScene>()
@@ -20,9 +20,10 @@ class ProgressiveSceneTest {
             val ids = partial.peaks.map { it.peak.id }.toSet()
             assertTrue("partial scenes only grow", ids.containsAll(previous))
             assertTrue("every partial result matches the final one", partial.peaks.all { it in plain.peaks })
-            // Everything already finished is no farther than anything still missing.
+            // Everything already finished is at least as tall as anything still missing.
             val missing = plain.peaks.filter { it.peak.id !in ids }
-            if (missing.isNotEmpty() && partial.peaks.isNotEmpty()) assertTrue(partial.peaks.maxOf { it.distanceM } <= missing.minOf { it.distanceM })
+            if (missing.isNotEmpty() && partial.peaks.isNotEmpty())
+                assertTrue(partial.peaks.minOf { it.peak.publishedHeightM ?: 0.0 } >= missing.maxOf { it.peak.publishedHeightM ?: 0.0 })
             previous = ids
         }
     }

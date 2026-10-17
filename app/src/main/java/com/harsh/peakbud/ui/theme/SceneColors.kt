@@ -22,5 +22,7 @@ object TrailCameraColors {
     val steady = Color(0xFF8DE0AD)
     /** Ring on label anchors placed by camera alignment rather than the compass estimate. */
     val alignedRing = steady
+    /** Height half of camera peak pins. */
+    val pinHeight = Color(0xFF2E8B6A)
     val uncertain = Color(0xFFFFC078)
 }

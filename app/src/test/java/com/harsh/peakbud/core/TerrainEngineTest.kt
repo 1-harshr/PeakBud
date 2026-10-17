@@ -71,12 +71,15 @@ class TerrainEngineTest {
         }
         assertEquals(Visibility.OCCLUDED, TerrainEngine().visibility(observer, target, narrow).visibility)
     }
+    // The ridge starts 300 m before the summit: outside the 250 m treated as the summit's own flank.
     @Test fun nearTangentSummitRemainsUncertain() {
         val tangent = object : Terrain {
             override val datum = VerticalDatum.EGM96
             override val resolutionM = 30.0
             override val heightErrorM = 0.0
-            override fun sample(point: GeoPoint) = TerrainSample.Valid(if (Geography.distance(origin, point) >= 9900) 2000.0 else 1000.0)
+            override fun sample(point: GeoPoint) = TerrainSample.Valid(Geography.distance(origin, point).let { d ->
+                // Ridge 300 m in front of the summit, just under the sight line (2000 m summit at 10 km, 1970 m ridge at 9.7 km).
+                if (d >= 9_995) 2000.0 else if (d >= 9_700) 1970.0 else 1000.0 })
         }
         assertEquals(Visibility.UNCERTAIN, TerrainEngine().visibility(observer, peak, tangent).visibility)
     }
