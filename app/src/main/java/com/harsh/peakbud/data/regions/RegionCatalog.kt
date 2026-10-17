@@ -5,8 +5,6 @@ import java.io.File
 import java.io.InputStream
 import java.security.MessageDigest
 import java.util.zip.GZIPInputStream
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
 import org.json.JSONObject
 
 data class CatalogTile(val path: String, val url: String, val downloadBytes: Long, val downloadSha256: String)
@@ -47,14 +45,17 @@ class CatalogInstaller(private val workRoot: File, private val store: RegionStor
                        private val openAsset: (String) -> InputStream) {
     fun install(region: CatalogRegion, checkpoint: () -> Unit = {}, progress: (InstallProgress) -> Unit = {}): RegionPack {
         workRoot.mkdirs()
-        require(workRoot.usableSpace > region.installedBytes * 4 + region.downloadBytes + 16_000_000) { "Not enough space on your phone. Free up some storage and try again." }
-        val work = workRoot.resolve(region.id)
-        work.deleteRecursively(); check(work.mkdirs())
-        try {
-            val records = JSONObject(region.manifest).getJSONArray("files")
-            val expected = (0 until records.length()).associate { i -> records.getJSONObject(i).let { it.getString("path") to it } }
+        // Cached compressed tiles plus final terrain, rather than four full terrain copies.
+        require(workRoot.usableSpace > region.installedBytes + region.downloadBytes + 32_000_000) { "Not enough space on your phone. Free up some storage and try again." }
+        val pack = store.installPrepared(region.manifest, checkpoint, progress) { staging, parsed ->
+            val expected = parsed.files.associateBy { it.path }
             region.tiles.forEachIndexed { index, tile ->
                 checkpoint()
+                val output = staging.resolve(tile.path)
+                if (store.reuseTerrain(expected.getValue(tile.path), output, checkpoint)) {
+                    progress(InstallProgress(InstallStage.REUSE_TERRAIN, current = index + 1, total = region.tiles.size))
+                    return@forEachIndexed
+                }
                 val compressed = downloader.download(tile.url, checkpoint) { received, total ->
                     progress(InstallProgress(InstallStage.DOWNLOAD, region.name, index + 1, region.tiles.size, received, total ?: tile.downloadBytes))
                 }
@@ -63,7 +64,6 @@ class CatalogInstaller(private val workRoot: File, private val store: RegionStor
                     downloader.discard(tile.url)
                     error("The download didn't match what we expected. Please try again later.")
                 }
-                val output = work.resolve(tile.path)
                 output.parentFile!!.mkdirs()
                 GZIPInputStream(compressed.inputStream()).use { input -> output.outputStream().use { target ->
                     val buffer = ByteArray(65536); var total = 0L
@@ -74,30 +74,23 @@ class CatalogInstaller(private val workRoot: File, private val store: RegionStor
                     }
                     require(total == CatalogRegion.HGT_BYTES) { "Incomplete terrain file" }
                 } }
-                require(hash(output, checkpoint) == expected.getValue(tile.path).getString("sha256")) { "Terrain checksum failed" }
             }
             listOf("peaks.json", "attribution.txt").forEach { name ->
                 checkpoint()
-                openAsset("${region.assetDirectory}/$name").use { input -> work.resolve(name).outputStream().use { input.copyTo(it) } }
+                val record = expected.getValue(name)
+                require(record.size <= 8_388_608)
+                openAsset("${region.assetDirectory}/$name").use { input -> staging.resolve(name).outputStream().use { out ->
+                    val buffer = ByteArray(65536); var total = 0L
+                    while (true) { checkpoint(); val n = input.read(buffer); if (n < 0) break
+                        total += n; require(total <= record.size); out.write(buffer, 0, n)
+                    }
+                    require(total == record.size)
+                } }
             }
             progress(InstallProgress(InstallStage.PREPARE, name = region.name))
-            val archive = work.resolve("region.zip")
-            ZipOutputStream(archive.outputStream().buffered()).use { zip ->
-                zip.setLevel(0) // Already compressed on the wire; avoid expensive mobile recompression.
-                zip.putNextEntry(ZipEntry("manifest.json")); zip.write(region.manifest.toByteArray()); zip.closeEntry()
-                expected.keys.forEach { path ->
-                    checkpoint(); zip.putNextEntry(ZipEntry(path))
-                    work.resolve(path).inputStream().use { input ->
-                        val buffer = ByteArray(65536)
-                        while (true) { checkpoint(); val n = input.read(buffer); if (n < 0) break; zip.write(buffer, 0, n) }
-                    }
-                    zip.closeEntry()
-                }
-            }
-            val pack = archive.inputStream().use { store.install(it, checkpoint, progress) }
-            region.tiles.forEach { downloader.discard(it.url) }
-            return pack
-        } finally { work.deleteRecursively() }
+        }
+        region.tiles.forEach { downloader.discard(it.url) }
+        return pack
     }
     private fun hash(file: File, checkpoint: () -> Unit): String {
         val digest = MessageDigest.getInstance("SHA-256")

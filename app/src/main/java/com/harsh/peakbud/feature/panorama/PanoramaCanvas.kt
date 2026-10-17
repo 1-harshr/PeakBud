@@ -20,6 +20,7 @@ import androidx.compose.ui.semantics.semantics
 import com.harsh.peakbud.core.geo.Geography
 import com.harsh.peakbud.core.model.*
 import com.harsh.peakbud.core.projection.PanoramaProjector
+import com.harsh.peakbud.core.projection.inLabelPriority
 import kotlin.math.*
 
 @Composable
@@ -96,12 +97,13 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         val cardHeight = type.cardHeight
         val peaks = state.scene?.peaks.orEmpty().filter {
             it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN
-        }.mapNotNull { peak -> peak.elevationDeg?.let { peak to project(peak.bearingDeg, it) } }
-            .filter { it.second.x in TrailCanvas.labelMargin.toPx()..(w - TrailCanvas.labelMargin.toPx()) && it.second.y in compassBand..h }.sortedBy { it.first.distanceM }
+        }.inLabelPriority().mapNotNull { peak -> peak.elevationDeg?.let { peak to project(peak.bearingDeg, it) } }
+            .filter { it.second.x in TrailCanvas.labelMargin.toPx()..(w - TrailCanvas.labelMargin.toPx()) && it.second.y in compassBand..h }
         val maxCards = 5
+        var secondaryMarkers = 0
         for ((peak, point) in peaks) {
             if (occupied.size >= maxCards) {
-                drawCircle(palette.marker, (TrailCanvas.secondaryMarker).toPx(), Offset(point.x, point.y))
+                if (secondaryMarkers++ < 20) drawCircle(palette.marker, (TrailCanvas.secondaryMarker).toPx(), Offset(point.x, point.y))
                 continue
             }
             paint.textSize = type.titlePx

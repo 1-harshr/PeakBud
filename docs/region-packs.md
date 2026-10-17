@@ -68,8 +68,8 @@ The tool preserves missing summit heights rather than inventing values, keeps ra
 height tags and source IDs, counts NoData cells, and hashes every payload file.
 All viewing geometry uses sampled terrain heights; published peak heights remain
 separate display metadata. The supported observer area is currently a rectangle,
-away from the poles/date line, and the maximum viewing radius is 50 km. A pack is
-limited to 512 MiB unpacked and 20,000 peaks. DEM samples may include voids; the
+away from the poles/date line, and the maximum viewing radius is 300 km. A pack is
+limited to 4 GiB unpacked and 20,000 peaks. DEM samples may include voids; the
 app must report incomplete directions and unknown visibility for affected paths.
 
 ## Product installation flow

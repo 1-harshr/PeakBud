@@ -5,7 +5,7 @@ import java.io.File
 import java.io.RandomAccessFile
 import kotlin.math.*
 
-/** HGT access with at most four open tiles and 48 MiB of cached height blocks. */
+/** HGT access with at most four open tiles, 48 MiB of height blocks and 4 MiB of read buffers. */
 class HgtTerrain(private val directory: File, private val bounds: GeoBounds) : Terrain {
     override val datum = VerticalDatum.EGM96
     override val resolutionM = 30.0
@@ -56,6 +56,9 @@ class HgtTerrain(private val directory: File, private val bounds: GeoBounds) : T
             else -> error("Invalid HGT length: ${file.name}")
         }
         private val input = RandomAccessFile(file, "r")
+        // Fetch a block's row span in one read. On Android, 128 seek/read pairs per
+        // block dominated long-range panoramas even when the file was already cached.
+        private val readBuffer = ByteArray(128 * side * 2)
         private val blocks = object : LinkedHashMap<Int, ShortArray>(384, 0.75f, true) {
             override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Int, ShortArray>?): Boolean = size > 384
         }
@@ -66,12 +69,15 @@ class HgtTerrain(private val directory: File, private val bounds: GeoBounds) : T
                 val top = blockRow * 128
                 val left = blockColumn * 128
                 val width = min(128, side - left)
-                val bytes = ByteArray(width * 2)
                 val values = ShortArray(128 * 128)
-                for (y in 0 until min(128, side - top)) {
-                    input.seek(((top + y).toLong() * side + left) * 2)
-                    input.readFully(bytes)
-                    for (x in 0 until width) values[y * 128 + x] = (((bytes[x * 2].toInt() and 255) shl 8) or (bytes[x * 2 + 1].toInt() and 255)).toShort()
+                val rows = min(128, side - top)
+                input.seek((top.toLong() * side + left) * 2)
+                input.readFully(readBuffer, 0, ((rows - 1) * side + width) * 2)
+                for (y in 0 until rows) {
+                    for (x in 0 until width) {
+                        val offset = (y * side + x) * 2
+                        values[y * 128 + x] = (((readBuffer[offset].toInt() and 255) shl 8) or (readBuffer[offset + 1].toInt() and 255)).toShort()
+                    }
                 }
                 values
             }

@@ -238,7 +238,7 @@ private fun CameraLabels(state: PanoramaState, lens: CameraLens, modifier: Modif
             setShadowLayer(TrailCanvas.shadowRadius.toPx(), 0f, TrailStroke.thin.toPx(), 0x99000000.toInt()) }
         val occupied = mutableListOf<RectF>()
         val peaks = state.scene?.peaks.orEmpty().filter { it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN }
-        for (peak in peaks.sortedBy { it.distanceM }) {
+        for (peak in peaks.inLabelPriority()) {
             val point = CameraProjector.project(peak.bearingDeg, peak.elevationDeg ?: continue, pose, lens) ?: continue
             // Overlays cover the top and bottom; keep labels and their anchors inside the clear area.
             val clearTop = safeTop.toPx() + TrailCanvas.labelMargin.toPx()

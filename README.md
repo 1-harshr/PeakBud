@@ -6,7 +6,9 @@ and peak data. Kotlin, Jetpack Compose, CameraX, coroutines, Room, and DataStore
 The app opens on **Home**, with a terrain panorama. Open **Camera**, allow foreground location and rear-camera access, then open **Regions**,
 choose a hiking area, and tap **Download**. Peak labels use terrain
 visibility, GPS, true-north heading, pitch, roll, and the camera preview transform.
-The built-in catalogue includes Poon Hill, Gokyo, Auli, and other hiking areas. Peak names
+The built-in catalogue starts with broad **Uttarakhand Himalaya** (250 km search) and
+**Jharkhand · Hills and Plateau** (200 km search) packs, alongside smaller hiking areas.
+Coverage includes surrounding terrain and peaks across state/country borders. Peak names
 and trusted terrain links are bundled; terrain downloads on demand.
 
 - Tap **Full screen** in camera mode for an edge-to-edge preview with location metadata.
@@ -35,4 +37,4 @@ python3 tools/check-room-schema.py
 ```
 
 See [the implementation plan](docs/plan.md), [region preparation instructions](docs/region-packs.md),
-[built-in region catalogue](docs/region-catalog.md), [design system and UX review](docs/design-system.md), and [current implementation and verification status](docs/implementation-status.md).
+[built-in region catalogue](docs/region-catalog.md), [broad regional coverage](docs/regional-coverage.md), [design system and UX review](docs/design-system.md), and [current implementation and verification status](docs/implementation-status.md).

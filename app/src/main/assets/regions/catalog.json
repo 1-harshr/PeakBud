@@ -2,6 +2,1862 @@
   "schemaVersion": 1,
   "regions": [
     {
+      "id": "uttarakhand-himalaya",
+      "country": "India",
+      "description": "Garhwal and Kumaon, with surrounding peaks in Tibet, Nepal and Himachal",
+      "assetDirectory": "regions/uttarakhand-himalaya",
+      "tiles": [
+        {
+          "path": "terrain/N26E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E074.hgt.gz",
+          "downloadBytes": 8077073,
+          "downloadSha256": "87dec8a04aa9f15bb870a2d880cdf96d8b5387a25c66ae2837da90890344a643"
+        },
+        {
+          "path": "terrain/N26E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E075.hgt.gz",
+          "downloadBytes": 6575012,
+          "downloadSha256": "c0aa0f3de09edce4c7cd3c0c9949f3b0b18bc2c453ca4befbee8e9419803872b"
+        },
+        {
+          "path": "terrain/N26E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E076.hgt.gz",
+          "downloadBytes": 7680924,
+          "downloadSha256": "7679b5580968fa224d56d715eec64d590f069557136b6c2bd6ba6c52c468ba3f"
+        },
+        {
+          "path": "terrain/N26E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E077.hgt.gz",
+          "downloadBytes": 8593749,
+          "downloadSha256": "912262e610e52b41d103ee031ff77aa242d5c564dfefa5b097c85e549311f46d"
+        },
+        {
+          "path": "terrain/N26E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E078.hgt.gz",
+          "downloadBytes": 6968178,
+          "downloadSha256": "abacd76c164c6228292364b6346f53edd4fb92907f793e71282488777aedb87a"
+        },
+        {
+          "path": "terrain/N26E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E079.hgt.gz",
+          "downloadBytes": 6061759,
+          "downloadSha256": "6199016eb191ddc43141f738f4119cc173c68eb8a4ab457c0af45b0300fbea72"
+        },
+        {
+          "path": "terrain/N26E080.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E080.hgt.gz",
+          "downloadBytes": 5420463,
+          "downloadSha256": "d76d82f698fff41ed109da80cf945f715dae8deafbda0a19d5cb943ee6a0df59"
+        },
+        {
+          "path": "terrain/N26E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E081.hgt.gz",
+          "downloadBytes": 5761044,
+          "downloadSha256": "79d1ec2de9752cacd64fb53c786df5fb1791471e7024b7a4b17447b711b96cea"
+        },
+        {
+          "path": "terrain/N26E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E082.hgt.gz",
+          "downloadBytes": 5428368,
+          "downloadSha256": "022ba15832a3c4bd901868f7b12abe95f689255605a8bb0b1a6cce875edd4f1a"
+        },
+        {
+          "path": "terrain/N26E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E083.hgt.gz",
+          "downloadBytes": 5213400,
+          "downloadSha256": "f300bf243a8dece23f9683414bb4b1ce737a58384ddb6bb14745600cbf9034fb"
+        },
+        {
+          "path": "terrain/N27E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E074.hgt.gz",
+          "downloadBytes": 6753838,
+          "downloadSha256": "cb7664fadf1de3a452eb405b0dbeaa869cf1a5c987170eec79d3d896a4870fcd"
+        },
+        {
+          "path": "terrain/N27E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E075.hgt.gz",
+          "downloadBytes": 8179570,
+          "downloadSha256": "5daf35598bbddbb1cd404aa8d1a6f9f6fe71cf90b9b91b605879735d7ae50b8d"
+        },
+        {
+          "path": "terrain/N27E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E076.hgt.gz",
+          "downloadBytes": 9380182,
+          "downloadSha256": "846ee6d40fc5d7eba554901bc5b6477545b5a7036c7bf4c82447535af8e22a57"
+        },
+        {
+          "path": "terrain/N27E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E077.hgt.gz",
+          "downloadBytes": 6241514,
+          "downloadSha256": "df1bfb160fa4a888a66580751c4e850ad77778be9b00266c3d6801a3c876f317"
+        },
+        {
+          "path": "terrain/N27E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E078.hgt.gz",
+          "downloadBytes": 6053825,
+          "downloadSha256": "53ae8c171f97568016067dac4a19e9139c83e57952c1f7a477f3421c68feefe1"
+        },
+        {
+          "path": "terrain/N27E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E079.hgt.gz",
+          "downloadBytes": 5061319,
+          "downloadSha256": "3ccd565a7b1def59d0c013e9ef45c76170c0ac56fa3e1ca666d9de92db68d8aa"
+        },
+        {
+          "path": "terrain/N27E080.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E080.hgt.gz",
+          "downloadBytes": 5799686,
+          "downloadSha256": "0170a28b8a07b2d7aa3eb01e759e9fb12f55ba4ae0b5f4140e42dbde055081a7"
+        },
+        {
+          "path": "terrain/N27E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E081.hgt.gz",
+          "downloadBytes": 5119887,
+          "downloadSha256": "2f41cd44cc19fd601a95883a62508bbc859cc66c4894a007044ddb21bc54c1a4"
+        },
+        {
+          "path": "terrain/N27E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E082.hgt.gz",
+          "downloadBytes": 8166838,
+          "downloadSha256": "0dd57513d5e7aa7fc1aa7dd2fb2ca44ea2a44fe5189d92ccbea1d389a928fc04"
+        },
+        {
+          "path": "terrain/N27E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E083.hgt.gz",
+          "downloadBytes": 9516700,
+          "downloadSha256": "f1616016e36e99d3334c2382d70ea2153670026d6da17b8e09e237f16e6bed3d"
+        },
+        {
+          "path": "terrain/N28E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E074.hgt.gz",
+          "downloadBytes": 7134916,
+          "downloadSha256": "e621787730475e9e4c52dc2f00ebd76627c49cf48ad8bc5e3a114d2282960fba"
+        },
+        {
+          "path": "terrain/N28E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E075.hgt.gz",
+          "downloadBytes": 6120516,
+          "downloadSha256": "4367e5f76afe5b0d97e1759036bba77eddee4af83cdcda570c0e19148c4e799b"
+        },
+        {
+          "path": "terrain/N28E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E076.hgt.gz",
+          "downloadBytes": 6730908,
+          "downloadSha256": "f26b180531bbe26c9907fe49e1b815334a21467f6b3d81a44c708c891796cd58"
+        },
+        {
+          "path": "terrain/N28E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E077.hgt.gz",
+          "downloadBytes": 6002775,
+          "downloadSha256": "046b2e5f54b986edfaf8b2d0fe579fd4565be4b5195bdf4a8ffa451ec09474d5"
+        },
+        {
+          "path": "terrain/N28E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E078.hgt.gz",
+          "downloadBytes": 5266516,
+          "downloadSha256": "d664e0611ea2bd6ff4e9ecbdd9ea8a73bf74bea320a63e9981cb3fb760267f55"
+        },
+        {
+          "path": "terrain/N28E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E079.hgt.gz",
+          "downloadBytes": 5382123,
+          "downloadSha256": "b173c3a8f33860de86ffeba34229bd18fbb4ced9e3a1bb7dc3f9e9de61b7ab67"
+        },
+        {
+          "path": "terrain/N28E080.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E080.hgt.gz",
+          "downloadBytes": 7250562,
+          "downloadSha256": "22d86f0cf4c4029dd22483aa7aa2fad8dd1ec1b84afe1e96ee72fa6d03e67254"
+        },
+        {
+          "path": "terrain/N28E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E081.hgt.gz",
+          "downloadBytes": 13614899,
+          "downloadSha256": "5b7d5a31523621e435b41d81dc0b294f30997a0a4b7c76dee19b3542470b8ad3"
+        },
+        {
+          "path": "terrain/N28E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E082.hgt.gz",
+          "downloadBytes": 18268257,
+          "downloadSha256": "99e801a0ac0db6420ed50f175c8a5ef54d08126e7454a006fb68c7072bf4faba"
+        },
+        {
+          "path": "terrain/N28E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N28/N28E083.hgt.gz",
+          "downloadBytes": 18840942,
+          "downloadSha256": "81ffb7c4ba700610523c260376eaf7cbbcba39dcd925c6fc0ae00d75d99c6fbc"
+        },
+        {
+          "path": "terrain/N29E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E074.hgt.gz",
+          "downloadBytes": 5718681,
+          "downloadSha256": "818d6a4612132d1ca358dbc64f08193351fb4229096bac5e0eebac3c75fc11ef"
+        },
+        {
+          "path": "terrain/N29E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E075.hgt.gz",
+          "downloadBytes": 6220862,
+          "downloadSha256": "c068daaae048f7d3323008f4cfb0158094dc2bd384904a359354609cdd26ec20"
+        },
+        {
+          "path": "terrain/N29E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E076.hgt.gz",
+          "downloadBytes": 5455515,
+          "downloadSha256": "aa96c262dfdf88f79aeb3bd493100bb2ccd124889f39975c0f6edd0a39353c7a"
+        },
+        {
+          "path": "terrain/N29E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E077.hgt.gz",
+          "downloadBytes": 5335268,
+          "downloadSha256": "ab6bfca67b2d6dcfb41ae85af36ade94b0a4ef1ee99e89729beeac081fbbccaa"
+        },
+        {
+          "path": "terrain/N29E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E078.hgt.gz",
+          "downloadBytes": 9256796,
+          "downloadSha256": "6031c86e9bcd23827e0488ef180740740b4340f41f28393ac206680431cc2134"
+        },
+        {
+          "path": "terrain/N29E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E079.hgt.gz",
+          "downloadBytes": 14988747,
+          "downloadSha256": "6e16aec11401c587f045f25a6a434aa76dacae73dcdedfa591e5bfe07c4b82e1"
+        },
+        {
+          "path": "terrain/N29E080.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E080.hgt.gz",
+          "downloadBytes": 18222501,
+          "downloadSha256": "914196ef7503d8715d2e1d03a076d27230c561d1969c3695e7283174fc599260"
+        },
+        {
+          "path": "terrain/N29E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E081.hgt.gz",
+          "downloadBytes": 19321527,
+          "downloadSha256": "b4ff2de7cf7f80647a2b1a74ed27fc9145b7d40b57ef5f6fc53f11f05c89c4f3"
+        },
+        {
+          "path": "terrain/N29E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E082.hgt.gz",
+          "downloadBytes": 18935308,
+          "downloadSha256": "10c9b13e39bad190f8244b2350ed5327390236b58b6ffe5b6b3061874b71a0cb"
+        },
+        {
+          "path": "terrain/N29E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N29/N29E083.hgt.gz",
+          "downloadBytes": 15341808,
+          "downloadSha256": "321401d4c67ea0e383da7e8ed807c0b383425ed4d95f9310510e34b28b78563e"
+        },
+        {
+          "path": "terrain/N30E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E074.hgt.gz",
+          "downloadBytes": 5702097,
+          "downloadSha256": "dcd8e697180fa7a47c7828f12f70c4773bd485da15e4cd9801886f1984aa1502"
+        },
+        {
+          "path": "terrain/N30E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E075.hgt.gz",
+          "downloadBytes": 6255462,
+          "downloadSha256": "93e632ad4da0ce02fd0e9b719b36a2af56c5bffb6a6a4761343149c4ccd9d983"
+        },
+        {
+          "path": "terrain/N30E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E076.hgt.gz",
+          "downloadBytes": 6967980,
+          "downloadSha256": "25f6f0cf535b3ec9556553945761d2c57c30f47fc604afd96544f824eb2f5e88"
+        },
+        {
+          "path": "terrain/N30E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E077.hgt.gz",
+          "downloadBytes": 12913075,
+          "downloadSha256": "0d9be7d97b9589b5582ee56e40c288b3c201cd8061e390e9f0beaac7410793d9"
+        },
+        {
+          "path": "terrain/N30E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E078.hgt.gz",
+          "downloadBytes": 18131689,
+          "downloadSha256": "4051e87302421410513f85b8ee6a431341426f95a191a1859cfab9bb19c0b828"
+        },
+        {
+          "path": "terrain/N30E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E079.hgt.gz",
+          "downloadBytes": 19206975,
+          "downloadSha256": "a54c8361799d729820f939ef91e4ce35bd181924d53cb2fd3747bef7e532d5d4"
+        },
+        {
+          "path": "terrain/N30E080.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E080.hgt.gz",
+          "downloadBytes": 17010979,
+          "downloadSha256": "c56312bbf51a31e3e31f2ad7b26f19d62b632cc62594f2f8d38797c29f97aa7e"
+        },
+        {
+          "path": "terrain/N30E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E081.hgt.gz",
+          "downloadBytes": 14645275,
+          "downloadSha256": "88008d42ca5370d4a3bcdaa7021fbaa8843c0f9991e6f2a8c1d60c854d1e1521"
+        },
+        {
+          "path": "terrain/N30E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E082.hgt.gz",
+          "downloadBytes": 13989241,
+          "downloadSha256": "9e81f0f6828bfcdb4765250c72b3b5ef3c6bdf023262f42a8193284740f29f03"
+        },
+        {
+          "path": "terrain/N30E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N30/N30E083.hgt.gz",
+          "downloadBytes": 13493846,
+          "downloadSha256": "7db6a31746850980dd007b28b880ae5ec8795d2c63159cd7c4b0a06d083f48ab"
+        },
+        {
+          "path": "terrain/N31E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E074.hgt.gz",
+          "downloadBytes": 6327540,
+          "downloadSha256": "851c834420ab4b61cf185bfe95e3a82f9028ce0e0c8e4ea8ab49592312b8ade6"
+        },
+        {
+          "path": "terrain/N31E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E075.hgt.gz",
+          "downloadBytes": 6575758,
+          "downloadSha256": "43e239bfc983779a2c31de76a5c635c366eeedacfe0b70a60495568d05d42ec7"
+        },
+        {
+          "path": "terrain/N31E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E076.hgt.gz",
+          "downloadBytes": 13420698,
+          "downloadSha256": "2b1ed9985d4813d24869f618a2c7190bf22ac3dcc28b7f18d8aa465bc9caa773"
+        },
+        {
+          "path": "terrain/N31E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E077.hgt.gz",
+          "downloadBytes": 19057173,
+          "downloadSha256": "9b3dfe53077505ccc586ace88f3c4210764ae9feadaded2a1c2932438d8074cd"
+        },
+        {
+          "path": "terrain/N31E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E078.hgt.gz",
+          "downloadBytes": 19243769,
+          "downloadSha256": "69b82462392cfa17255a2d13004ff96ea6339ad3df6f0117b6a6720df67618b2"
+        },
+        {
+          "path": "terrain/N31E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E079.hgt.gz",
+          "downloadBytes": 16445423,
+          "downloadSha256": "1fe5aeabc05d1e335c23ba94db66aaf0c9e81f776289889de1a7bd6cec9ade55"
+        },
+        {
+          "path": "terrain/N31E080.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E080.hgt.gz",
+          "downloadBytes": 14718517,
+          "downloadSha256": "2b4a6d99e6736f97085883a6372d2789b9d63fe347d2b7aac1c82f63f9a86c25"
+        },
+        {
+          "path": "terrain/N31E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E081.hgt.gz",
+          "downloadBytes": 14212224,
+          "downloadSha256": "017c431e080e62986482af3d4627787fc4091000606bc0213e9409ab27acb031"
+        },
+        {
+          "path": "terrain/N31E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E082.hgt.gz",
+          "downloadBytes": 12634861,
+          "downloadSha256": "e80c74539d915ea93d13ed75bb695915f9860931f250243037e9a4b30aa611e6"
+        },
+        {
+          "path": "terrain/N31E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N31/N31E083.hgt.gz",
+          "downloadBytes": 13389111,
+          "downloadSha256": "e2af11e38b87c29782e9343cc47040c2267fcbf01d42d6bd0b936d59288257c4"
+        },
+        {
+          "path": "terrain/N32E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E074.hgt.gz",
+          "downloadBytes": 6793493,
+          "downloadSha256": "00c63ce52206b164fc64ca40d7acd302d861dfa28108dc0bee0b84b3f957d1af"
+        },
+        {
+          "path": "terrain/N32E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E075.hgt.gz",
+          "downloadBytes": 12851208,
+          "downloadSha256": "8b552f3981a7f276c7fcd2b94a887a1f960256fd174dcbe5239d353112a999ef"
+        },
+        {
+          "path": "terrain/N32E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E076.hgt.gz",
+          "downloadBytes": 19198872,
+          "downloadSha256": "33c85639ba48152ee2eb45d9b8faddeedbe4968229aeb73227d230496fe811c3"
+        },
+        {
+          "path": "terrain/N32E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E077.hgt.gz",
+          "downloadBytes": 18415941,
+          "downloadSha256": "ead497f10d93cbdd555e5b26f0732f4955ad8b9970ca85a6486a0991fc99b184"
+        },
+        {
+          "path": "terrain/N32E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E078.hgt.gz",
+          "downloadBytes": 17040269,
+          "downloadSha256": "fc6e8237cd5f8fb35cd777066137c8ba07a7e9237153ca0495f01e0d48f86838"
+        },
+        {
+          "path": "terrain/N32E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E079.hgt.gz",
+          "downloadBytes": 15531507,
+          "downloadSha256": "9f2c3dd2f862e4bdcc0b997c375c6238af927ec1e9492e49cd9ce146ec023cd5"
+        },
+        {
+          "path": "terrain/N32E080.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E080.hgt.gz",
+          "downloadBytes": 15035045,
+          "downloadSha256": "f7afce43e3af6508d3b948db8b4b5a7750ac7a1b6d0a76069b9ad819a43a11b8"
+        },
+        {
+          "path": "terrain/N32E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E081.hgt.gz",
+          "downloadBytes": 13639299,
+          "downloadSha256": "3ad515efd5962579aba307a32c09a885ff2e54421d51b911f02f63030b942714"
+        },
+        {
+          "path": "terrain/N32E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E082.hgt.gz",
+          "downloadBytes": 12138666,
+          "downloadSha256": "f5c509cf77eceeb903cb328f9dac9d8b7fbf1c5c5f103432939954a0175c9104"
+        },
+        {
+          "path": "terrain/N32E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N32/N32E083.hgt.gz",
+          "downloadBytes": 12013338,
+          "downloadSha256": "b8ec08e7ce7ecbc0e2de69c90cc2e02402b96a926bb1c09fdd7cdc3def009946"
+        },
+        {
+          "path": "terrain/N33E074.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E074.hgt.gz",
+          "downloadBytes": 16780444,
+          "downloadSha256": "6c5ea5013844e3d243d0598836fb6c1e2e441c96d4c4c365186b485c576bbfb4"
+        },
+        {
+          "path": "terrain/N33E075.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E075.hgt.gz",
+          "downloadBytes": 18175393,
+          "downloadSha256": "5cc307d645df1e27704715074afd98f438d6e403039bcbd135c40ca6cedd9acd"
+        },
+        {
+          "path": "terrain/N33E076.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E076.hgt.gz",
+          "downloadBytes": 18692665,
+          "downloadSha256": "e9b5b0b4408701bac6e5dc983539dd4bafd8c41d52c968e4392d20ed0f162a02"
+        },
+        {
+          "path": "terrain/N33E077.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E077.hgt.gz",
+          "downloadBytes": 17833704,
+          "downloadSha256": "89bd0a37682a079c92406999feb3c0bb3abcbe53908aeedb31d0e43206afce45"
+        },
+        {
+          "path": "terrain/N33E078.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E078.hgt.gz",
+          "downloadBytes": 16537959,
+          "downloadSha256": "3e7662786079ffb81d6f4477ded64a5fea178049ce12f2f28f58cd4d0f890d0d"
+        },
+        {
+          "path": "terrain/N33E079.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E079.hgt.gz",
+          "downloadBytes": 15812913,
+          "downloadSha256": "7ce5ee3108d538b572928a46e990f980c033e4d9b8247f1a9a8145fcd856a7f0"
+        },
+        {
+          "path": "terrain/N33E080.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E080.hgt.gz",
+          "downloadBytes": 13938248,
+          "downloadSha256": "5a22b17bd0541c5ccfe9aa45c97deb60f5f8ba5f1fd992bc8e51a33b561f3ea2"
+        },
+        {
+          "path": "terrain/N33E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E081.hgt.gz",
+          "downloadBytes": 13026137,
+          "downloadSha256": "28e93c3d7def3777e6b33dd9d3506ff58dea4bdf39e281cbce9ef8d2d91d72b9"
+        },
+        {
+          "path": "terrain/N33E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E082.hgt.gz",
+          "downloadBytes": 11988078,
+          "downloadSha256": "82d9605bae1a5f506e1241ad8a4fd0cad8bd16ff2f3af011d1ed417a37c97605"
+        },
+        {
+          "path": "terrain/N33E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N33/N33E083.hgt.gz",
+          "downloadBytes": 11321839,
+          "downloadSha256": "08e1132ca761c1829dd1f86a7b4cf93a53519c4702c0f1be0998f8cf787e88bd"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "uttarakhand-himalaya",
+        "name": "Uttarakhand Himalaya",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 28.7,
+          "west": 77.5,
+          "north": 31.5,
+          "east": 81.1
+        },
+        "terrainBounds": {
+          "south": 26,
+          "west": 74,
+          "north": 34,
+          "east": 84
+        },
+        "radiusM": 250000,
+        "viewpoint": {
+          "latitude": 30.53,
+          "longitude": 79.57,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N26E074.hgt",
+            "size": 25934402,
+            "sha256": "e67f332521a6649b7e488bd1816d0d964431bde79d51067684ea1405c71d8061"
+          },
+          {
+            "path": "terrain/N26E075.hgt",
+            "size": 25934402,
+            "sha256": "efbac1a1cea4c2d6ac6b314a412da08876c9a1f84848df968f3795ad4a7e5625"
+          },
+          {
+            "path": "terrain/N26E076.hgt",
+            "size": 25934402,
+            "sha256": "4195027c785c0bd6d08f8c7a606105b600751a4eab4767f8c38324cc59f3d1d6"
+          },
+          {
+            "path": "terrain/N26E077.hgt",
+            "size": 25934402,
+            "sha256": "296ca6b0de660ab84a1aaf9a1afbb6cd33a1c2b2197ae73a7146154e8bb0a559"
+          },
+          {
+            "path": "terrain/N26E078.hgt",
+            "size": 25934402,
+            "sha256": "d4ccc497504676dc4a499c91f4a9f7c9ee7a911c5981e875031b044f536f9769"
+          },
+          {
+            "path": "terrain/N26E079.hgt",
+            "size": 25934402,
+            "sha256": "db63c6a0d95caa5a5169a4adeab0d64b74c40c298257df16250d91af798ffc53"
+          },
+          {
+            "path": "terrain/N26E080.hgt",
+            "size": 25934402,
+            "sha256": "3f25a26ddce2c0c383b100323722a77409885ee09e496a204548b44ca8cd295f"
+          },
+          {
+            "path": "terrain/N26E081.hgt",
+            "size": 25934402,
+            "sha256": "e2cd39eb5d05a1ad9a2697f676ccb10fbda46388656fb27f332c92eddaab9b2e"
+          },
+          {
+            "path": "terrain/N26E082.hgt",
+            "size": 25934402,
+            "sha256": "905f504c3c9ca4021d54361d6152e9dc71687d30ca29b0bb523297044dbf4bdb"
+          },
+          {
+            "path": "terrain/N26E083.hgt",
+            "size": 25934402,
+            "sha256": "bc07a7b2f59b99b269567738465a87d6797e5904f7645b60e3f8895f371fa948"
+          },
+          {
+            "path": "terrain/N27E074.hgt",
+            "size": 25934402,
+            "sha256": "3d93824d4c780b805b9542b67d2bf3255984ab152af094f8bcd356c291ef68c6"
+          },
+          {
+            "path": "terrain/N27E075.hgt",
+            "size": 25934402,
+            "sha256": "90bd72ad4c843ec122c19a59ccadf364141750fb1348913b6dc52c08e5f32fce"
+          },
+          {
+            "path": "terrain/N27E076.hgt",
+            "size": 25934402,
+            "sha256": "0d93c1b2be190739f910974ce4f4afbe0dd36664587b04f5c35314498eb843b9"
+          },
+          {
+            "path": "terrain/N27E077.hgt",
+            "size": 25934402,
+            "sha256": "4b0ef439dddbbe1dadf59b71201cfb8a69814078920869d26fb413ecb006310e"
+          },
+          {
+            "path": "terrain/N27E078.hgt",
+            "size": 25934402,
+            "sha256": "42ce05d2d226c753698d6b0bf74dfacb55afc9464e5f7260bf3c87d1b9006b1d"
+          },
+          {
+            "path": "terrain/N27E079.hgt",
+            "size": 25934402,
+            "sha256": "deec4f39bd4c52ac7b222823a9a9b0ca0df76278d4c4f29ed0bc7b8192a62235"
+          },
+          {
+            "path": "terrain/N27E080.hgt",
+            "size": 25934402,
+            "sha256": "a5ab39b90dd9e5afd5dc051e41938eed5238217ff9b64248edf5b1498bf30555"
+          },
+          {
+            "path": "terrain/N27E081.hgt",
+            "size": 25934402,
+            "sha256": "f125cfc2544bd17d0ae161b7fcf6b73efd8c8c1929341de00c576e728ac1cd14"
+          },
+          {
+            "path": "terrain/N27E082.hgt",
+            "size": 25934402,
+            "sha256": "fb6bf7f74d64e6f452e54f8dded0b8c2b0b047ae7686d60be34ee3e823a1a829"
+          },
+          {
+            "path": "terrain/N27E083.hgt",
+            "size": 25934402,
+            "sha256": "fb0804a546ebe203b49a2d05ba23f94ba6bf8334701f2a305f12e66418ce99a3"
+          },
+          {
+            "path": "terrain/N28E074.hgt",
+            "size": 25934402,
+            "sha256": "3f90d92a87070ca47390869be1c3921be67a61ef571aa57c8dc99cc1aef432a7"
+          },
+          {
+            "path": "terrain/N28E075.hgt",
+            "size": 25934402,
+            "sha256": "051e6af25101de7b0448c364843bdf0bd02b38e2070090ee8922b35691257d8b"
+          },
+          {
+            "path": "terrain/N28E076.hgt",
+            "size": 25934402,
+            "sha256": "c1c2e3fba13c78128d497c65aa4d4ef2a5110de21aa5255ccd6fd494cfbb374c"
+          },
+          {
+            "path": "terrain/N28E077.hgt",
+            "size": 25934402,
+            "sha256": "c50b9ef0d97d36360d087cbb6c0042a7114e3770a8422657fd1bb5ac9b5be8c8"
+          },
+          {
+            "path": "terrain/N28E078.hgt",
+            "size": 25934402,
+            "sha256": "a2fc0581203125aea1c122c9edae7de4439315ac994c0265ac956a4ad7d5bb74"
+          },
+          {
+            "path": "terrain/N28E079.hgt",
+            "size": 25934402,
+            "sha256": "d7292d01033974cf99fb47ba49cb75ec0d5e54333bd8e21709ce3353e23fec66"
+          },
+          {
+            "path": "terrain/N28E080.hgt",
+            "size": 25934402,
+            "sha256": "ab6099b9ae3844e9a315ef9ababd12bc2a2f08cdb1402615a723debe91f0c6bc"
+          },
+          {
+            "path": "terrain/N28E081.hgt",
+            "size": 25934402,
+            "sha256": "c9413718bc46ac9453c489bb443dcc801c57963c2ca7f9b9cca2ce90ac715978"
+          },
+          {
+            "path": "terrain/N28E082.hgt",
+            "size": 25934402,
+            "sha256": "6c52d36da8af77768110e192e49b61d09aae7eec3bf1447cd67ed8cb3ec0e7cd"
+          },
+          {
+            "path": "terrain/N28E083.hgt",
+            "size": 25934402,
+            "sha256": "e844c5cc8cd1d2251b958c1ad7a75329f4e4732aa79f9f84f7e1c0c8ee2e279c"
+          },
+          {
+            "path": "terrain/N29E074.hgt",
+            "size": 25934402,
+            "sha256": "6acf6112bff2a8fcd5aa40ae7df9996cac156f20eb9131d99bc31217a403e25f"
+          },
+          {
+            "path": "terrain/N29E075.hgt",
+            "size": 25934402,
+            "sha256": "665309c1e110b3c1521686faa309aeb52df42e770f17fc2cefc933dbb03a1246"
+          },
+          {
+            "path": "terrain/N29E076.hgt",
+            "size": 25934402,
+            "sha256": "f68e27789cd430fbd9c0a3dff2df7e0281fcf385d5489f97a354b0e939d8350e"
+          },
+          {
+            "path": "terrain/N29E077.hgt",
+            "size": 25934402,
+            "sha256": "34cb0b6a2ab23504f8f52834f6486d62afda0d9199b3e542bb94c77173726680"
+          },
+          {
+            "path": "terrain/N29E078.hgt",
+            "size": 25934402,
+            "sha256": "b6345b640a962e50b565d934d87c5a7bff36e0e2e2105a842af13e0d546d0fac"
+          },
+          {
+            "path": "terrain/N29E079.hgt",
+            "size": 25934402,
+            "sha256": "aeb25fdece746729a43e40fc970717ccea6b5b326da0fa766f1734d518043298"
+          },
+          {
+            "path": "terrain/N29E080.hgt",
+            "size": 25934402,
+            "sha256": "4a2a8cea58f895b51bddbfa1b99a671ad0633c6f6f73461fdc9b7fd1dfa9bd52"
+          },
+          {
+            "path": "terrain/N29E081.hgt",
+            "size": 25934402,
+            "sha256": "f252b21fcca14d01d1366bc8a3fcb7a78ac383df4cd08bbfd763680addb66f1a"
+          },
+          {
+            "path": "terrain/N29E082.hgt",
+            "size": 25934402,
+            "sha256": "eb51977cf9b2d70fe39ded30c0d6c0061de60587edb44abb7b5ce96c2f4ffc7b"
+          },
+          {
+            "path": "terrain/N29E083.hgt",
+            "size": 25934402,
+            "sha256": "e3efad24ae411fb55554f49883b65198b8f28a91f7ac7662ee993ecdbefcf78e"
+          },
+          {
+            "path": "terrain/N30E074.hgt",
+            "size": 25934402,
+            "sha256": "321d956a4cae747deffef21b2f70f90e202a4428edf6896a25faf77ee7dedc9b"
+          },
+          {
+            "path": "terrain/N30E075.hgt",
+            "size": 25934402,
+            "sha256": "542d062151b3192d86c2e48eb633bed93af8febf468f7a2e4c348e5b593683b1"
+          },
+          {
+            "path": "terrain/N30E076.hgt",
+            "size": 25934402,
+            "sha256": "8cf2820d24e457c5fd7a1de97065ff38b930715cd8df606962c7370481a18777"
+          },
+          {
+            "path": "terrain/N30E077.hgt",
+            "size": 25934402,
+            "sha256": "30393fabcf9d0dd7b73799ebc0f7584661c5e664606fe22e29aad242a9c58574"
+          },
+          {
+            "path": "terrain/N30E078.hgt",
+            "size": 25934402,
+            "sha256": "4a942e7759f5da31f73dce270d341c31406cb1e576ae792a51f12acaef058656"
+          },
+          {
+            "path": "terrain/N30E079.hgt",
+            "size": 25934402,
+            "sha256": "f1652f5e39e98b153ed2837ac79ee58428a09da777332dcbf246b7c4dc7b60e3"
+          },
+          {
+            "path": "terrain/N30E080.hgt",
+            "size": 25934402,
+            "sha256": "aa9c73c017b532f76e61cc612f9e261a5ae6058ca6757f24748d248af5f638d4"
+          },
+          {
+            "path": "terrain/N30E081.hgt",
+            "size": 25934402,
+            "sha256": "16364754d23c8554f6199c206fd100e4692c0fd8625ee4f5791a8615f304ec07"
+          },
+          {
+            "path": "terrain/N30E082.hgt",
+            "size": 25934402,
+            "sha256": "9ef300f0a9ec3d83f997de9f2d03a8c49b9c1b8782bb83398023fd09b562cfa4"
+          },
+          {
+            "path": "terrain/N30E083.hgt",
+            "size": 25934402,
+            "sha256": "50fa924d31c67c1c400d79ec742d804928180c1e46212292e00fbaefa553ba4c"
+          },
+          {
+            "path": "terrain/N31E074.hgt",
+            "size": 25934402,
+            "sha256": "685e2209714cdadf5612f136458da7565f772601fe796a7305c3bb0ed3a5c119"
+          },
+          {
+            "path": "terrain/N31E075.hgt",
+            "size": 25934402,
+            "sha256": "9f705433eefa4b6b4a4b3a8ac608a6d98c5ea5a63623decdb78e809de328a474"
+          },
+          {
+            "path": "terrain/N31E076.hgt",
+            "size": 25934402,
+            "sha256": "0d6a9b56a88a572bf89ccaf467bebbc2ef87c2ae24a5ee0661013b3cd883b18a"
+          },
+          {
+            "path": "terrain/N31E077.hgt",
+            "size": 25934402,
+            "sha256": "b4aa13901bb91504cd4f054d89465003d2510d3e2df66f4189b5dc2f49eb58e6"
+          },
+          {
+            "path": "terrain/N31E078.hgt",
+            "size": 25934402,
+            "sha256": "f05a36c2c082fb9ca0bb8d0c1b845fb96b95c08cde6c81a83180fc7c24612300"
+          },
+          {
+            "path": "terrain/N31E079.hgt",
+            "size": 25934402,
+            "sha256": "efd3a846ef8eac1b4596a5c7afe175ccc3c630e33fd99eeff199d942c4a9ae71"
+          },
+          {
+            "path": "terrain/N31E080.hgt",
+            "size": 25934402,
+            "sha256": "bbd4ac68dea0707d658f0f472963674bbec57c36e5afa1fe4dd3902693afbc3a"
+          },
+          {
+            "path": "terrain/N31E081.hgt",
+            "size": 25934402,
+            "sha256": "8a7aaef6e5d9612eea24fe1d40d217b89c9ff448f3f06f815636b56a66ff2634"
+          },
+          {
+            "path": "terrain/N31E082.hgt",
+            "size": 25934402,
+            "sha256": "b41b8afe1027727720024085b30c5a2bd9d7888298666a6d3b83135fd08a4cbe"
+          },
+          {
+            "path": "terrain/N31E083.hgt",
+            "size": 25934402,
+            "sha256": "a9f84e64aa380ff9d5f96f2329284c3a2a19958fbbaf9ccbc59f3df6bb28e460"
+          },
+          {
+            "path": "terrain/N32E074.hgt",
+            "size": 25934402,
+            "sha256": "f87dbea0f504fea46f3ad7eaa48351cc4d71d50bcd24513c0cbd271fe6670f91"
+          },
+          {
+            "path": "terrain/N32E075.hgt",
+            "size": 25934402,
+            "sha256": "1129d445a2e7847b6076bab55fa40b85dee6be8838db7b600c03554e35de9fc9"
+          },
+          {
+            "path": "terrain/N32E076.hgt",
+            "size": 25934402,
+            "sha256": "01b48d40369f394cb960ede11fff9bf895d810fc0922b625555d0bd82d156e30"
+          },
+          {
+            "path": "terrain/N32E077.hgt",
+            "size": 25934402,
+            "sha256": "e786e192841431a215dfbf242e06e0b544edccb3f7a89040ae56c2bcf7c5ccc7"
+          },
+          {
+            "path": "terrain/N32E078.hgt",
+            "size": 25934402,
+            "sha256": "ddc423fd9b1ef0158ce34d9ed3c52c33321a97466f5a1fc66a2a092702be2611"
+          },
+          {
+            "path": "terrain/N32E079.hgt",
+            "size": 25934402,
+            "sha256": "9b3c62d9545d631c47637039590acb5b95fcd67db0be8e256ca73836646df046"
+          },
+          {
+            "path": "terrain/N32E080.hgt",
+            "size": 25934402,
+            "sha256": "caab8ef93e427def80689a0670fce00226121dffe25746e5435a14f775c97acc"
+          },
+          {
+            "path": "terrain/N32E081.hgt",
+            "size": 25934402,
+            "sha256": "7339c653b54eab076c7c065500a11f44afe85c2163f0c00eee8ce92860648657"
+          },
+          {
+            "path": "terrain/N32E082.hgt",
+            "size": 25934402,
+            "sha256": "acd9d6a28e1b7b6fe1298b33933540d49bdf7ff81bf8443f03d1fc8d3edba698"
+          },
+          {
+            "path": "terrain/N32E083.hgt",
+            "size": 25934402,
+            "sha256": "7afec9a892c0430a7a056e444008db75668b940668976c3086393a4cb9895822"
+          },
+          {
+            "path": "terrain/N33E074.hgt",
+            "size": 25934402,
+            "sha256": "1c25b398ee334bda22b657ee44158f128a4bce232534f2286349608146bc80d8"
+          },
+          {
+            "path": "terrain/N33E075.hgt",
+            "size": 25934402,
+            "sha256": "632061a51e5f13b3ac37b2fa464a6c421dc867e3eb1bd06b705b63bc32198da2"
+          },
+          {
+            "path": "terrain/N33E076.hgt",
+            "size": 25934402,
+            "sha256": "5d40f59adb1f8f4d11c7b6f2516d5dee77350934c03ec5ea36f04f65edaa35e8"
+          },
+          {
+            "path": "terrain/N33E077.hgt",
+            "size": 25934402,
+            "sha256": "c402072cb9b477f36c67b599346e37c283edac3e7792a29227337a41c78a4439"
+          },
+          {
+            "path": "terrain/N33E078.hgt",
+            "size": 25934402,
+            "sha256": "b1e6c0a423eadf62d3fcdeeeeb024a9f146fda3c243688a0dea20838fd81f7a7"
+          },
+          {
+            "path": "terrain/N33E079.hgt",
+            "size": 25934402,
+            "sha256": "93df89a7153bb6a07d9634f67ab433f1eddb9ca61127158523c73bdf0b959093"
+          },
+          {
+            "path": "terrain/N33E080.hgt",
+            "size": 25934402,
+            "sha256": "c4b3287b626e5998ddeaf5d478792b461bf0ac544b07bfcbbd579f060abbbf70"
+          },
+          {
+            "path": "terrain/N33E081.hgt",
+            "size": 25934402,
+            "sha256": "36e722462f870973f6b02fe148dce2363239603b235244249ca13c8c17aae43b"
+          },
+          {
+            "path": "terrain/N33E082.hgt",
+            "size": 25934402,
+            "sha256": "d1a9d419ca875d4a4d76502feed1dd25aa3efed1b32bd015dc3f2ad775ce0d28"
+          },
+          {
+            "path": "terrain/N33E083.hgt",
+            "size": 25934402,
+            "sha256": "2e4f0308b98ad20c15fec532c988748151bdf1c8a8e83a41da6b664a6c9e6709"
+          },
+          {
+            "path": "peaks.json",
+            "size": 499703,
+            "sha256": "37345bf3cf11c0886cafac5dd30b3b41c9cd22aa5cd2d5ae8d6c1196494ba79d"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 7295,
+            "sha256": "30dd6793baa5c476c9c9a683d6194bdf4c251bf3a47353867f7871f111295e15"
+          }
+        ]
+      }
+    },
+    {
+      "id": "jharkhand",
+      "country": "India",
+      "description": "Ranchi, Parasnath, Netarhat, Dalma and Rajmahal, with surrounding hills",
+      "assetDirectory": "regions/jharkhand",
+      "tiles": [
+        {
+          "path": "terrain/N20E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N20/N20E081.hgt.gz",
+          "downloadBytes": 8208168,
+          "downloadSha256": "fc04a08be5fae246904142383766b74ee635d840171e77eb92febb21d2dba84b"
+        },
+        {
+          "path": "terrain/N20E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N20/N20E082.hgt.gz",
+          "downloadBytes": 10848323,
+          "downloadSha256": "63e91605b2ad4bc7cab7ada2ab8a3d2b30db6636cde1676b8713b04e893e9d63"
+        },
+        {
+          "path": "terrain/N20E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N20/N20E083.hgt.gz",
+          "downloadBytes": 10069218,
+          "downloadSha256": "3bf33bbfb3a7fd4e38493e9dd7394cc40e4631e9f9cc7743a5b306198340970f"
+        },
+        {
+          "path": "terrain/N20E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N20/N20E084.hgt.gz",
+          "downloadBytes": 12198187,
+          "downloadSha256": "852211e95c020e9e6921f3ce2c75c94e94d8110159204ab1092961c17455dbb0"
+        },
+        {
+          "path": "terrain/N20E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N20/N20E085.hgt.gz",
+          "downloadBytes": 8562711,
+          "downloadSha256": "f35babbac2f80b270c29dedf512a42acb82457f722bd7e4414a375232338997c"
+        },
+        {
+          "path": "terrain/N20E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N20/N20E086.hgt.gz",
+          "downloadBytes": 4327773,
+          "downloadSha256": "ecc77054111c2b26d39535ac01cddbd9423c4fce722ac9c30051ff86607f374a"
+        },
+        {
+          "path": "terrain/N20E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N20/N20E087.hgt.gz",
+          "downloadBytes": 1226651,
+          "downloadSha256": "a0495ec2d751ddccbfa33e71d274b3e07a4551f75a0db56bcc9dc849d2ff4d26"
+        },
+        {
+          "path": "terrain/N20E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N20/N20E088.hgt.gz",
+          "downloadBytes": 1219799,
+          "downloadSha256": "1c3c28e171b84d095c0572f9bab1d0e6ff25cea429576a4565f5755e2a83d62f"
+        },
+        {
+          "path": "terrain/N20E089.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N20/N20E089.hgt.gz",
+          "downloadBytes": 2499286,
+          "downloadSha256": "a7c21941f9b8ed63912c64ad3b4af7c016c2189d04e7bf0bdc8f0515c815e623"
+        },
+        {
+          "path": "terrain/N20E090.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N20/N20E090.hgt.gz",
+          "downloadBytes": 1057904,
+          "downloadSha256": "474dfefef78bcd1791c78c73605eb9fbef9c9c5edee94e06ffc4fb26e25feb59"
+        },
+        {
+          "path": "terrain/N21E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N21/N21E081.hgt.gz",
+          "downloadBytes": 7314494,
+          "downloadSha256": "1f62872c9325d4e383c5eb91b78341de94b37c243063afeb4a6f660f2ff819f3"
+        },
+        {
+          "path": "terrain/N21E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N21/N21E082.hgt.gz",
+          "downloadBytes": 8230082,
+          "downloadSha256": "207b23408e830f8c1da9953b0b3044cbe55fb139cfeec5a60036d86a7493d2ae"
+        },
+        {
+          "path": "terrain/N21E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N21/N21E083.hgt.gz",
+          "downloadBytes": 8143060,
+          "downloadSha256": "134bba4a0ba55160130ab74fe861a25a989aed59e5bec8ab96b05c02a3c9aca0"
+        },
+        {
+          "path": "terrain/N21E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N21/N21E084.hgt.gz",
+          "downloadBytes": 10565659,
+          "downloadSha256": "4583b43f13e57af34ff45d8810ffd14ceab8966163ad9395e4a9f09a64e336bf"
+        },
+        {
+          "path": "terrain/N21E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N21/N21E085.hgt.gz",
+          "downloadBytes": 11071129,
+          "downloadSha256": "2616ceaa2ef0e1a5822037d19188dc845da9700bebdb287b95180bd30d1c4656"
+        },
+        {
+          "path": "terrain/N21E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N21/N21E086.hgt.gz",
+          "downloadBytes": 9034854,
+          "downloadSha256": "27d1f6035c10041dd1e7c2249008f515a1139b0a1bf5fad23f900192862c10bb"
+        },
+        {
+          "path": "terrain/N21E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N21/N21E087.hgt.gz",
+          "downloadBytes": 2325728,
+          "downloadSha256": "3f247a7fd5b62eb06a69500254922254e44f20392bcb710cc844ce2f1f4b4147"
+        },
+        {
+          "path": "terrain/N21E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N21/N21E088.hgt.gz",
+          "downloadBytes": 1665845,
+          "downloadSha256": "fcf61e9a283aab683f03366e51a5b72f34f1fb3aa1afd2931da7e2f53e700062"
+        },
+        {
+          "path": "terrain/N21E089.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N21/N21E089.hgt.gz",
+          "downloadBytes": 1825395,
+          "downloadSha256": "93acf84343b23a3f26d95039fd80c015e9c4954c0dfbf343f56b85d0b4b065fd"
+        },
+        {
+          "path": "terrain/N21E090.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N21/N21E090.hgt.gz",
+          "downloadBytes": 882102,
+          "downloadSha256": "a21e85133f0c6eac3fc97bc5d6937516ba9c3961f21d9449955f2d26e23f760a"
+        },
+        {
+          "path": "terrain/N22E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E081.hgt.gz",
+          "downloadBytes": 11191188,
+          "downloadSha256": "c83f472b6f6381ba4b7e06c05e8f2714c922f408d9282b77f1162b7ea6939daf"
+        },
+        {
+          "path": "terrain/N22E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E082.hgt.gz",
+          "downloadBytes": 9549733,
+          "downloadSha256": "4ba11b19e28ae822083827325b0887055d66f8b4ed284b4880a2b09b9f611560"
+        },
+        {
+          "path": "terrain/N22E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E083.hgt.gz",
+          "downloadBytes": 10539883,
+          "downloadSha256": "3287744de3e4c6521770e435be98a426ce3d1014fee744084a026a1164f711ea"
+        },
+        {
+          "path": "terrain/N22E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E084.hgt.gz",
+          "downloadBytes": 10021245,
+          "downloadSha256": "74df02791e8cf5f1898074989879b5b2c9510a6e69c36604006db6994b537348"
+        },
+        {
+          "path": "terrain/N22E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E085.hgt.gz",
+          "downloadBytes": 11154126,
+          "downloadSha256": "e47165878465c3d1229c3e01a356387e5aca45a6a4ce70aa766d79b21b1f1fd2"
+        },
+        {
+          "path": "terrain/N22E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E086.hgt.gz",
+          "downloadBytes": 9677497,
+          "downloadSha256": "c59c851f566ac82de71f382b0800fcb5d138f93048a00150e3b861894327c3c0"
+        },
+        {
+          "path": "terrain/N22E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E087.hgt.gz",
+          "downloadBytes": 6102700,
+          "downloadSha256": "5fd40f48449e6858d98e5c922b0bd97f6ea29a5c8d5421b25e16dd6e9987ffd9"
+        },
+        {
+          "path": "terrain/N22E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E088.hgt.gz",
+          "downloadBytes": 5142070,
+          "downloadSha256": "622c02b52086d38bbedeb2839cc3eeacf8a519dfda0130b7e2abdfc618793796"
+        },
+        {
+          "path": "terrain/N22E089.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E089.hgt.gz",
+          "downloadBytes": 4630192,
+          "downloadSha256": "fa6b281995c8099053bb7f184ec4fc0c42482fad1f2c9a13a13195801a59e93f"
+        },
+        {
+          "path": "terrain/N22E090.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N22/N22E090.hgt.gz",
+          "downloadBytes": 4630434,
+          "downloadSha256": "693a0700eed845675b84d4d633da351bd0d4873df137885c8cd95951bed29ce6"
+        },
+        {
+          "path": "terrain/N23E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E081.hgt.gz",
+          "downloadBytes": 9933862,
+          "downloadSha256": "223030077121bbf20355d4a19d3517fbfdd4d948131a9f1390dc8e5dd8ca9656"
+        },
+        {
+          "path": "terrain/N23E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E082.hgt.gz",
+          "downloadBytes": 10445674,
+          "downloadSha256": "e6f7b8592158e42a4f307a4eab1856afa6f740d06fc8a8f85acb05ad89cf3420"
+        },
+        {
+          "path": "terrain/N23E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E083.hgt.gz",
+          "downloadBytes": 10532091,
+          "downloadSha256": "bc86f97c2c73cec6c494c7a6d095a7c54eae5dfcc1cd5194c691da01665b109b"
+        },
+        {
+          "path": "terrain/N23E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E084.hgt.gz",
+          "downloadBytes": 10513308,
+          "downloadSha256": "e61578ea442070738b5bec1cfd6573d7c381249a6e875b59d0da67228f668406"
+        },
+        {
+          "path": "terrain/N23E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E085.hgt.gz",
+          "downloadBytes": 9685871,
+          "downloadSha256": "a20503975a1ec7fdba2605f41f1ac3994fa1a4d6e2b0066219a06c6b22f03321"
+        },
+        {
+          "path": "terrain/N23E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E086.hgt.gz",
+          "downloadBytes": 8391629,
+          "downloadSha256": "be51a399d345b2846e1a4d4d5136ac8b1b695dab6592593db6da864ce0e55fd1"
+        },
+        {
+          "path": "terrain/N23E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E087.hgt.gz",
+          "downloadBytes": 6619105,
+          "downloadSha256": "a86c48c5494e85064a22180cfb17d75e76929dd2d91be5da9a43693b7154e92f"
+        },
+        {
+          "path": "terrain/N23E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E088.hgt.gz",
+          "downloadBytes": 5243943,
+          "downloadSha256": "6127e7671598f02025cfbed0395fdffdeffa7370a3cc3bac8fbd2d868e6d1807"
+        },
+        {
+          "path": "terrain/N23E089.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E089.hgt.gz",
+          "downloadBytes": 5011078,
+          "downloadSha256": "659889a3c411464b1dce15b326fc98c24f0ee279c8fcc5e47146043773fcd8d6"
+        },
+        {
+          "path": "terrain/N23E090.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N23/N23E090.hgt.gz",
+          "downloadBytes": 5008290,
+          "downloadSha256": "fd4e19dfca6ff3eeac61b7f047153bd9a1e6aecbe71057c496e4d2f696c7316e"
+        },
+        {
+          "path": "terrain/N24E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E081.hgt.gz",
+          "downloadBytes": 8112180,
+          "downloadSha256": "1980add536bcf7d1fb7af114f8ff765afbe1417c03d229731747a3855e7c00d8"
+        },
+        {
+          "path": "terrain/N24E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E082.hgt.gz",
+          "downloadBytes": 9070563,
+          "downloadSha256": "fe963804a9fcdc96d0864fd29f52730eb774b66df1b39256740544ed16fc6983"
+        },
+        {
+          "path": "terrain/N24E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E083.hgt.gz",
+          "downloadBytes": 8969478,
+          "downloadSha256": "3221a7fc42f95827383ac2a8fd9e5478fc7d54879374e44c026fe0eccbcf3cae"
+        },
+        {
+          "path": "terrain/N24E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E084.hgt.gz",
+          "downloadBytes": 7679973,
+          "downloadSha256": "1b87ffa4fe6127b00e4d70b5a4cf2a7ca62001ebdafc47d54613b38568d240cd"
+        },
+        {
+          "path": "terrain/N24E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E085.hgt.gz",
+          "downloadBytes": 8355986,
+          "downloadSha256": "b9eb350f4d94b76c971329a0487f86e266fb0cf599162c33b4deafa8dfe544af"
+        },
+        {
+          "path": "terrain/N24E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E086.hgt.gz",
+          "downloadBytes": 8063683,
+          "downloadSha256": "9f25c08fd8d531aa118e440768426a4b8a07c624c1b725d1d38a23779f096c60"
+        },
+        {
+          "path": "terrain/N24E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E087.hgt.gz",
+          "downloadBytes": 8659639,
+          "downloadSha256": "80cf5a100d4d820b08ab3f385316199d9498c7698cad3e0e5422a9d4a2d932df"
+        },
+        {
+          "path": "terrain/N24E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E088.hgt.gz",
+          "downloadBytes": 5247323,
+          "downloadSha256": "a34e03bf01d1f632231dbba1268bf8002ca7908ea614779e5963b34f9dea0702"
+        },
+        {
+          "path": "terrain/N24E089.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E089.hgt.gz",
+          "downloadBytes": 5406251,
+          "downloadSha256": "186e6d2b89c184b0e8fc32f8932f254a247b7a92e4aa7446380c2d1ea9335b54"
+        },
+        {
+          "path": "terrain/N24E090.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N24/N24E090.hgt.gz",
+          "downloadBytes": 5437145,
+          "downloadSha256": "2ca15dbbf076c9a98a0d4a11fbe23adba283351c64cc8435d54798bd0b34fd82"
+        },
+        {
+          "path": "terrain/N25E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E081.hgt.gz",
+          "downloadBytes": 6371378,
+          "downloadSha256": "13be0aef1f086c46ea61ae1f10f8643ca6e0dcaa6b29d1ab873e2584be0a7b59"
+        },
+        {
+          "path": "terrain/N25E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E082.hgt.gz",
+          "downloadBytes": 5528348,
+          "downloadSha256": "e4db6d8c1bc860cbd6a6cf0a1c6c2dfa823eaa88a700fff62bd72877d9a9cf33"
+        },
+        {
+          "path": "terrain/N25E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E083.hgt.gz",
+          "downloadBytes": 5404355,
+          "downloadSha256": "77cd2d021919d848a994604d485f05375690c7931b08fd64c2200dd759b5df6a"
+        },
+        {
+          "path": "terrain/N25E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E084.hgt.gz",
+          "downloadBytes": 5209849,
+          "downloadSha256": "59e17f7a4acf35fdfa7f27be726891c3e1347bee798d1f587b0d2cfc800422e6"
+        },
+        {
+          "path": "terrain/N25E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E085.hgt.gz",
+          "downloadBytes": 5173481,
+          "downloadSha256": "6859bd4b9ef916fd2bcc640b3b1b651b89ee940784a58b1358bb279de39c9a1b"
+        },
+        {
+          "path": "terrain/N25E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E086.hgt.gz",
+          "downloadBytes": 5763600,
+          "downloadSha256": "38dfe6d616d658db3798bd1cda435f411b37966d2d76908299d125d21fd0a4b3"
+        },
+        {
+          "path": "terrain/N25E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E087.hgt.gz",
+          "downloadBytes": 5519330,
+          "downloadSha256": "e30f4901731bbb61a908cb2f503f24a7db7d4c8b06b5a5dbfc59e62a1b983530"
+        },
+        {
+          "path": "terrain/N25E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E088.hgt.gz",
+          "downloadBytes": 5374034,
+          "downloadSha256": "bc4b78598857ae36cf0ff87b02091a2bec65406fc1eaf14da3da730e6c5db11b"
+        },
+        {
+          "path": "terrain/N25E089.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E089.hgt.gz",
+          "downloadBytes": 5704449,
+          "downloadSha256": "6a7a9dbdb6311cb01b912df1aa417a09cbca575506fb78ffd8ea737da2fcd67f"
+        },
+        {
+          "path": "terrain/N25E090.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N25/N25E090.hgt.gz",
+          "downloadBytes": 11799411,
+          "downloadSha256": "5810cd5c3f1db5f2a8ca37e418a296f950c2ae96deeea9e5ca725022d856fc76"
+        },
+        {
+          "path": "terrain/N26E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E081.hgt.gz",
+          "downloadBytes": 5761044,
+          "downloadSha256": "79d1ec2de9752cacd64fb53c786df5fb1791471e7024b7a4b17447b711b96cea"
+        },
+        {
+          "path": "terrain/N26E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E082.hgt.gz",
+          "downloadBytes": 5428368,
+          "downloadSha256": "022ba15832a3c4bd901868f7b12abe95f689255605a8bb0b1a6cce875edd4f1a"
+        },
+        {
+          "path": "terrain/N26E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E083.hgt.gz",
+          "downloadBytes": 5213400,
+          "downloadSha256": "f300bf243a8dece23f9683414bb4b1ce737a58384ddb6bb14745600cbf9034fb"
+        },
+        {
+          "path": "terrain/N26E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E084.hgt.gz",
+          "downloadBytes": 5024562,
+          "downloadSha256": "371abafb34c28339cbbf62a7d94d57a124d75ccd2771e06fb6454237be88ae03"
+        },
+        {
+          "path": "terrain/N26E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E085.hgt.gz",
+          "downloadBytes": 5204548,
+          "downloadSha256": "87d3cd6f7b3727ca95a2b839178ea82c7adfa18c5ab6160c41f1e165f3fd8e87"
+        },
+        {
+          "path": "terrain/N26E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E086.hgt.gz",
+          "downloadBytes": 7609666,
+          "downloadSha256": "0df643dfe68f2dd1c025c209486c1fb7f17f4ae9e45a7c1ea8684b4ac90c8d3b"
+        },
+        {
+          "path": "terrain/N26E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E087.hgt.gz",
+          "downloadBytes": 8234027,
+          "downloadSha256": "05095600ef48793ce1b84157b40c6aa09cf8a63073a275c4fdfe038712f330e6"
+        },
+        {
+          "path": "terrain/N26E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E088.hgt.gz",
+          "downloadBytes": 7777876,
+          "downloadSha256": "026a48813c3363b52bfce9ed71404387cbfeeae2d77944c96cadbaefb0780ebe"
+        },
+        {
+          "path": "terrain/N26E089.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E089.hgt.gz",
+          "downloadBytes": 8772310,
+          "downloadSha256": "121228138f01252b13bff9783fd943cb2c1cfa2150813107b40a9986dee2124e"
+        },
+        {
+          "path": "terrain/N26E090.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N26/N26E090.hgt.gz",
+          "downloadBytes": 8905335,
+          "downloadSha256": "61a1fdf56ef45bbedf4d499e60f4b8269a2b19b42f4f13b31c071dd55f3480e8"
+        },
+        {
+          "path": "terrain/N27E081.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E081.hgt.gz",
+          "downloadBytes": 5119887,
+          "downloadSha256": "2f41cd44cc19fd601a95883a62508bbc859cc66c4894a007044ddb21bc54c1a4"
+        },
+        {
+          "path": "terrain/N27E082.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E082.hgt.gz",
+          "downloadBytes": 8166838,
+          "downloadSha256": "0dd57513d5e7aa7fc1aa7dd2fb2ca44ea2a44fe5189d92ccbea1d389a928fc04"
+        },
+        {
+          "path": "terrain/N27E083.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E083.hgt.gz",
+          "downloadBytes": 9516700,
+          "downloadSha256": "f1616016e36e99d3334c2382d70ea2153670026d6da17b8e09e237f16e6bed3d"
+        },
+        {
+          "path": "terrain/N27E084.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E084.hgt.gz",
+          "downloadBytes": 11659594,
+          "downloadSha256": "31c6ca2861dfd3da1b5e20e8d459584383069882c31ca84ddfab0cd77abe799c"
+        },
+        {
+          "path": "terrain/N27E085.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E085.hgt.gz",
+          "downloadBytes": 15740650,
+          "downloadSha256": "a0db33f173a26e557fdc9393637118989cea02faeebaab5d287cf6460b40a9dc"
+        },
+        {
+          "path": "terrain/N27E086.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E086.hgt.gz",
+          "downloadBytes": 18934204,
+          "downloadSha256": "0e95b43508321ee2b3d9454797130bf1c972737377eff4cb07b4cf912138aad1"
+        },
+        {
+          "path": "terrain/N27E087.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E087.hgt.gz",
+          "downloadBytes": 19090522,
+          "downloadSha256": "6ba4d52b6943221995ee0301076235336e4934905fab98aa921af425550e3cee"
+        },
+        {
+          "path": "terrain/N27E088.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E088.hgt.gz",
+          "downloadBytes": 19126851,
+          "downloadSha256": "7fe3800064057256cc431a0d7d7258899b251b8facc355c3c45d93ad5d127ee1"
+        },
+        {
+          "path": "terrain/N27E089.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E089.hgt.gz",
+          "downloadBytes": 18595049,
+          "downloadSha256": "9215624415a3f4efb4b708ad3cf26867b55a4c70aba532356198cd026972738d"
+        },
+        {
+          "path": "terrain/N27E090.hgt",
+          "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N27/N27E090.hgt.gz",
+          "downloadBytes": 18437856,
+          "downloadSha256": "b1c5724ca226c3d9d92a18e3da12ee1afee58e0ea0d486d1de37ff656b937a8c"
+        }
+      ],
+      "manifest": {
+        "schemaVersion": 1,
+        "id": "jharkhand",
+        "name": "Jharkhand · Hills and Plateau",
+        "version": "1",
+        "horizontalCrs": "EPSG:4326",
+        "verticalDatum": "EGM96",
+        "observerBounds": {
+          "south": 21.9,
+          "west": 83.2,
+          "north": 25.4,
+          "east": 88.0
+        },
+        "terrainBounds": {
+          "south": 20,
+          "west": 81,
+          "north": 28,
+          "east": 91
+        },
+        "radiusM": 200000,
+        "viewpoint": {
+          "latitude": 23.3441,
+          "longitude": 85.3096,
+          "headingDeg": 0
+        },
+        "source": "Mapzen/Tilezen Skadi; GeoNames CC BY 4.0",
+        "preparedAt": "2026-10-17",
+        "files": [
+          {
+            "path": "terrain/N20E081.hgt",
+            "size": 25934402,
+            "sha256": "06d2dbaee94894792ad4e85969dfb9a3d04af4cc686738595734e3b6165f6cb5"
+          },
+          {
+            "path": "terrain/N20E082.hgt",
+            "size": 25934402,
+            "sha256": "3cff80874603879aa9282b82df61206a72e66b754347ccbe6f5c1a56ce3d52a1"
+          },
+          {
+            "path": "terrain/N20E083.hgt",
+            "size": 25934402,
+            "sha256": "bab5aa9fa22af7dd0f4d1519d1fc730b3e30690261d0232994b12e4e89eeb8f7"
+          },
+          {
+            "path": "terrain/N20E084.hgt",
+            "size": 25934402,
+            "sha256": "951d69e250a719a96ca1ece1ae60d1a293cda98b4ba324e34f91d3b1feaf7055"
+          },
+          {
+            "path": "terrain/N20E085.hgt",
+            "size": 25934402,
+            "sha256": "17cc70b8982c537443fc6181bd6f3ed0de0e81642c46881dcddd12cafc1f9a59"
+          },
+          {
+            "path": "terrain/N20E086.hgt",
+            "size": 25934402,
+            "sha256": "93e4fa657cf725cf9796860bf9bd466b455d68221e1afdfd2a6186a988074bad"
+          },
+          {
+            "path": "terrain/N20E087.hgt",
+            "size": 25934402,
+            "sha256": "2d937e53a04d79b2a7fb2cf273b4c1e6066fd9aad07ff00f354cb6547df8fa42"
+          },
+          {
+            "path": "terrain/N20E088.hgt",
+            "size": 25934402,
+            "sha256": "c289238551c84babec53ed9afa08bdb2439da299624c414d3815144095ebf57b"
+          },
+          {
+            "path": "terrain/N20E089.hgt",
+            "size": 25934402,
+            "sha256": "2e0f0712fc26f61e0e44921fb6dad4792c11bf0aa1b4bc49939b72c5928ca975"
+          },
+          {
+            "path": "terrain/N20E090.hgt",
+            "size": 25934402,
+            "sha256": "d94762ee1b0b4b1e7cd4d3701e46397a6c653f3ecdee83ade22959d5e9bd41a5"
+          },
+          {
+            "path": "terrain/N21E081.hgt",
+            "size": 25934402,
+            "sha256": "46f3ff535f61cceb4ae1efe6cf6c6b6e00c682012921f3c79e502d3b9cb6ba24"
+          },
+          {
+            "path": "terrain/N21E082.hgt",
+            "size": 25934402,
+            "sha256": "d0e52ad8e53f812a097669ea359ddb27325a8aabc76b488c37cdf03e612dd5e5"
+          },
+          {
+            "path": "terrain/N21E083.hgt",
+            "size": 25934402,
+            "sha256": "bd655fbdeb55ed0ab820f89604d9e91f42b49d2b60021553d53229222e4a3a1a"
+          },
+          {
+            "path": "terrain/N21E084.hgt",
+            "size": 25934402,
+            "sha256": "f44ad3178daf3864328254bad067ac44c1b837a12ac0005df19078fd1861f402"
+          },
+          {
+            "path": "terrain/N21E085.hgt",
+            "size": 25934402,
+            "sha256": "d4828fa653f6a9084802dd5659b0412f2b3353594d5a2814eea1657d56bad4cf"
+          },
+          {
+            "path": "terrain/N21E086.hgt",
+            "size": 25934402,
+            "sha256": "2b41c93eae169db4500ac438eb177e3c08d6b484628dc45bef5bafd3cd2c7148"
+          },
+          {
+            "path": "terrain/N21E087.hgt",
+            "size": 25934402,
+            "sha256": "e59e9846afad2b3e87f79b1f906c43b6365c077148299518885a581f4c951141"
+          },
+          {
+            "path": "terrain/N21E088.hgt",
+            "size": 25934402,
+            "sha256": "793b32b2040c807a1edd1260aae1a70ec8d454eb7c3033fa32a0249e78cfe19e"
+          },
+          {
+            "path": "terrain/N21E089.hgt",
+            "size": 25934402,
+            "sha256": "aa228e189a09306d80032016998c931b21cd2cd8ae6d3bf95394a5c8f58a186e"
+          },
+          {
+            "path": "terrain/N21E090.hgt",
+            "size": 25934402,
+            "sha256": "1117effd3e8a143846e8a8731bb02af2778e376836db959d7aec68501823f86e"
+          },
+          {
+            "path": "terrain/N22E081.hgt",
+            "size": 25934402,
+            "sha256": "a8e8bd978e097167194f947f37c4a37d4a6be6565f90e78c232a106eca8de055"
+          },
+          {
+            "path": "terrain/N22E082.hgt",
+            "size": 25934402,
+            "sha256": "b450393149e8ee2d96375ce713e2fd8eedabed44fcd81a47025d8f2c4546477c"
+          },
+          {
+            "path": "terrain/N22E083.hgt",
+            "size": 25934402,
+            "sha256": "7f08c5ea10026a50d66c97e599266b3212a5000375308512fc5cb4726ee20782"
+          },
+          {
+            "path": "terrain/N22E084.hgt",
+            "size": 25934402,
+            "sha256": "d5a484755bb43ce770ad7d252cc68447006e065ecc8c7b1a6538bc4e34ea9f45"
+          },
+          {
+            "path": "terrain/N22E085.hgt",
+            "size": 25934402,
+            "sha256": "01aae8da50086561fd26f9fe1ae41a83e96980ce7547f9dd1b4c2753df0af34b"
+          },
+          {
+            "path": "terrain/N22E086.hgt",
+            "size": 25934402,
+            "sha256": "5665a78b35c033f9d78a7aed5f80b53cc1d18004aec5963d632f620e987968de"
+          },
+          {
+            "path": "terrain/N22E087.hgt",
+            "size": 25934402,
+            "sha256": "37a6c7539a2fb007e7ce4a5af381bdd3853f5834e44de8be26b7b023978b8919"
+          },
+          {
+            "path": "terrain/N22E088.hgt",
+            "size": 25934402,
+            "sha256": "79927e34af00384e4475681ab8d804e3d4c5a43070437dd3ac7ee7e409955b90"
+          },
+          {
+            "path": "terrain/N22E089.hgt",
+            "size": 25934402,
+            "sha256": "7e32504a5a6bc3dfa86b9354785b6f8648295a70d0afeb76f0daa8059f77cdc6"
+          },
+          {
+            "path": "terrain/N22E090.hgt",
+            "size": 25934402,
+            "sha256": "59865d90f3fedf65ef6d249d5fd169ac6e6ac08f9c80870b45c5326833aae22b"
+          },
+          {
+            "path": "terrain/N23E081.hgt",
+            "size": 25934402,
+            "sha256": "ba883ec7c7a5570defd492f1a70ab6cd2e588eae01e9cf7d36e5b0c44759144f"
+          },
+          {
+            "path": "terrain/N23E082.hgt",
+            "size": 25934402,
+            "sha256": "2d524940cd4175c214afacbbab60417aa67d64b34ef76ad7b19811848cdf633e"
+          },
+          {
+            "path": "terrain/N23E083.hgt",
+            "size": 25934402,
+            "sha256": "f406d8c9d470d20707542fa7e59ed3f48d302ac583e2210088bfddec24cfd360"
+          },
+          {
+            "path": "terrain/N23E084.hgt",
+            "size": 25934402,
+            "sha256": "c1546645562e670a274caba653e4672de1fea88911007f1d0531c3fb9610751f"
+          },
+          {
+            "path": "terrain/N23E085.hgt",
+            "size": 25934402,
+            "sha256": "2e9170fc4b53daae927207e67a1a9eadbd10a0081c05da9b62b80edcbee322ca"
+          },
+          {
+            "path": "terrain/N23E086.hgt",
+            "size": 25934402,
+            "sha256": "00fb88ea39ffd9fcdc17dc526d98e16f8c228295a9c3c701c4b6d02c16b1eee4"
+          },
+          {
+            "path": "terrain/N23E087.hgt",
+            "size": 25934402,
+            "sha256": "176a9502b25486b4ab1e6ab92789d3fd63760718bf178bd08c2c73536433d28d"
+          },
+          {
+            "path": "terrain/N23E088.hgt",
+            "size": 25934402,
+            "sha256": "44cbcd02041a1872dd8b26d8145ac2c235d867b4ae0637877c79a158fc7c7bfa"
+          },
+          {
+            "path": "terrain/N23E089.hgt",
+            "size": 25934402,
+            "sha256": "0c494ffcd6691a97636f585b6fc03b49ac623777cdcddde98e69fa84d0301905"
+          },
+          {
+            "path": "terrain/N23E090.hgt",
+            "size": 25934402,
+            "sha256": "b35efb2b5cbcb8d789034eabc8f320123c23c49f6489a0f25dc7a12777805fdb"
+          },
+          {
+            "path": "terrain/N24E081.hgt",
+            "size": 25934402,
+            "sha256": "d38a472c09fcc89c2095148ea5ef2546c8608a3ac2b161d9778866628d029f13"
+          },
+          {
+            "path": "terrain/N24E082.hgt",
+            "size": 25934402,
+            "sha256": "761cf9ece27346d0ad49281b1a63c20c05129ded1f6ba41dd5d2e8feaa7b002e"
+          },
+          {
+            "path": "terrain/N24E083.hgt",
+            "size": 25934402,
+            "sha256": "a61b194fa0eb4eb37f314e1358971d9c88ceaf0f8c74bb2ca443def72363b976"
+          },
+          {
+            "path": "terrain/N24E084.hgt",
+            "size": 25934402,
+            "sha256": "d8ebabc90416a2fbda0ad2569da530c960c81dd02036b516462c1a9b42360c5b"
+          },
+          {
+            "path": "terrain/N24E085.hgt",
+            "size": 25934402,
+            "sha256": "79226f9079f9fbf2d0ff813c72bbfa8391370743ea0f1347e2f27a95fdfc6d01"
+          },
+          {
+            "path": "terrain/N24E086.hgt",
+            "size": 25934402,
+            "sha256": "6e4907b9b070e5fd4b389026610a123f6a1152849770ed1e4c5beaed5e811c30"
+          },
+          {
+            "path": "terrain/N24E087.hgt",
+            "size": 25934402,
+            "sha256": "704f548983888ed2c0d968bfcd901718077c30e44a274697ba41b8fe885b303d"
+          },
+          {
+            "path": "terrain/N24E088.hgt",
+            "size": 25934402,
+            "sha256": "a58362939f99dfe9c817675508862cd0e8b7a826348214bb237a1767ce7e1227"
+          },
+          {
+            "path": "terrain/N24E089.hgt",
+            "size": 25934402,
+            "sha256": "e00ee66e8c3e141f99e492ce60de4bb56d9c13e38aafff110ba9acd6bef33d7d"
+          },
+          {
+            "path": "terrain/N24E090.hgt",
+            "size": 25934402,
+            "sha256": "1664adca4a3e2bd04245aeba372fe245d5960e74d659a92c45a1ab5406fa4eb7"
+          },
+          {
+            "path": "terrain/N25E081.hgt",
+            "size": 25934402,
+            "sha256": "00b6bd91a73faa29dff4a0d5daa57f5c1f4c69883e2ea90f5b9ecefca7c65f23"
+          },
+          {
+            "path": "terrain/N25E082.hgt",
+            "size": 25934402,
+            "sha256": "0515b45cbcaae5de59d9b392d6fc9932d64fdb8e6a505a70b2d28d3f7a12fe17"
+          },
+          {
+            "path": "terrain/N25E083.hgt",
+            "size": 25934402,
+            "sha256": "cc9dbbdb2130fd1002f076b6591900504c0f1682cab03b88c4617fec288a6b79"
+          },
+          {
+            "path": "terrain/N25E084.hgt",
+            "size": 25934402,
+            "sha256": "d86dca1238bdf09ca640e924cc7d4c899451d6586a56b356b1c841922cbcfaaa"
+          },
+          {
+            "path": "terrain/N25E085.hgt",
+            "size": 25934402,
+            "sha256": "a5c6fc5c4b9e379565b016f24bd03f22a79a859c0dc387a7f222a7eec61275f2"
+          },
+          {
+            "path": "terrain/N25E086.hgt",
+            "size": 25934402,
+            "sha256": "440f094f7efe6251087de93e9a5e07dcc0344ea43dba8a4773e1925dcbf00761"
+          },
+          {
+            "path": "terrain/N25E087.hgt",
+            "size": 25934402,
+            "sha256": "b1b2d27e07d5fa608ce981dc0641153edbcb5747c6d79549a021732980d80931"
+          },
+          {
+            "path": "terrain/N25E088.hgt",
+            "size": 25934402,
+            "sha256": "d1dc584990f9a1596e9855d3bd8e83b986b4972f7e50777d89f277ff396c7c0d"
+          },
+          {
+            "path": "terrain/N25E089.hgt",
+            "size": 25934402,
+            "sha256": "a9e55560ced1508858f8a96f62c6c736eb5fc02c88190f25678775b355d395d4"
+          },
+          {
+            "path": "terrain/N25E090.hgt",
+            "size": 25934402,
+            "sha256": "bb9b51221ce1971d2c4b8e5a1523deaf1603aa582fd54809990a8f45c24d4d50"
+          },
+          {
+            "path": "terrain/N26E081.hgt",
+            "size": 25934402,
+            "sha256": "e2cd39eb5d05a1ad9a2697f676ccb10fbda46388656fb27f332c92eddaab9b2e"
+          },
+          {
+            "path": "terrain/N26E082.hgt",
+            "size": 25934402,
+            "sha256": "905f504c3c9ca4021d54361d6152e9dc71687d30ca29b0bb523297044dbf4bdb"
+          },
+          {
+            "path": "terrain/N26E083.hgt",
+            "size": 25934402,
+            "sha256": "bc07a7b2f59b99b269567738465a87d6797e5904f7645b60e3f8895f371fa948"
+          },
+          {
+            "path": "terrain/N26E084.hgt",
+            "size": 25934402,
+            "sha256": "8a214cfc8ee814a15b2096666997b631cde0a5970b0548b183683c8e3ca3f13b"
+          },
+          {
+            "path": "terrain/N26E085.hgt",
+            "size": 25934402,
+            "sha256": "6363ea9373cfde8f01c6ab8f2290c6542d0a15446a25265010e16fed4f445317"
+          },
+          {
+            "path": "terrain/N26E086.hgt",
+            "size": 25934402,
+            "sha256": "ebc5bcb70494a83ba79978e718a9255237029592fb2ec35bcec80e064abcf8d5"
+          },
+          {
+            "path": "terrain/N26E087.hgt",
+            "size": 25934402,
+            "sha256": "d7bce7fe40fb98ea7c4f195268e81dd784aa41febebb781bb4b3bb3bd406d47b"
+          },
+          {
+            "path": "terrain/N26E088.hgt",
+            "size": 25934402,
+            "sha256": "7b7c3df7d07d2785d4ffd51b6090b62f5ae43a50d0f473a5b9fb304337214a89"
+          },
+          {
+            "path": "terrain/N26E089.hgt",
+            "size": 25934402,
+            "sha256": "5df3ca3407c513178e15565e27c64534a412ccdc482f16f45c37e48b8cf016dc"
+          },
+          {
+            "path": "terrain/N26E090.hgt",
+            "size": 25934402,
+            "sha256": "506544d7554d65197517505761125999f5186c3c4e913ce8fd0a3c8d4e81de0b"
+          },
+          {
+            "path": "terrain/N27E081.hgt",
+            "size": 25934402,
+            "sha256": "f125cfc2544bd17d0ae161b7fcf6b73efd8c8c1929341de00c576e728ac1cd14"
+          },
+          {
+            "path": "terrain/N27E082.hgt",
+            "size": 25934402,
+            "sha256": "fb6bf7f74d64e6f452e54f8dded0b8c2b0b047ae7686d60be34ee3e823a1a829"
+          },
+          {
+            "path": "terrain/N27E083.hgt",
+            "size": 25934402,
+            "sha256": "fb0804a546ebe203b49a2d05ba23f94ba6bf8334701f2a305f12e66418ce99a3"
+          },
+          {
+            "path": "terrain/N27E084.hgt",
+            "size": 25934402,
+            "sha256": "22e0c84c0a16b4228b00c425e7632155f8a356d53871fd6be965edcb96b3930f"
+          },
+          {
+            "path": "terrain/N27E085.hgt",
+            "size": 25934402,
+            "sha256": "013c3863b612f870d60083b0c1521da7376309a293c832eba2f5152eb18fb3b0"
+          },
+          {
+            "path": "terrain/N27E086.hgt",
+            "size": 25934402,
+            "sha256": "150d99a7cee9472de347cf7c5d2baf95b70b8c87d0f9ac992976774d94c8e717"
+          },
+          {
+            "path": "terrain/N27E087.hgt",
+            "size": 25934402,
+            "sha256": "fc37e9eda5856c60efc298716091afa7ac7c2813f4ebf70ff4bbfedd2695cd3f"
+          },
+          {
+            "path": "terrain/N27E088.hgt",
+            "size": 25934402,
+            "sha256": "ee9422b5141d21a2db47a5719a89df00968bd81e4c0631bbf31a33ab6da34322"
+          },
+          {
+            "path": "terrain/N27E089.hgt",
+            "size": 25934402,
+            "sha256": "f1bcfa2c5c35090e632b8e50a0d15427151cde78202b93440af467707d3b972c"
+          },
+          {
+            "path": "terrain/N27E090.hgt",
+            "size": 25934402,
+            "sha256": "fd88fe5871255352e7d6fbf3ff8e66e369a7cd7ef9dc1bbf0dceb5c2e572c8f5"
+          },
+          {
+            "path": "peaks.json",
+            "size": 1011689,
+            "sha256": "57ecc1601b7b6a2c349c0861cdbcc81c0c2e7341077593d6e5f0df0e51944f58"
+          },
+          {
+            "path": "attribution.txt",
+            "size": 7428,
+            "sha256": "4d7bdfb5cf1c2a505a5d046318626325f02a52bd40dcce07b159b4e4a66ed582"
+          }
+        ]
+      }
+    },
+    {
       "id": "poon-hill",
       "country": "Nepal",
       "description": "Poon Hill and Ghorepani viewpoints · Annapurna Himalaya",

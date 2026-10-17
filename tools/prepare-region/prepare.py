@@ -14,7 +14,7 @@ import re
 import zipfile
 
 HGT_BYTES = 3601 * 3601 * 2
-MAX_BYTES = 512 * 1024 * 1024
+MAX_BYTES = 4 * 1024 * 1024 * 1024
 
 
 def numbers(text, count):
@@ -80,8 +80,8 @@ def prepare(args):
     lat, lon = args.viewpoint
     if not (-55 < south <= lat <= north < 59 and -180 < west <= lon <= east < 180):
         raise ValueError('Use an observer rectangle in SRTM coverage, away from the date line')
-    if not 0.1 <= args.radius_km <= 50:
-        raise ValueError('Radius must be between 0.1 and 50 km')
+    if not 0.1 <= args.radius_km <= 300:
+        raise ValueError('Radius must be between 0.1 and 300 km')
     angular = math.degrees(args.radius_km * 1000 / 6371008.8) + 1 / 3600
     longitude_margin = angular / math.cos(math.radians(max(abs(south), abs(north)) + angular))
     low_lat, high_lat = math.floor(south - angular), math.floor(north + angular)
@@ -125,7 +125,7 @@ def prepare(args):
         records.append(dict(path=name, size=len(data), sha256=hashlib.sha256(data).hexdigest()))
     total = sum(record['size'] for record in records)
     if total > MAX_BYTES:
-        raise ValueError('Region exceeds the current 512 MiB pack limit; reduce observer area/radius')
+        raise ValueError('Region exceeds the 4 GiB pack limit; reduce observer area/radius')
     manifest = dict(schemaVersion=1, id=args.id, name=args.name, version=args.version,
                     horizontalCrs='EPSG:4326', verticalDatum='EGM96',
                     observerBounds=dict(south=south, west=west, north=north, east=east),

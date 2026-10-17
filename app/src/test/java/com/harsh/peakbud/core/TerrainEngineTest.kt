@@ -122,6 +122,7 @@ class TerrainEngineTest {
                 set(1800, 1800, 100); set(1800, 1801, 200)
                 set(1801, 1800, 300); set(1801, 1801, 400)
                 set(2000, 2000, -32768)
+                set(3600, 3600, 925)
             }
             HgtTerrain(dir, GeoBounds(-1.0, -1.0, 0.0, 0.0)).use { hgt ->
                 val point = GeoPoint(-1800.5 / 3600, -1 + 1800.5 / 3600)
@@ -131,6 +132,8 @@ class TerrainEngineTest {
                 assertEquals(TerrainSample.OutsideCoverage, hgt.sample(GeoPoint(1.0, 1.0)))
                 // Shared north/east edge can be served by the southwest tile.
                 assertEquals(TerrainSample.Valid(0.0), hgt.sample(GeoPoint(0.0, 0.0)))
+                // The shortened final block spans the last row/column without reading past EOF.
+                assertEquals(TerrainSample.Valid(925.0), hgt.sample(GeoPoint(-1.0, 0.0)))
             }
             assertEquals("S01W001.hgt", HgtTerrain.tileName(-1, -1))
         } finally { dir.deleteRecursively() }

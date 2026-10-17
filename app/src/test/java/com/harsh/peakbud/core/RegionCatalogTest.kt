@@ -108,4 +108,44 @@ class RegionCatalogTest {
         assertTrue(store.installed().isEmpty())
         assertTrue(downloader.pending().isEmpty())
     }
+    @Test fun identicalInstalledTerrainIsSharedAndSurvivesDeletingOriginalPack() = fixture { root, store, region, downloader, assets, requests ->
+        val installer = CatalogInstaller(root.resolve("work"),store,downloader) { assets.getValue(it).inputStream() }
+        val first = installer.install(region)
+        val second = installer.install(region)
+        assertEquals(1, requests())
+        val tile = region.tiles.single().path
+        assertTrue(Files.isSameFile(first.directory.resolve(tile).toPath(), second.directory.resolve(tile).toPath()))
+        store.delete(first)
+        RegionStore(root.resolve("installed")).verify(second)
+        assertEquals("Synthetic summit", store.peaks(second).single().name)
+    }
+
+    @Test fun broadRegionsCoverBothStatesAndContainDistantCrossBorderNames() {
+        val regions = RegionCatalog.load { assets.resolve(it).inputStream() }.associateBy { it.id }
+        val root = Files.createTempDirectory("peakbud-broad-manifests").toFile()
+        try {
+            listOf("uttarakhand-himalaya", "jharkhand").forEach { id ->
+                val directory = root.resolve(id).apply { mkdirs() }
+                directory.resolve("manifest.json").writeText(regions.getValue(id).manifest)
+            }
+            val parsed = RegionStore(root).installed().associateBy { it.id }
+            assertEquals(250_000.0, parsed.getValue("uttarakhand-himalaya").radiusM, 0.0)
+            assertTrue(parsed.getValue("uttarakhand-himalaya").observerBounds.contains(com.harsh.peakbud.core.model.GeoPoint(29.38,79.46)))
+            val jharkhand = parsed.getValue("jharkhand")
+            assertEquals(200_000.0, jharkhand.radiusM, 0.0)
+            listOf(23.3441 to 85.3096, 22.8 to 86.2, 24.18 to 86.3, 23.47 to 84.27, 25.25 to 87.65).forEach { (lat, lon) ->
+                assertTrue(jharkhand.observerBounds.contains(com.harsh.peakbud.core.model.GeoPoint(lat, lon)))
+            }
+            val region = regions.getValue("uttarakhand-himalaya")
+            val peaks = JSONArray(assets.resolve("${region.assetDirectory}/peaks.json").readText())
+            assertTrue((0 until peaks.length()).any {
+                val peak = peaks.getJSONObject(it)
+                val point = com.harsh.peakbud.core.model.GeoPoint(peak.getDouble("latitude"), peak.getDouble("longitude"))
+                peak.getString("countryCode") == "CN" && com.harsh.peakbud.core.geo.Geography.distance(parsed.getValue(region.id).viewpoint, point) in 50_001.0..250_000.0
+            })
+            val hills = JSONArray(assets.resolve("regions/jharkhand/peaks.json").readText())
+            assertTrue((0 until hills.length()).any { hills.getJSONObject(it).getString("featureCode") == "HLL" })
+            assertTrue((0 until hills.length()).any { hills.getJSONObject(it).getString("name").contains("Parasnāth", ignoreCase = true) })
+        } finally { root.deleteRecursively() }
+    }
 }

@@ -8,6 +8,7 @@ import java.io.File
 import java.io.InputStream
 import java.security.MessageDigest
 import java.util.UUID
+import java.nio.file.Files
 import java.util.zip.ZipFile
 import org.json.JSONArray
 import org.json.JSONObject
@@ -31,6 +32,14 @@ data class RegionPack(
 class RegionStore(private val root: File) {
     private val verifiedKeys = mutableSetOf<String>()
     init { check(root.isDirectory || root.mkdirs()) { "Cannot create offline region storage" } }
+
+    /** Call once at process startup, before accepting installs. Compressed downloads remain resumable. */
+    fun cleanupInterruptedInstalls() {
+        val temporary = Regex("\\.[0-9a-f-]{36}\\.(staging|zip)")
+        root.listFiles().orEmpty().filter { temporary.matches(it.name) }.forEach {
+            check(if (it.isDirectory) it.deleteRecursively() else it.delete()) { "Could not clear interrupted installation" }
+        }
+    }
 
     fun installed(): List<RegionPack> = root.listFiles().orEmpty()
         .filter { it.isDirectory && !it.name.startsWith('.') }
@@ -70,6 +79,51 @@ class RegionStore(private val root: File) {
         }
     }
 
+    /** Reuse identical installed tiles without another download or a second physical copy. */
+    fun reuseTerrain(record: PackFile, target: File, checkpoint: () -> Unit): Boolean {
+        require(record.path.startsWith("terrain/"))
+        for (pack in installed()) {
+            if (pack.files.none { it == record }) continue
+            val source = pack.directory.resolve(record.path)
+            if (!source.isFile || source.length() != record.size || sha256(source, checkpoint) != record.sha256) continue
+            target.parentFile!!.mkdirs()
+            try { Files.createLink(target.toPath(), source.toPath()) }
+            catch (_: java.io.IOException) { source.inputStream().use { input -> target.outputStream().use { copyBounded(input, it, record.size, checkpoint) } } }
+            catch (_: UnsupportedOperationException) { source.inputStream().use { input -> target.outputStream().use { copyBounded(input, it, record.size, checkpoint) } } }
+            return true
+        }
+        return false
+    }
+
+    /** Catalogue downloads write straight into private staging; no multi-gigabyte ZIP copy. */
+    fun installPrepared(manifest: String, checkpoint: () -> Unit = {}, progress: (InstallProgress) -> Unit = {},
+                        prepare: (File, RegionPack) -> Unit): RegionPack {
+        val token = UUID.randomUUID().toString()
+        val staging = root.resolve(".$token.staging")
+        try {
+            val pack = parse(manifest, staging)
+            require(pack.files.sumOf { it.size } <= MAX_BYTES) { "Region exceeds 4 GiB" }
+            require(root.usableSpace > pack.files.sumOf { it.size } + 16_000_000) { "Not enough space for this region" }
+            check(staging.mkdir())
+            prepare(staging, pack)
+            pack.files.forEachIndexed { index, record ->
+                checkpoint()
+                progress(InstallProgress(InstallStage.CHECK_FILES, current = index + 1, total = pack.files.size))
+                val file = staging.resolve(record.path)
+                require(file.isFile && file.length() == record.size && sha256(file, checkpoint) == record.sha256) { "Checksum mismatch: ${record.path}" }
+            }
+            require(staging.resolve("attribution.txt").length() <= 1_048_576)
+            require(staging.resolve("peaks.json").length() <= 8_388_608)
+            peaks(pack)
+            staging.resolve("manifest.json").writeText(manifest)
+            checkpoint()
+            val final = root.resolve("${pack.id}-$token")
+            check(staging.renameTo(final)) { "Could not activate region" }
+            synchronized(this) { verifiedKeys += final.name }
+            return pack.copy(directory = final)
+        } finally { staging.deleteRecursively() }
+    }
+
     fun install(stream: InputStream, checkpoint: () -> Unit = {}, progress: (InstallProgress) -> Unit = {}): RegionPack {
         val token = UUID.randomUUID().toString()
         val archive = root.resolve(".$token.zip")
@@ -89,7 +143,7 @@ class RegionStore(private val root: File) {
                     bytes.toString("UTF-8")
                 }
                 val pack = parse(text, staging)
-                require(pack.files.sumOf { it.size } <= MAX_BYTES) { "Region exceeds 512 MiB" }
+                require(pack.files.sumOf { it.size } <= MAX_BYTES) { "Region exceeds 4 GiB" }
                 require(root.usableSpace > pack.files.sumOf { it.size } + 16_000_000) { "Not enough space on your phone. Free up some storage and try again." }
                 val expected = pack.files.associateBy { it.path }
                 require(entries.all { it.isDirectory || it.name == "manifest.json" || it.name in expected }) { "Archive contains unlisted files" }
@@ -142,7 +196,7 @@ class RegionStore(private val root: File) {
         require(terrainBounds.west < terrainBounds.east && observerBounds.west < observerBounds.east)
         require(observerBounds.south > -55 && observerBounds.north < 59)
         val radius = obj.getDouble("radiusM")
-        require(radius.isFinite() && radius in 100.0..50_000.0)
+        require(radius.isFinite() && radius in 100.0..300_000.0)
         val view = obj.getJSONObject("viewpoint")
         val viewpoint = GeoPoint(view.getDouble("latitude"), view.getDouble("longitude"))
         require(observerBounds.contains(viewpoint))
@@ -156,6 +210,7 @@ class RegionStore(private val root: File) {
             val size = f.getLong("size")
             val hash = f.getString("sha256")
             require(size in 1..MAX_BYTES && hash.matches(Regex("[a-f0-9]{64}")))
+            if (path.endsWith(".hgt")) require(size == 3601L * 3601 * 2) { "Only 1 arc-second HGT tiles are supported" }
             PackFile(path, size, hash)
         }
         require("peaks.json" in paths && "attribution.txt" in paths && paths.any { it.endsWith(".hgt") })
@@ -177,7 +232,7 @@ class RegionStore(private val root: File) {
     }
 
     companion object {
-        const val MAX_BYTES = 512L * 1024 * 1024
+        const val MAX_BYTES = 4L * 1024 * 1024 * 1024
         private fun copyBounded(input: InputStream, output: java.io.OutputStream, limit: Long, checkpoint: () -> Unit) {
             val buffer = ByteArray(65536)
             var total = 0L

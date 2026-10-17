@@ -751,7 +751,7 @@ private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, o
                 val saved = state.pendingDownloads.any { transfer -> region.tiles.any { it.url == transfer.address } }
                 val downloading = state.downloadingRegionId == region.id
                 RegionCard(region.name, strings(R.string.region_subtitle, region.country, region.description),
-                    strings(R.string.mb_peaks_up_to_km_away , (region.downloadBytes + 1_048_575) / 1_048_576, distance(region.radiusKm * 1000.0, state, strings)),
+                    strings(R.string.region_download_storage_range, storageSize(region.downloadBytes, strings), storageSize(region.installedBytes, strings), distance(region.radiusKm * 1000.0, state, strings)),
                     if (downloading) strings(R.string.downloading) else if (saved) strings(R.string.paused) else null, MaterialTheme.colorScheme.tertiary,
                     menu = if (saved && !downloading) { close -> DropdownMenuItem(text = { Text(strings(R.string.discard_download)) }, leadingIcon = { Icon(painterResource(R.drawable.ic_delete), null) },
                         enabled = state.importing == null, onClick = { close(); onDiscard(region) }) } else null) {
@@ -947,3 +947,7 @@ internal fun peakReason(peak: PeakView, strings: TrailStrings): String = when (p
     PeakReason.BORDERLINE -> strings(R.string.peak_reason_uncertain)
     PeakReason.MISSING_TERRAIN -> strings(R.string.peak_reason_missing_path)
 }
+
+internal fun storageSize(bytes: Long, strings: TrailStrings): String = if (bytes >= 1_000_000_000)
+    strings(R.string.storage_gb, bytes / 1_000_000_000.0)
+else strings(R.string.storage_mb, (bytes + 999_999) / 1_000_000)

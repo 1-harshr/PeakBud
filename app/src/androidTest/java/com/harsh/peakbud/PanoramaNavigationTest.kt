@@ -60,6 +60,8 @@ class PanoramaNavigationTest {
         compose.onNodeWithText("Cancel").performClick()
         tab(R.string.regions)
         compose.onNodeWithText("Search places, countries or ranges").assertIsDisplayed()
+        compose.onNodeWithText("Uttarakhand Himalaya").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Jharkhand · Hills and Plateau").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Poon Hill · Annapurna").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Import region ZIP").assertDoesNotExist()
         compose.onNodeWithText("Download from URL").assertDoesNotExist()

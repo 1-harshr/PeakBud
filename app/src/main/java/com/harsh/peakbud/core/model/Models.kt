@@ -84,7 +84,7 @@ data class MountainScene(val observer: Observer, val horizon: List<HorizonSample
 
 data class CalculationSettings(val radiusM: Double = 50_000.0, val angularStepDeg: Double = 0.5) {
     init {
-        require(radiusM.isFinite() && radiusM in 100.0..150_000.0)
+        require(radiusM.isFinite() && radiusM in 100.0..300_000.0)
         require(angularStepDeg.isFinite() && angularStepDeg in 0.1..10.0)
     }
 }

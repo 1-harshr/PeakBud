@@ -87,7 +87,7 @@ class RegionDownloader(
                         part.delete(); metadata.delete(); error("The download changed on the server. Tap the download button to start again.")
                     }
                 }
-                require(expected == null || expected in 1..RegionStore.MAX_BYTES) { "Region download exceeds 512 MiB" }
+                require(expected == null || expected in 1..RegionStore.MAX_BYTES) { "Region download exceeds the permitted size" }
                 require(directory.usableSpace > (expected?.minus(start) ?: 16_000_000) + 16_000_000) { "Not enough space on your phone for this download." }
                 val etag = connection.getHeaderField("ETag")
                 Properties().apply {

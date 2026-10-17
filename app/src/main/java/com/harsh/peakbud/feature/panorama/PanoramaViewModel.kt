@@ -94,7 +94,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                 }
         }
         viewModelScope.launch {
-            val packs = withContext(Dispatchers.IO) { store.installed() }
+            val packs = withContext(Dispatchers.IO) { store.cleanupInterruptedInstalls(); store.installed() }
             val catalog = withContext(Dispatchers.IO) { RegionCatalog.load { application.assets.open(it) } }
             mutable.update { it.copy(packs = packs, catalog = catalog) }
             refreshDownloads()
@@ -112,11 +112,13 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
             mutable.update { it.copy(calculating = true, scene = null, message = null) }
             try {
                 // HGT is a bounded file-backed reader. Keep mixed file/CPU work off Main.
+                val calculationStarted = android.os.SystemClock.elapsedRealtime()
                 val scene = withContext(Dispatchers.IO) {
                     val context = currentCoroutineContext()
                     val pack = input.activePack
                     if (pack != null && !pack.observerBounds.contains(input.point)) throw ObservationMessage(strings(R.string.you_re_outside_this_hiking_area_pick_an_area_that_covers_where_you_are_or_ch))
                     if (pack != null) store.verify(pack) { context.ensureActive() }
+                    Telemetry.log("terrain verified in ${android.os.SystemClock.elapsedRealtime() - calculationStarted} ms")
                     val terrain: Terrain = if (pack == null) DemoTerrain() else HgtTerrain(pack.directory.resolve("terrain"), pack.bounds)
                     terrain.use {
                         val sample = it.sample(input.point) as? TerrainSample.Valid
@@ -133,12 +135,13 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                                     database.peaks().insertRegion(RegionRecord(pack.key, pack.id, pack.name, pack.version))
                                 }
                             }
-                            database.peaks().candidates(pack.key, pack.bounds.south, pack.bounds.west, pack.bounds.north, pack.bounds.east).map { p -> p.toPeak() }
+                            Geography.viewingBounds(input.point, pack.radiusM).let { b -> database.peaks().candidates(pack.key, b.south, b.west, b.north, b.east) }.map { p -> p.toPeak() }
                         }
                         TerrainEngine().calculate(observer, it, peaks, CalculationSettings(pack?.radiusM ?: 50_000.0)) { context.ensureActive() }
                     }
                 }
                 ensureActive()
+                Telemetry.log("terrain calculated ${scene.peaks.size} candidates in ${android.os.SystemClock.elapsedRealtime() - calculationStarted} ms")
                 mutable.update { it.copy(scene = scene, calculating = false) }
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) {
@@ -265,6 +268,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
 
     private fun progressText(value: InstallProgress): String = when (value.stage) {
         InstallStage.DOWNLOAD -> strings(R.string.progress_download, value.name, value.receivedBytes / 1_048_576, value.downloadBytes / 1_048_576, value.current, value.total)
+        InstallStage.REUSE_TERRAIN -> strings(R.string.progress_reuse_terrain, value.current, value.total)
         InstallStage.CHECK_TERRAIN -> strings(R.string.progress_check_terrain, value.current, value.total)
         InstallStage.PREPARE -> strings(R.string.progress_prepare, value.name)
         InstallStage.SAVE -> strings(R.string.progress_save)

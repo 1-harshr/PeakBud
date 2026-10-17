@@ -1,3 +1,5 @@
+> Updated regional coverage: broad Uttarakhand (250 km) and Jharkhand (200 km) packs now ship in the catalogue alongside smaller areas. See [regional coverage and current validation](regional-coverage.md). Older verification counts and small-area notes below describe the earlier prototype checkpoint.
+
 # Implementation status
 
 Updated 2026-10-17. The primary experience is now a live camera view with peak

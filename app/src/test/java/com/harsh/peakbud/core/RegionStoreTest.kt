@@ -56,6 +56,16 @@ class RegionStoreTest {
         store.delete(pack)
         assertTrue(store.installed().isEmpty())
     }
+    @Test fun startupClearsInterruptedStagingAndRetainsInstalledRegions() = withRoot { root, store ->
+        val pack = fixture(root).inputStream().use { store.install(it) }
+        val directory = root.resolve("installed/.00000000-0000-0000-0000-000000000000.staging").apply { mkdirs() }
+        directory.resolve("partial.hgt").writeText("interrupted")
+        val archive = root.resolve("installed/.00000000-0000-0000-0000-000000000000.zip").apply { writeText("interrupted") }
+        store.cleanupInterruptedInstalls()
+        assertFalse(directory.exists())
+        assertFalse(archive.exists())
+        assertEquals(pack.key, store.installed().single().key)
+    }
     @Test fun checksumMismatchCannotActivateAPartialPack() = withRoot { root, store ->
         val archive = fixture(root, badHash = true)
         assertTrue(runCatching { archive.inputStream().use { store.install(it) } }.isFailure)

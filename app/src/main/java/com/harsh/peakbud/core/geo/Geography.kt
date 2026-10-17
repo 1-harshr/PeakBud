@@ -31,7 +31,17 @@ object Geography {
         val lon = l + atan2(sin(b) * sin(d) * cos(p), cos(d) - sin(p) * sin(q))
         return GeoPoint(Math.toDegrees(q), wrap180(Math.toDegrees(lon)))
     }
-    /** Curvature included once; no refraction. Heights must share a vertical datum. */
-    fun elevationAngle(observerHeightM: Double, targetHeightM: Double, distanceM: Double): Double =
-        Math.toDegrees(atan2(targetHeightM - observerHeightM - distanceM * distanceM / (2 * EARTH_RADIUS_M), distanceM))
+    /** Conservative search rectangle for supported regional packs, away from the poles/dateline. */
+    fun viewingBounds(origin: GeoPoint, radiusM: Double): com.harsh.peakbud.core.model.GeoBounds {
+        val angular = Math.toDegrees(radiusM / EARTH_RADIUS_M) + 1.0 / 3600
+        val longitudeMargin = angular / cos(Math.toRadians(abs(origin.latitude) + angular))
+        return com.harsh.peakbud.core.model.GeoBounds(origin.latitude - angular, origin.longitude - longitudeMargin,
+            origin.latitude + angular, origin.longitude + longitudeMargin)
+    }
+    /** Spherical line of sight, including curvature once; no assumed atmospheric refraction. */
+    fun elevationAngle(observerHeightM: Double, targetHeightM: Double, distanceM: Double): Double {
+        val arc = distanceM / EARTH_RADIUS_M
+        val targetRadius = EARTH_RADIUS_M + targetHeightM
+        return Math.toDegrees(atan2(targetRadius * cos(arc) - (EARTH_RADIUS_M + observerHeightM), targetRadius * sin(arc)))
+    }
 }

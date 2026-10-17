@@ -19,23 +19,24 @@ class TerrainEngine {
         val horizon = List(count) { index ->
             checkpoint()
             val bearing = index * 360.0 / count
+            val ray = TerrainRay(observer, bearing)
             var highest = Double.NEGATIVE_INFINITY
             var distance: Double? = null
             var complete = true
             var d = terrain.resolutionM / 2
             while (d <= settings.radiusM) {
                 if ((d / terrain.resolutionM).toInt() % 128 == 0) checkpoint()
-                when (val sample = terrain.sample(Geography.destination(observer.point, bearing, d))) {
+                when (val sample = terrain.sample(ray.pointAt(d))) {
                     is TerrainSample.Valid -> {
-                        val angle = Geography.elevationAngle(observer.heightM, sample.heightM, d)
-                        if (angle > highest) { highest = angle; distance = d }
+                        val slope = ray.slope(sample.heightM)
+                        if (slope > highest) { highest = slope; distance = d }
                     }
                     else -> complete = false
                 }
                 // Draft skyline only. Named targets use a finer, independent ray.
                 d += max(terrain.resolutionM, d * 0.004)
             }
-            HorizonSample(bearing, highest.takeIf { it.isFinite() }, distance, complete)
+            HorizonSample(bearing, highest.takeIf { it.isFinite() }?.let { Math.toDegrees(atan(it)) }, distance, complete)
         }
         val views = peaks.filter { Geography.distance(observer.point, it.point) in 1.0..settings.radiusM }
             .map { peak -> checkpoint(); visibility(observer, peak, terrain, checkpoint) }
@@ -47,29 +48,46 @@ class TerrainEngine {
         require(observer.datum == terrain.datum)
         val distance = Geography.distance(observer.point, peak.point)
         val bearing = Geography.bearing(observer.point, peak.point)
+        val ray = TerrainRay(observer, bearing)
         val summit = terrain.sample(peak.point) as? TerrainSample.Valid
             ?: return PeakView(peak, distance, bearing, null, null, Visibility.UNKNOWN, reason = PeakReason.NO_SUMMIT_DATA)
         val angle = Geography.elevationAngle(observer.heightM, summit.heightM, distance)
         val step = (terrain.resolutionM / 3).coerceAtLeast(1.0)
         var maximum = Double.NEGATIVE_INFINITY
+        var maximumSlope = Double.NEGATIVE_INFINITY
         var blocker: Double? = null
         var missing = false
+        var stoppedAtBlocker = false
+        val targetError = Math.toDegrees(atan2(terrain.heightErrorM + observer.heightUncertaintyM, max(distance, 1.0)))
+        val angularPositionError = Math.toDegrees(atan2(observer.horizontalAccuracyM + terrain.resolutionM / 2, max(distance, 1.0)))
         var d = step
         // Last half-cell is the summit's own DEM footprint, not a separate ridge.
         // Borderline approach geometry remains UNCERTAIN rather than self-occluding.
         while (d < distance - terrain.resolutionM / 2) {
             if ((d / step).toInt() % 128 == 0) checkpoint()
-            when (val sample = terrain.sample(Geography.destination(observer.point, bearing, d))) {
+            when (val sample = terrain.sample(ray.pointAt(d))) {
                 is TerrainSample.Valid -> {
-                    val local = Geography.elevationAngle(observer.heightM, sample.heightM, d)
-                    if (local > maximum) { maximum = local; blocker = d }
+                    val slope = ray.slope(sample.heightM)
+                    if (slope > maximumSlope) {
+                        maximumSlope = slope
+                        maximum = Math.toDegrees(atan(slope))
+                        blocker = d
+                    }
+                    // A proven blocker cannot be undone by more distant terrain. Preserve the
+                    // same error budget as the final classification, without scanning the rest
+                    // of a 250 km ray for an already hidden summit.
+                    if (blocker == d) {
+                        val ridgeError = Math.toDegrees(atan2(terrain.heightErrorM + observer.heightUncertaintyM, max(d, 1.0)))
+                        if (maximum > angle + targetError + angularPositionError + ridgeError + 0.02) {
+                            stoppedAtBlocker = true
+                            break
+                        }
+                    }
                 }
                 else -> missing = true
             }
             d += step
         }
-        val targetError = Math.toDegrees(atan2(terrain.heightErrorM + observer.heightUncertaintyM, max(distance, 1.0)))
-        val angularPositionError = Math.toDegrees(atan2(observer.horizontalAccuracyM + terrain.resolutionM / 2, max(distance, 1.0)))
         // Error budget at the limiting ridge and summit, rather than treating a
         // coherent DEM height offset as a new near-field wall at every sample.
         val ridgeError = Math.toDegrees(atan2(terrain.heightErrorM + observer.heightUncertaintyM, max(blocker ?: distance, 1.0)))
@@ -95,6 +113,34 @@ class TerrainEngine {
             Visibility.UNKNOWN -> PeakReason.MISSING_TERRAIN
         }
         return PeakView(peak, distance, bearing, angle, summit.heightM, state,
-            (angle - maximum).takeIf { it.isFinite() }, blocker, reason, heightDifference?.toInt())
+            (angle - maximum).takeIf { !stoppedAtBlocker && it.isFinite() }, blocker, reason, heightDifference?.toInt())
+    }
+}
+
+/** Per-ray constants and arc trig are shared by destination and height projection.
+ * Compare slopes before converting to angles; the 300 km domain has a positive horizontal component.
+ * The cursor is private to one synchronous ray, never shared between calculations.
+ */
+private class TerrainRay(observer: Observer, bearingDeg: Double) {
+    private val latitude = Math.toRadians(observer.point.latitude)
+    private val longitude = Math.toRadians(observer.point.longitude)
+    private val sinLatitude = sin(latitude)
+    private val cosLatitude = cos(latitude)
+    private val sinBearing = sin(Math.toRadians(bearingDeg))
+    private val cosBearing = cos(Math.toRadians(bearingDeg))
+    private val observerRadius = Geography.EARTH_RADIUS_M + observer.heightM
+    private var sinArc = 0.0
+    private var cosArc = 1.0
+    fun pointAt(distanceM: Double): GeoPoint {
+        val arc = distanceM / Geography.EARTH_RADIUS_M
+        sinArc = sin(arc); cosArc = cos(arc)
+        val sinDestination = (sinLatitude * cosArc + cosLatitude * sinArc * cosBearing).coerceIn(-1.0, 1.0)
+        val destinationLatitude = asin(sinDestination)
+        val destinationLongitude = longitude + atan2(sinBearing * sinArc * cosLatitude, cosArc - sinLatitude * sinDestination)
+        return GeoPoint(Math.toDegrees(destinationLatitude), Geography.wrap180(Math.toDegrees(destinationLongitude)))
+    }
+    fun slope(heightM: Double): Double {
+        val radius = Geography.EARTH_RADIUS_M + heightM
+        return (radius * cosArc - observerRadius) / (radius * sinArc)
     }
 }

@@ -16,6 +16,13 @@ import zipfile
 # installer's bounds-plus-radius rule. Peak snapshots merge every listed GeoNames country.
 R = dict
 REGIONS = [
+    # Broad observer areas, with terrain and names extending across administrative borders.
+    R(id='uttarakhand-himalaya', name='Uttarakhand Himalaya', country='India',
+      description='Garhwal and Kumaon, with surrounding peaks in Tibet, Nepal and Himachal', codes=['IN','CN','NP','PK'],
+      observerBounds=[28.70,77.50,31.50,81.10], viewpoint=[30.53,79.57], radiusM=250000, hills=True),
+    R(id='jharkhand', name='Jharkhand · Hills and Plateau', country='India',
+      description='Ranchi, Parasnath, Netarhat, Dalma and Rajmahal, with surrounding hills', codes=['IN','NP','BD','BT','CN'],
+      observerBounds=[21.90,83.20,25.40,88.00], viewpoint=[23.3441,85.3096], radiusM=200000, hills=True),
     # --- Nepal ---
     R(id='poon-hill', name='Poon Hill · Annapurna', country='Nepal', description='Poon Hill and Ghorepani viewpoints · Annapurna Himalaya', codes=['NP'],
       observerBounds=[28.38,83.63,28.46,83.78], viewpoint=[28.4,83.69], radiusM=40000),
@@ -121,7 +128,7 @@ for region in REGIONS:
 
 def sha(data): return hashlib.sha256(data).hexdigest()
 def bounds(values): return dict(zip(['south','west','north','east'],values))
-def peaks(dumps, codes, extent):
+def peaks(dumps, codes, extent, hills=False):
     rows=[]
     for code in codes:
         with zipfile.ZipFile(dumps/(code+'.zip')) as archive:
@@ -129,22 +136,24 @@ def peaks(dumps, codes, extent):
     result=[]
     for line in rows:
         r=line.split('\t')
-        if len(r)!=19 or r[6]!='T' or r[7] not in ('MT','PK'): continue
+        if len(r)!=19 or r[6]!='T' or r[7] not in (('MT','PK','HLL') if hills else ('MT','PK')): continue
         lat,lon=float(r[4]),float(r[5])
         if not (extent[0]<=lat<=extent[2] and extent[1]<=lon<=extent[3]): continue
         # GeoNames DEM column is not a measured summit elevation. Do not use it.
         height=int(r[15]) if r[15] and -500<=int(r[15])<=10000 else None
         result.append(dict(id='geonames:'+r[0],name=r[1],latitude=lat,longitude=lon,
-                           elevationM=height,source='GeoNames (CC BY 4.0)',
+                           elevationM=height,countryCode=r[8],source='GeoNames (CC BY 4.0)',
                            sourceUrl=f'https://www.geonames.org/{r[0]}/',modified=r[18],featureCode=r[7]))
     assert result, 'No mountain records in this region'
     return sorted(result,key=lambda p:p['id'])
 
 def build(args):
     entries=[]
-    for region in REGIONS:
+    selected = [r for r in REGIONS if not args.regions or r['id'] in args.regions]
+    assert not args.regions or set(args.regions) == {r['id'] for r in selected}, 'Unknown region ID'
+    for region in selected:
         directory=args.output/region['id']; directory.mkdir(parents=True,exist_ok=True)
-        peak_data=json.dumps(peaks(args.dumps,region['codes'],region['terrainBounds']),ensure_ascii=False,indent=2).encode()
+        peak_data=json.dumps(peaks(args.dumps,region['codes'],region['terrainBounds'],region.get('hills',False)),ensure_ascii=False,indent=2).encode()
         tiles=[]; files=[]
         for name in region['tiles']:
             compressed=(args.tiles/(name+'.hgt.gz')).read_bytes()
@@ -165,7 +174,7 @@ Peak names/coordinates: GeoNames, https://www.geonames.org/ (CC BY 4.0).
 License: https://creativecommons.org/licenses/by/4.0/
 Country dumps retrieved {args.date}:
 '''+''.join(f'https://download.geonames.org/export/dump/{c}.zip  SHA-256 {sha((args.dumps/(c+".zip")).read_bytes())}\n' for c in region['codes'])+'''
-Changes: selected single-mountain/peak records (MT/PK), clipped to terrain bounds,
+Changes: selected single-mountain/peak records (MT/PK; HLL also included for broad hill regions), clipped to terrain bounds,
 normalized fields, retained IDs/source links/modification dates; absent elevation stays null.
 The GeoNames DEM column is not used as a published summit elevation.
 Data is provided as is. Coverage and summit positions require field validation.
@@ -180,6 +189,9 @@ Tile source URLs:
                       viewpoint=dict(latitude=view[0],longitude=view[1],headingDeg=0),source='Mapzen/Tilezen Skadi; GeoNames CC BY 4.0',preparedAt=args.date,files=files)
         entries.append(dict(id=region['id'],country=region['country'],description=region['description'],assetDirectory='regions/'+region['id'],tiles=tiles,manifest=manifest))
         print(region['name'],len(json.loads(peak_data)),'mountains',sum(t['downloadBytes'] for t in tiles),'download bytes')
+    if args.regions and (args.output/'catalog.json').exists():
+        existing = json.loads((args.output/'catalog.json').read_text())['regions']
+        entries += [r for r in existing if r['id'] not in {v['id'] for v in entries}]
     (args.output/'catalog.json').write_text(json.dumps(dict(schemaVersion=1,regions=entries),ensure_ascii=False,indent=2)+'\n')
 
 if __name__=='__main__':
@@ -188,6 +200,7 @@ if __name__=='__main__':
     parser.add_argument('--tiles',required=True,type=Path)
     parser.add_argument('--output',default='app/src/main/assets/regions',type=Path)
     parser.add_argument('--date')
+    parser.add_argument('--regions',nargs='+',help='Build only these region IDs and preserve other existing entries')
     parser.add_argument('--list-tiles',action='store_true',help='Print required terrain tiles and exit')
     options=parser.parse_args()
     if options.list_tiles:
