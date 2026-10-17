@@ -36,6 +36,15 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
     val pan by rememberUpdatedState(onPan)
     val select by rememberUpdatedState(onPeak)
     val zoom by rememberUpdatedState(onZoom)
+    // The vertical axis follows the terrain in view: the lowest and highest skyline points (and labelled peaks) are
+    // fitted to the frame, easing as you pan so the view never jumps.
+    val target = remember(state.scene, state.heading, state.fov, state.preferences.showUncertain) {
+        PanoramaProjector.window(state.scene?.horizon.orEmpty(),
+            state.scene?.peaks.orEmpty().filter { it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN }
+                .mapNotNull { p -> p.elevationDeg?.let { p.bearingDeg to it } }, state.heading, state.fov)
+    }
+    val windowLow by androidx.compose.animation.core.animateFloatAsState((target?.lowDeg ?: 0.0).toFloat(), androidx.compose.animation.core.tween(450), label = "low")
+    val windowHigh by androidx.compose.animation.core.animateFloatAsState((target?.highDeg ?: 10.0).toFloat(), androidx.compose.animation.core.tween(450), label = "high")
     Canvas(modifier.clipToBounds()
         .semantics { contentDescription = strings(R.string.mountain_panorama_drag_horizontally_to_look_around_peak_details_are_also_ava) }
         // One finger turns the view; two fingers pinch to zoom.
@@ -54,12 +63,15 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         if (state.scene == null && !state.calculating) return@Canvas
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL); textSize = type.axisPx; color = palette.axis.toArgb() }
         val heading = state.heading
-        // Relief of the skyline in view (plus peaks shown) decides how much to stretch heights.
-        val inView = state.scene?.horizon.orEmpty().filter { it.complete && abs(Geography.wrap180(it.bearingDeg - heading)) <= state.fov / 2 }
-            .mapNotNull { it.elevationDeg?.takeIf(Double::isFinite) }
-        val relief = if (inView.size > 2) inView.max() - min(inView.min(), 0.0) else 0.0
-        val verticalScale = PanoramaProjector.autoScale(relief, state.fov, w, h)
-        fun project(b: Double, e: Double) = PanoramaProjector.project(b, e, heading, state.pitch, w, h, state.fov, verticalScale)
+        // Highest point in view sits at 45% of the height (room above for pins), lowest at 75% (ground below).
+        val window = PanoramaProjector.VerticalWindow(windowLow.toDouble(), windowHigh.toDouble())
+        val topY = h * .45f; val bottomY = h * .75f
+        val pxPerDeg = PanoramaProjector.fittedPxPerDeg(window, topY, bottomY, state.fov, w)
+        val verticalScale = pxPerDeg / (w / state.fov)
+        val centreDeg = (window.lowDeg + window.highDeg) / 2
+        fun project(b: Double, e: Double) = PanoramaProjector.project(b, 0.0, heading, 0.0, w, h, state.fov).let {
+            com.harsh.peakbud.core.projection.ScreenPoint(it.x, ((topY + bottomY) / 2 - (e - centreDeg) * pxPerDeg).toFloat())
+        }
         val axisMetrics = paint.fontMetrics
         val axisHeight = axisMetrics.descent - axisMetrics.ascent
         val axisBaseline = TrailSpace.md.toPx() + TrailSpace.xs.toPx() - axisMetrics.ascent
@@ -70,15 +82,15 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         val elevationLabels = mutableListOf<Pair<Float, String>>()
         // Finer angle lines when heights are stretched, so they keep marking true angles at a readable spacing.
         // Pick the smallest of 2/5/10/20° steps that keeps lines at least ~56 dp apart on screen.
-        val pxPerDeg = abs(project(heading, 1.0).y - project(heading, 0.0).y)
-        val stepDeg = listOf(2.0, 5.0, 10.0, 20.0).firstOrNull { it * pxPerDeg >= TrailSpace.section.toPx() + TrailSpace.sm.toPx() } ?: 20.0
+        val gridPxPerDeg = abs(project(heading, 1.0).y - project(heading, 0.0).y)
+        val stepDeg = listOf(.5, 1.0, 2.0, 5.0, 10.0, 20.0).firstOrNull { it * gridPxPerDeg >= TrailSpace.section.toPx() + TrailSpace.sm.toPx() } ?: 20.0
         var angleIndex = (-20 / stepDeg).toInt()
         while (angleIndex * stepDeg <= 40) {
             val angle = angleIndex * stepDeg; angleIndex++
             val y = project(heading, angle).y
             if (y in (compassBand + (TrailSpace.md).toPx())..(h - footerClearance)) {
                 drawLine(palette.grid, Offset(0f, y), Offset(w, y), 1f)
-                elevationLabels += y to strings(R.string.angle_degrees , angle.toInt())
+                elevationLabels += y to strings(R.string.angle_degrees , if (stepDeg < 1) String.format(java.util.Locale.US, "%.1f", angle) else angle.toInt().toString())
             }
         }
         for (b in 0 until 360 step 15) {

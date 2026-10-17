@@ -38,13 +38,24 @@ object PanoramaProjector {
         )
     }
 
+    /** Lowest and highest angles worth fitting on screen: the skyline in view and the peaks that may be labelled. */
+    data class VerticalWindow(val lowDeg: Double, val highDeg: Double)
+
+    fun window(samples: List<HorizonSample>, peakAngles: List<Pair<Double, Double>>, heading: Double, horizontalFov: Double): VerticalWindow? {
+        val inView = { bearing: Double -> abs(Geography.wrap180(bearing - heading)) <= horizontalFov / 2 }
+        val skyline = samples.filter { it.complete && inView(it.bearingDeg) }.mapNotNull { it.elevationDeg?.takeIf(Double::isFinite) }
+        if (skyline.size < 3) return null
+        val peaks = peakAngles.filter { inView(it.first) && it.second.isFinite() }.map { it.second }
+        return VerticalWindow(skyline.min(), maxOf(skyline.max(), peaks.maxOrNull() ?: Double.NEGATIVE_INFINITY))
+    }
+
     /**
-     * Exaggeration that makes the skyline's height range (relief, in degrees) fill about an eighth of the view's
-     * vertical angle, between 1× (true) and 3×. Steep Himalayan views stay true; plateau hills get stretched.
+     * Vertical scale (pixels per degree) that fits [window] between [topY] and [bottomY], never flatter than true angles
+     * and at most [maxStretch] times steeper.
      */
-    fun autoScale(reliefDeg: Double, horizontalFov: Double, width: Float, height: Float): Double {
-        if (!reliefDeg.isFinite() || reliefDeg <= 0) return 1.0
-        val verticalFov = horizontalFov * height / width
-        return (verticalFov * .125 / reliefDeg).coerceIn(1.0, 3.0)
+    fun fittedPxPerDeg(window: VerticalWindow, topY: Float, bottomY: Float, horizontalFov: Double, width: Float, maxStretch: Double = 8.0): Double {
+        val truePx = width / horizontalFov
+        val relief = (window.highDeg - window.lowDeg).coerceAtLeast(.05)
+        return ((bottomY - topY) / relief).coerceIn(truePx, truePx * maxStretch)
     }
 }
