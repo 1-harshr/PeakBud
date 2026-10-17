@@ -46,7 +46,9 @@ object AlignmentHorizon {
                     }
                     else -> if (d >= nearLimitM) complete = false
                 }
-                d += max(terrain.resolutionM, d * .003)
+                // Fine steps nearby; beyond 30 km a 0.5% step keeps a crest's angular error well under the 0.2°
+                // a phone analysis pixel covers, at roughly half the samples.
+                d += max(terrain.resolutionM, d * if (d < 30_000) .003 else .005)
             }
             val usable = complete && far.isFinite() && near <= far
             HorizonSample(bearing, far.takeIf { it.isFinite() }?.let { Math.toDegrees(it) }, farDistance, usable)

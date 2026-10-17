@@ -48,6 +48,10 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import com.harsh.peakbud.R
+import com.harsh.peakbud.core.projection.CameraPose
+import com.harsh.peakbud.feature.camera.AlignmentUi
+import com.harsh.peakbud.core.alignment.AlignmentProblem
+import com.harsh.peakbud.core.alignment.AlignmentPhase
 import com.harsh.peakbud.telemetry.Telemetry
 import androidx.compose.ui.text.font.FontWeight
 import com.harsh.peakbud.ui.theme.*
@@ -128,7 +132,8 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
             if (!state.followingGps && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) model.startGps()
         }
     }
-    LaunchedEffect(state.scene) { selectedPeak = null }
+    // Partial scenes arrive while distant peaks are checked; only a new viewpoint closes the open peak.
+    LaunchedEffect(state.scene?.observer) { selectedPeak = null }
     LaunchedEffect(selectedPeak?.peak?.id) { selectedPeak?.let { Telemetry.event("peak_open", "visibility" to it.visibility.name.lowercase(), "from" to listOf("camera", "home", "peaks", "regions")[tab]) } }
     fun gps() {
         if (state.followingGps) { model.stopGps(); return }
@@ -248,8 +253,18 @@ private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov:
     val statusTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val topBar = statusTop + TrailSize.cameraBarClearance
     val showControls = !immersive
+    val alignment by model.alignment.ui.collectAsStateWithLifecycle()
+    // Prepare the terrain prediction in the background once camera geometry and a heading are known, after the peak
+    // calculation finishes so the two do not compete for the CPU. Tapping Align earlier builds it immediately.
+    val headingBucket = state.cameraPose?.heading?.let { (it / 20).toInt() }
+    LaunchedEffect(state.point, state.activePack?.key, cameraFov?.first?.toInt(), headingBucket, state.calculating) {
+        if (!state.calculating) model.prefetchAlignment(cameraFov?.first)
+    }
+    val pose = alignment.pose(state.cameraPose)
     Box(Modifier.fillMaxSize()) {
         CameraPanel(state, Modifier.fillMaxSize(), onRegions, onGps, model::startCameraTracking, onFov, fullScreen = true,
+            pose = pose, aligned = alignment.aligned, hiddenPeaks = alignment.hiddenByForeground,
+            alignment = model.alignment, rawPose = { model.state.value.cameraPose },
             safeTop = if (showControls) topBar else statusTop + TrailSize.touchTarget,
             safeBottom = (if (showControls) barSpace + TrailSize.chip else WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()) + TrailSize.cameraBarClearance,
             onBackgroundTap = { onImmersive(!immersive) },
@@ -270,7 +285,7 @@ private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov:
                     verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
                     Box(Modifier.fillMaxWidth()) {
                         LocationChip(state, Modifier.align(Alignment.CenterStart)) { sheet = true }
-                        HeadingChip(state, Modifier.align(Alignment.Center)) { sheet = true }
+                        HeadingChip(state, pose, alignment.aligned, Modifier.align(Alignment.Center)) { sheet = true }
                         GlassIconButton(R.drawable.ic_settings, strings(R.string.settings), Modifier.align(Alignment.CenterEnd), onSettings)
                     }
                     if (state.followingCompass && state.cameraPose != null && !state.poseReliable)
@@ -278,6 +293,7 @@ private fun CameraTab(state: PanoramaState, model: PanoramaViewModel, cameraFov:
                 }
                 Column(Modifier.align(Alignment.BottomCenter).padding(bottom = barSpace + TrailSize.cameraBarClearance + TrailSpace.xs), horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
+                    AlignControl(alignment, onAlign = { model.startAlignment(cameraFov?.first) }, onReset = model::resetAlignment)
                     shifted?.let { start ->
                         GlassPill(Modifier.padding(start = TrailSpace.lg, end = TrailSpace.xs)) {
                             Text(strings(R.string.labels_shifted , signedDegrees(state.labelTrim, strings)), style = MaterialTheme.typography.labelMedium)
@@ -379,10 +395,10 @@ private fun LocationChip(state: PanoramaState, modifier: Modifier, onClick: () -
 
 /** Top-centre: heading with a status dot (green steady, amber unsteady, white ring when labels are shifted). */
 @Composable
-private fun HeadingChip(state: PanoramaState, modifier: Modifier, onClick: () -> Unit) {
+private fun HeadingChip(state: PanoramaState, pose: CameraPose?, aligned: Boolean, modifier: Modifier, onClick: () -> Unit) {
     val strings = rememberTrailStrings()
-    val heading = state.cameraPose?.heading
-    val dot = when { !state.followingCompass || heading == null -> Color.White.copy(alpha = .5f); !state.poseReliable -> TrailCameraColors.uncertain; else -> TrailCameraColors.steady }
+    val heading = pose?.heading
+    val dot = when { aligned -> TrailCameraColors.alignedRing; !state.followingCompass || heading == null -> Color.White.copy(alpha = .5f); !state.poseReliable -> TrailCameraColors.uncertain; else -> TrailCameraColors.steady }
     Surface(onClick = onClick, modifier = modifier.heightIn(min = TrailSize.touchTarget).semantics { contentDescription = strings(R.string.heading_degrees_compass_and_label_settings , heading?.toInt() ?: strings(R.string.unknown)) },
         shape = CircleShape, color = TrailCameraColors.scrim, contentColor = Color.White) {
         Row(Modifier.padding(horizontal = TrailSpace.lg), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
@@ -391,6 +407,62 @@ private fun HeadingChip(state: PanoramaState, modifier: Modifier, onClick: () ->
             Text(heading?.let { strings(R.string.bearing_with_cardinal , it.toInt().toString().padStart(3, '0'), cardinal(it, strings)) } ?: strings(R.string.heading_pending), style = MaterialTheme.typography.titleSmall)
         }
     }
+}
+
+/**
+ * "Align with camera" and its states. Short labels only: Aligning, Aligned, Couldn't match this view, with one reason
+ * line and a single action. Manual nudging stays available as the fallback and replaces alignment when used.
+ */
+@Composable
+private fun AlignControl(ui: AlignmentUi, onAlign: () -> Unit, onReset: () -> Unit) {
+    val strings = rememberTrailStrings()
+    val white = ButtonDefaults.textButtonColors(contentColor = Color.White)
+    androidx.compose.animation.AnimatedContent(ui.phase, label = "align") { phase ->
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(TrailSpace.xs)) {
+            when (phase) {
+                AlignmentPhase.SENSOR -> GlassPill(Modifier.clickable(onClick = onAlign).semantics { role = Role.Button }) {
+                    Icon(painterResource(R.drawable.ic_landscape), null, Modifier.size(TrailSize.iconSmall))
+                    Spacer(Modifier.width(TrailSpace.sm))
+                    Text(strings(R.string.align_with_camera), style = MaterialTheme.typography.labelLarge)
+                }
+                AlignmentPhase.ALIGNING -> GlassPill(Modifier.padding(end = TrailSpace.xs)) {
+                    CircularProgressIndicator(Modifier.size(TrailSize.iconSmall), color = Color.White, strokeWidth = TrailStroke.selected)
+                    Spacer(Modifier.width(TrailSpace.sm))
+                    Text(strings(if (ui.preparing) R.string.reading_the_terrain else R.string.aligning), style = MaterialTheme.typography.labelLarge)
+                    TextButton(onClick = onReset, colors = white) { Text(strings(R.string.cancel)) }
+                }
+                AlignmentPhase.ALIGNED -> GlassPill(Modifier.padding(end = TrailSpace.xs)) {
+                    Box(Modifier.size(TrailSpace.sm).clip(CircleShape).background(TrailCameraColors.alignedRing))
+                    Spacer(Modifier.width(TrailSpace.sm))
+                    Text(strings(R.string.aligned_with_camera), style = MaterialTheme.typography.labelLarge)
+                    TextButton(onClick = onReset, colors = white) { Text(strings(R.string.reset)) }
+                }
+                AlignmentPhase.FAILED, AlignmentPhase.LOST -> {
+                    GlassPill(Modifier.padding(end = TrailSpace.xs), color = TrailCameraColors.warningSurface) {
+                        Text(strings(if (phase == AlignmentPhase.LOST) R.string.alignment_lost else R.string.couldnt_match_this_view), style = MaterialTheme.typography.labelLarge)
+                        TextButton(onClick = onAlign, colors = white) { Text(strings(R.string.retry)) }
+                    }
+                    Text(if (phase == AlignmentPhase.LOST) strings(R.string.alignment_lost_hint) else strings(alignmentProblemText(ui.problem)),
+                        style = MaterialTheme.typography.labelMedium, color = Color.White, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        modifier = Modifier.widthIn(max = TrailSize.noticeWidth).background(TrailCameraColors.scrim, MaterialTheme.shapes.small).padding(horizontal = TrailSpace.md, vertical = TrailSpace.xs))
+                }
+            }
+            if (ui.aligned && ui.hiddenByForeground.isNotEmpty()) Text(strings(R.string.peaks_hidden_by_foreground, ui.hiddenByForeground.size),
+                style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = .85f))
+        }
+    }
+}
+
+internal fun alignmentProblemText(problem: AlignmentProblem?): Int = when (problem) {
+    AlignmentProblem.NO_CLEAR_SKY -> R.string.align_problem_no_clear_sky
+    AlignmentProblem.NOT_ENOUGH_SHAPE -> R.string.align_problem_not_enough_shape
+    AlignmentProblem.NO_TERRAIN -> R.string.align_problem_no_terrain
+    AlignmentProblem.NO_CLEAR_MATCH -> R.string.align_problem_no_clear_match
+    AlignmentProblem.HOLD_UPRIGHT -> R.string.align_problem_hold_upright
+    AlignmentProblem.MOVING -> R.string.align_problem_moving
+    AlignmentProblem.ROUGH_LOCATION -> R.string.align_problem_rough_location
+    AlignmentProblem.NO_CAMERA -> R.string.align_problem_no_camera
+    AlignmentProblem.NO_SKYLINE, null -> R.string.align_problem_no_skyline
 }
 
 @Composable
@@ -584,7 +656,7 @@ private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifi
     Card(modifier, shape = MaterialTheme.shapes.large) {
         Box(Modifier.fillMaxSize()) {
             PanoramaCanvas(state, Modifier.fillMaxSize(), model::pan, onPeak)
-            if (state.calculating) Surface(Modifier.align(Alignment.Center), shape = MaterialTheme.shapes.medium) {
+            if (state.calculating && state.scene == null) Surface(Modifier.align(Alignment.Center), shape = MaterialTheme.shapes.medium) {
                 Row(Modifier.padding(TrailSpace.lg), horizontalArrangement = Arrangement.spacedBy(TrailSpace.md), verticalAlignment = Alignment.CenterVertically) {
                     CircularProgressIndicator(Modifier.size(TrailSize.icon), strokeWidth = TrailStroke.normal)
                     Text(strings(R.string.tracing_the_ridgelines), style = MaterialTheme.typography.bodySmall)
@@ -631,7 +703,7 @@ private fun PeakList(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, 
     } }.thenBy { it.distanceM })
     LazyColumn(modifier, contentPadding = PaddingValues(top = TrailSpace.xs, bottom = bottomSpace + TrailSpace.sm), verticalArrangement = Arrangement.spacedBy(TrailSpace.xxs)) {
         if (peaks.isEmpty()) item {
-            EmptyState(if (state.calculating) strings(R.string.finding_nearby_peaks) else if (state.noRegion) strings(R.string.choose_a_hiking_area_in_regions_to_list_its_peaks) else strings(R.string.no_peaks_found_from_this_spot))
+            EmptyState(if (state.calculating && state.scene == null) strings(R.string.finding_nearby_peaks) else if (state.noRegion) strings(R.string.choose_a_hiking_area_in_regions_to_list_its_peaks) else strings(R.string.no_peaks_found_from_this_spot))
         }
         itemsIndexed(peaks, key = { _, it -> it.peak.id }) { index, peak ->
             val tone = when (peak.visibility) {

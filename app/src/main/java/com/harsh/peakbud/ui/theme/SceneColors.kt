@@ -20,5 +20,7 @@ object TrailCameraColors {
     val labelSurface = Color(0xE6101C16)
     val warningSurface = Color(0xFF633D14)
     val steady = Color(0xFF8DE0AD)
+    /** Ring on label anchors placed by camera alignment rather than the compass estimate. */
+    val alignedRing = steady
     val uncertain = Color(0xFFFFC078)
 }

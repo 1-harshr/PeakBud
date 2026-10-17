@@ -236,4 +236,24 @@
     <string name="region_subtitle">%1$s · %2$s</string>
     <string name="peak_label_detail">%1$s · %2$s</string>
     <string name="approximate_height">~%1$s</string>
+    <!-- Camera alignment -->
+    <string name="align_with_camera">Align with camera</string>
+    <string name="aligning">Aligning…</string>
+    <string name="reading_the_terrain">Reading the terrain…</string>
+    <string name="aligned_with_camera">Aligned with camera</string>
+    <string name="sensor_estimate">Labels from compass</string>
+    <string name="couldnt_match_this_view">Couldn\'t match this view</string>
+    <string name="alignment_lost">Alignment lost</string>
+    <string name="retry">Retry</string>
+    <string name="align_problem_no_clear_sky">Needs a clear sky above the mountains.</string>
+    <string name="align_problem_no_skyline">Point at a clear mountain skyline.</string>
+    <string name="align_problem_not_enough_shape">Not enough mountain shape in view. Try a more rugged ridge.</string>
+    <string name="align_problem_no_terrain">Map data doesn\'t cover this view.</string>
+    <string name="align_problem_no_clear_match">The view doesn\'t clearly match the terrain.</string>
+    <string name="align_problem_hold_upright">Hold the phone upright, facing the mountains.</string>
+    <string name="align_problem_moving">Hold the phone still for a moment.</string>
+    <string name="align_problem_rough_location">Your location isn\'t precise enough yet.</string>
+    <string name="align_problem_no_camera">Camera details aren\'t available yet. Try again in a moment.</string>
+    <string name="alignment_lost_hint">The view changed. Point at the skyline and retry.</string>
+    <string name="peaks_hidden_by_foreground">%1$d hidden by something nearer</string>
 </resources>

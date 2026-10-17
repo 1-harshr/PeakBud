@@ -50,6 +50,7 @@ import com.harsh.peakbud.core.model.*
 import com.harsh.peakbud.core.projection.*
 import com.harsh.peakbud.feature.panorama.*
 import com.harsh.peakbud.telemetry.Telemetry
+import com.harsh.peakbud.core.alignment.UprightFrame
 import kotlinx.coroutines.delay
 import kotlin.math.hypot
 
@@ -57,7 +58,9 @@ import kotlin.math.hypot
 @Composable
 fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit, onGps: () -> Unit, onTrack: () -> Unit, onFov: (Pair<Double, Double>?) -> Unit,
                 fullScreen: Boolean = false, safeTop: androidx.compose.ui.unit.Dp = TrailSpace.none, safeBottom: androidx.compose.ui.unit.Dp = TrailSpace.none,
-                onBackgroundTap: () -> Unit = {}, onDragNudge: (Double) -> Unit = {}, onDragEnd: () -> Unit = {}, onPeak: (PeakView) -> Unit) {
+                onBackgroundTap: () -> Unit = {}, onDragNudge: (Double) -> Unit = {}, onDragEnd: () -> Unit = {},
+                pose: CameraPose? = state.cameraPose, aligned: Boolean = false, hiddenPeaks: Set<String> = emptySet(),
+                alignment: CameraAlignmentController? = null, rawPose: () -> CameraPose? = { state.cameraPose }, onPeak: (PeakView) -> Unit) {
     val strings = rememberTrailStrings()
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
@@ -83,16 +86,16 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
         !state.followingGps -> strings(R.string.share_your_location_so_peaks_appear_in_the_right_place)
         !state.gpsFresh -> state.gpsStatus ?: strings(R.string.finding_your_location)
         !state.followingCompass -> strings(R.string.turn_on_the_compass_so_labels_follow_where_you_point)
-        state.cameraPose == null -> strings(R.string.point_the_back_of_your_phone_toward_the_mountains)
+        pose == null -> strings(R.string.point_the_back_of_your_phone_toward_the_mountains)
         !state.poseReliable && !fullScreen -> state.compassStatus ?: strings(R.string.compass_is_unsteady_move_away_from_metal_and_wave_your_phone_in_a_figure_eig)
-        state.calculating -> strings(R.string.finding_the_peaks_you_can_see)
+        state.calculating && state.scene == null -> strings(R.string.finding_the_peaks_you_can_see)
         state.scene == null -> strings(R.string.this_hiking_area_doesn_t_cover_where_you_are_pick_one_that_does)
         lens == null -> strings(R.string.this_phone_s_camera_can_t_place_labels_accurately_use_home_instead)
         else -> null
     }
     Box(modifier.onSizeChanged { viewport = it }.clipToBounds().background(Color.Black)) {
-        if (permission) CameraPreview(Modifier.fillMaxSize(), { lens = it }, { cameraStatus = it })
-        if (notice == null) CameraLabels(state, lens!!, Modifier.fillMaxSize(), safeTop, safeBottom, onBackgroundTap, onDragNudge, onDragEnd, onPeak)
+        if (permission) CameraPreview(Modifier.fillMaxSize(), { lens = it }, { cameraStatus = it }, alignment, rawPose) { state.scene?.peaks.orEmpty() }
+        if (notice == null) CameraLabels(state, pose!!, aligned, hiddenPeaks, lens!!, Modifier.fillMaxSize(), safeTop, safeBottom, onBackgroundTap, onDragNudge, onDragEnd, onPeak)
         else if (fullScreen) Box(Modifier.fillMaxSize().pointerInput(Unit) { detectTapGestures { onBackgroundTap() } }
             .pointerInput(Unit) { detectHorizontalDragGestures { change, _ -> change.consume() } })  // a swipe is not a tap
         if (notice != null) {
@@ -128,7 +131,8 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
 
 @androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
 @Composable
-private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onStatus: (String?) -> Unit) {
+private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onStatus: (String?) -> Unit,
+                          alignment: CameraAlignmentController?, rawPose: () -> CameraPose?, peaks: () -> List<PeakView>) {
     val strings = rememberTrailStrings()
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
@@ -141,6 +145,11 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
     var optics by remember { mutableStateOf<Triple<Double, Double, Pair<Float, Float>>?>(null) }
     var streaming by remember { mutableStateOf(false) }
     var focalLength by remember { mutableStateOf<Float?>(null) }
+    // Read by the analysis thread: preview geometry captured on the main thread.
+    val frameGeometry = remember { FrameGeometry() }
+    val currentAlignment by rememberUpdatedState(alignment)
+    val currentPose by rememberUpdatedState(rawPose)
+    val currentPeaks by rememberUpdatedState(peaks)
     AndroidView(factory = { view }, modifier = modifier.semantics { contentDescription = if (streaming) strings(R.string.live_rear_camera_preview) else strings(R.string.camera_preview_starting) })
     DisposableEffect(view, owner) {
         var disposed = false
@@ -159,6 +168,26 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
             }
         )
         val preview = builder.build()
+        // Frame analysis for "Align with camera": one dedicated worker, latest frame only, small RGBA frames.
+        val analysisExecutor = java.util.concurrent.Executors.newSingleThreadExecutor { Thread(it, "peakbud-alignment") }
+        val analysis = androidx.camera.core.ImageAnalysis.Builder()
+            .setBackpressureStrategy(androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .setOutputImageFormat(androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
+            .setTargetRotation(view.display?.rotation ?: android.view.Surface.ROTATION_0)
+            .setResolutionSelector(androidx.camera.core.resolutionselector.ResolutionSelector.Builder()
+                .setResolutionStrategy(androidx.camera.core.resolutionselector.ResolutionStrategy(android.util.Size(640, 480),
+                    androidx.camera.core.resolutionselector.ResolutionStrategy.FALLBACK_RULE_CLOSEST_LOWER_THEN_HIGHER)).build())
+            .build()
+        analysis.setAnalyzer(analysisExecutor) { image ->
+            try {
+                val controller = currentAlignment
+                if (!disposed && controller != null && controller.wantsFrame()) analyseFrame(image, frameGeometry, controller, currentPose(), currentPeaks())
+            } catch (error: Exception) {
+                Telemetry.error("alignment frame", error)
+            } finally {
+                image.close()  // every frame, or CameraX stops delivering them
+            }
+        }
         val streamObserver = Observer<PreviewView.StreamState> { value ->
             streaming = value == PreviewView.StreamState.STREAMING
             if (streaming) statusCallback(null)
@@ -170,7 +199,11 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
                 provider = future.get()
                 check(provider!!.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) { strings(R.string.this_phone_has_no_rear_camera_use_home_instead) }
                 preview.setSurfaceProvider(view.surfaceProvider)
-                val camera = provider!!.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview)
+                // Preview and analysis share the preview's viewport so they cover the same scene. Mapping still goes
+                // through sensor coordinates, so it stays correct even if the viewport is not ready yet.
+                val group = androidx.camera.core.UseCaseGroup.Builder().addUseCase(preview).addUseCase(analysis)
+                view.viewPort?.let { group.setViewPort(it) }
+                val camera = provider!!.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, group.build())
                 val info = Camera2CameraInfo.from(camera.cameraInfo)
                 val physical = info.getCameraCharacteristic(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE)
                 val pixels = info.getCameraCharacteristic(CameraCharacteristics.SENSOR_INFO_PIXEL_ARRAY_SIZE)
@@ -193,7 +226,11 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
             view.previewStreamState.removeObserver(streamObserver)
             cameraObserver?.let { observedCamera?.cameraInfo?.cameraState?.removeObserver(it) }
             cameraObserver = null; observedCamera = null
-            provider?.unbind(preview)
+            analysis.clearAnalyzer()
+            provider?.unbind(preview, analysis)
+            analysisExecutor.shutdown()
+            alignment?.reset()
+            frameGeometry.lens = null; frameGeometry.previewTransform = null
             lensCallback(null)
         }
     }
@@ -202,7 +239,9 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
             while (true) {
                 val o = optics
                 val transform = if (streaming) view.sensorToViewTransform else null
-                lensCallback(if (o != null && transform != null && focalLength != null && focalLength!! > 0) {
+                frameGeometry.previewTransform = if (streaming) view.outputTransform else null
+                frameGeometry.viewWidth = view.width; frameGeometry.viewHeight = view.height
+                val lens = if (o != null && transform != null && focalLength != null && focalLength!! > 0) {
                     // Transform sensor focal vectors to preview pixels. This incorporates
                     // sensor rotation, stream crop, and PreviewView's FILL_CENTER crop.
                     val (cx, cy) = o.third
@@ -211,7 +250,9 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
                     val fx = hypot((points[2] - points[0]).toDouble(), (points[4] - points[0]).toDouble())
                     val fy = hypot((points[3] - points[1]).toDouble(), (points[5] - points[1]).toDouble())
                     if (fx > 0 && fy > 0) CameraLens(fx, fy, points[0].toDouble(), points[1].toDouble()) else null
-                } else null)
+                } else null
+                frameGeometry.lens = lens
+                lensCallback(lens)
                 delay(100)
             }
         }
@@ -219,7 +260,7 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
 }
 
 @Composable
-private fun CameraLabels(state: PanoramaState, lens: CameraLens, modifier: Modifier, safeTop: androidx.compose.ui.unit.Dp, safeBottom: androidx.compose.ui.unit.Dp,
+private fun CameraLabels(state: PanoramaState, pose: CameraPose, aligned: Boolean, hiddenPeaks: Set<String>, lens: CameraLens, modifier: Modifier, safeTop: androidx.compose.ui.unit.Dp, safeBottom: androidx.compose.ui.unit.Dp,
                          onBackgroundTap: () -> Unit, onDragNudge: (Double) -> Unit, onDragEnd: () -> Unit, onPeak: (PeakView) -> Unit) {
     val strings = rememberTrailStrings()
     val type = peakLabelTypography()
@@ -233,12 +274,12 @@ private fun CameraLabels(state: PanoramaState, lens: CameraLens, modifier: Modif
         // Drag sideways to line labels up with the real ridges; degrees follow the lens's horizontal scale.
         .pointerInput(lens) { detectHorizontalDragGestures(onDragEnd = { dragEnd() }) { change, dx -> change.consume(); nudge(-Math.toDegrees(kotlin.math.atan(dx / lens.fx))) } }) {
         hits.clear()
-        val pose = state.cameraPose ?: return@Canvas
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = type.titlePx; color = android.graphics.Color.WHITE; typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
             setShadowLayer(TrailCanvas.shadowRadius.toPx(), 0f, TrailStroke.thin.toPx(), 0x99000000.toInt()) }
         val occupied = mutableListOf<RectF>()
         val peaks = state.scene?.peaks.orEmpty().filter { it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN }
         for (peak in peaks.inLabelPriority()) {
+            if (peak.peak.id in hiddenPeaks) continue  // the camera shows something nearer covering this summit
             val point = CameraProjector.project(peak.bearingDeg, peak.elevationDeg ?: continue, pose, lens) ?: continue
             // Overlays cover the top and bottom; keep labels and their anchors inside the clear area.
             val clearTop = safeTop.toPx() + TrailCanvas.labelMargin.toPx()
@@ -267,6 +308,8 @@ private fun CameraLabels(state: PanoramaState, lens: CameraLens, modifier: Modif
             drawLine(Color.White, Offset(point.x, point.y), Offset(box.centerX(), box.bottom), TrailStroke.thin.toPx())
             drawCircle(Color.Black.copy(alpha = .35f), TrailCanvas.markerHalo.toPx(), Offset(point.x, point.y))
             drawCircle(Color.White, TrailCanvas.marker.toPx(), Offset(point.x, point.y))
+            // Camera-aligned anchors get a green ring; sensor estimates stay plain white.
+            if (aligned) drawCircle(TrailCameraColors.alignedRing, TrailCanvas.markerHalo.toPx(), Offset(point.x, point.y), style = androidx.compose.ui.graphics.drawscope.Stroke(TrailStroke.heavy.toPx()))
             val text = android.text.TextUtils.ellipsize(label, android.text.TextPaint(paint), width - TrailSpace.lg.toPx(), android.text.TextUtils.TruncateAt.END).toString()
             drawContext.canvas.nativeCanvas.drawText(text, box.left + TrailCanvas.labelMargin.toPx(), box.top + type.titleBaseline, paint)
             paint.textSize = type.detailPx; paint.alpha = 220
@@ -276,4 +319,37 @@ private fun CameraLabels(state: PanoramaState, lens: CameraLens, modifier: Modif
             hits += box to peak
         }
     }
+}
+
+
+/** Preview geometry written on the main thread and read by the analysis thread. */
+private class FrameGeometry {
+    @Volatile var lens: CameraLens? = null
+    @Volatile var previewTransform: androidx.camera.view.transform.OutputTransform? = null
+    @Volatile var viewWidth = 0
+    @Volatile var viewHeight = 0
+}
+
+/** Downsample the frame upright, then map boundary points to preview pixels through sensor coordinates. */
+@androidx.annotation.OptIn(androidx.camera.view.TransformExperimental::class)
+private fun analyseFrame(image: androidx.camera.core.ImageProxy, geometry: FrameGeometry, controller: CameraAlignmentController,
+                         pose: CameraPose?, peaks: List<PeakView>) {
+    val target = geometry.previewTransform ?: return
+    val width = geometry.viewWidth; val height = geometry.viewHeight
+    if (width <= 0 || height <= 0) return
+    val toPreview = androidx.camera.view.transform.CoordinateTransform(
+        androidx.camera.view.transform.ImageProxyTransformFactory().getOutputTransform(image), target)
+    val plane = image.planes[0]
+    val buffer = plane.buffer; val rowStride = plane.rowStride; val pixelStride = plane.pixelStride
+    val crop = image.cropRect
+    val frame = UprightFrame.sample(crop.left, crop.top, crop.width(), crop.height(), image.imageInfo.rotationDegrees, 320) { x, y ->
+        val offset = y * rowStride + x * pixelStride
+        (0xff shl 24) or ((buffer.get(offset).toInt() and 255) shl 16) or ((buffer.get(offset + 1).toInt() and 255) shl 8) or (buffer.get(offset + 2).toInt() and 255)
+    }
+    val point = FloatArray(2)
+    controller.process(frame, { bx, by ->
+        point[0] = bx.toFloat(); point[1] = by.toFloat()
+        toPreview.mapPoints(point)
+        if (point[0] in 0f..width.toFloat() && point[1] in 0f..height.toFloat()) point[0].toDouble() to point[1].toDouble() else null
+    }, geometry.lens, pose, peaks)
 }

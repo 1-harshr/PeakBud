@@ -11,6 +11,9 @@ class TerrainEngine {
         terrain: Terrain,
         peaks: List<Peak>,
         settings: CalculationSettings = CalculationSettings(),
+        /** Receives partial scenes (skyline plus the peaks finished so far) about every [progressMs]; results are unchanged. */
+        onProgress: ((MountainScene) -> Unit)? = null,
+        progressMs: Long = 1_500,
         checkpoint: () -> Unit = {},
     ): MountainScene {
         require(observer.datum == terrain.datum) { "Your height and the map use different references, so this is approximate." }
@@ -38,10 +41,20 @@ class TerrainEngine {
             }
             HorizonSample(bearing, highest.takeIf { it.isFinite() }?.let { Math.toDegrees(atan(it)) }, distance, complete)
         }
-        val views = peaks.filter { Geography.distance(observer.point, it.point) in 1.0..settings.radiusM }
-            .map { peak -> checkpoint(); visibility(observer, peak, terrain, checkpoint) }
-            .sortedBy { it.bearingDeg }
-        return MountainScene(observer, horizon, views, settings.radiusM)
+        // Nearest peaks first, so progressive results label the closest (usually most prominent) summits early.
+        val candidates = peaks.map { it to Geography.distance(observer.point, it.point) }
+            .filter { it.second in 1.0..settings.radiusM }.sortedBy { it.second }.map { it.first }
+        val views = ArrayList<PeakView>(candidates.size)
+        var lastProgress = System.nanoTime()
+        for (peak in candidates) {
+            checkpoint()
+            views += visibility(observer, peak, terrain, checkpoint)
+            if (onProgress != null && System.nanoTime() - lastProgress > progressMs * 1_000_000) {
+                lastProgress = System.nanoTime()
+                onProgress(MountainScene(observer, horizon, views.sortedBy { it.bearingDeg }, settings.radiusM))
+            }
+        }
+        return MountainScene(observer, horizon, views.sortedBy { it.bearingDeg }, settings.radiusM)
     }
 
     fun visibility(observer: Observer, peak: Peak, terrain: Terrain, checkpoint: () -> Unit = {}): PeakView {

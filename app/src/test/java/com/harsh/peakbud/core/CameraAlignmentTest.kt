@@ -81,7 +81,21 @@ class CameraAlignmentTest {
         assertEquals(AlignmentPhase.LOST, session.observe(match.copy(correction = AlignmentCorrection(9.0, 0.0)), 5000).phase)
         assertEquals(AlignmentPhase.SENSOR, session.reset().phase)
         session.start(6000)
-        assertEquals(AlignmentPhase.LOST, session.tick(16001).phase)
+        session.miss(AlignmentProblem.NO_CLEAR_SKY, 6100); session.miss(AlignmentProblem.NO_CLEAR_SKY, 6400); session.miss(AlignmentProblem.NOT_ENOUGH_SHAPE, 6700)
+        val failed = session.tick(16001)
+        assertEquals(AlignmentPhase.FAILED, failed.phase)
+        assertEquals("the most frequent reason explains the failure", AlignmentProblem.NO_CLEAR_SKY, failed.problem)
+        assertNull(failed.correction)
+    }
+    @Test fun acceptedAlignmentFollowsSmallDriftWithoutJumping() {
+        val session = AlignmentSession()
+        val match = SkylineMatch(AlignmentCorrection(3.0, -1.0), .1, .95, 1.0)
+        session.start(0)
+        for (t in listOf(100L, 400L, 700L)) session.observe(match, t)
+        val drifted = session.observe(match.copy(correction = AlignmentCorrection(3.6, -1.0)), 1000)
+        assertEquals(AlignmentPhase.ALIGNED, drifted.phase)
+        assertEquals(3.18, drifted.correction!!.heading, .001)
+        assertEquals(1000L, drifted.verifiedAtMs)
     }
     @Test fun threeVisualMissesRevokeAcceptedCorrection() {
         val session = AlignmentSession()

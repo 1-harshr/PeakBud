@@ -19,6 +19,8 @@ import com.harsh.peakbud.data.download.RegionDownloader
 import com.harsh.peakbud.data.download.PendingDownload
 import com.harsh.peakbud.device.*
 import com.harsh.peakbud.telemetry.Telemetry
+import com.harsh.peakbud.feature.camera.CameraAlignmentController
+import com.harsh.peakbud.core.alignment.AlignmentProblem
 import java.io.File
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -71,6 +73,8 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     private val settings = AppSettings(application)
     private val downloader = RegionDownloader(File(application.noBackupFilesDir, "downloads"))
     private var calculation: Job? = null
+    /** Camera alignment state lives here, apart from the raw sensor pose in [state]. */
+    val alignment = CameraAlignmentController(viewModelScope, log = { Telemetry.log(it) })
     private var importJob: Job? = null
     private var lastGpsPoint: GeoPoint? = null
     private var gpsAccuracyM = 0.0
@@ -137,7 +141,14 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                             }
                             Geography.viewingBounds(input.point, pack.radiusM).let { b -> database.peaks().candidates(pack.key, b.south, b.west, b.north, b.east) }.map { p -> p.toPeak() }
                         }
-                        TerrainEngine().calculate(observer, it, peaks, CalculationSettings(pack?.radiusM ?: 50_000.0)) { context.ensureActive() }
+                        TerrainEngine().calculate(observer, it, peaks, CalculationSettings(pack?.radiusM ?: 50_000.0),
+                            // Publish partial scenes so nearby labels appear while distant peaks are still being checked.
+                            onProgress = { partial ->
+                                if (context.isActive) {
+                                    if (mutable.value.scene == null) Telemetry.log("first peaks ready in ${android.os.SystemClock.elapsedRealtime() - calculationStarted} ms: ${partial.peaks.size} so far")
+                                    mutable.update { s -> s.copy(scene = partial) }
+                                }
+                            }) { context.ensureActive() }
                     }
                 }
                 ensureActive()
@@ -154,12 +165,43 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    /** "Align with camera": predict the skyline from the downloaded terrain and match camera frames against it. */
+    fun startAlignment(hfovDeg: Double?) {
+        val input = mutable.value
+        val pack = input.activePack
+        val fix = input.gpsFix
+        val blocker = when {
+            pack == null -> AlignmentProblem.NO_TERRAIN
+            hfovDeg == null || hfovDeg !in 20.0..120.0 -> AlignmentProblem.NO_CAMERA
+            input.followingGps && (!input.gpsFresh || fix == null || fix.accuracyM > 50) -> AlignmentProblem.ROUGH_LOCATION
+            input.cameraPose == null -> AlignmentProblem.HOLD_UPRIGHT
+            !pack.observerBounds.contains(input.point) -> AlignmentProblem.NO_TERRAIN
+            else -> null
+        }
+        Telemetry.event("align_start", "blocked" to (blocker?.name?.lowercase() ?: "no"))
+        val target = if (pack != null && hfovDeg != null) CameraAlignmentController.Target(pack, input.point,
+            input.groundOverrideM ?: input.scene?.observer?.groundHeightM, input.preferences.phoneHeightM, hfovDeg) else null
+        alignment.start(target, input.cameraPose, blocker)
+    }
+    fun resetAlignment() = alignment.reset()
+    /** Warm the terrain prediction for the current direction while the Camera tab is open. */
+    fun prefetchAlignment(hfovDeg: Double?) {
+        val input = mutable.value
+        val pack = input.activePack ?: return
+        val pose = input.cameraPose ?: return
+        if (hfovDeg == null || hfovDeg !in 20.0..120.0 || !pack.observerBounds.contains(input.point)) return
+        alignment.prefetch(CameraAlignmentController.Target(pack, input.point, input.groundOverrideM ?: input.scene?.observer?.groundHeightM,
+            input.preferences.phoneHeightM, hfovDeg), pose.heading)
+    }
+
     fun manualViewpoint(point: GeoPoint, groundHeight: Double?) {
+        alignment.reset()
         mutable.update { it.copy(point = point, groundOverrideM = groundHeight, followingGps = false, gpsStatus = null) }
         recalculate()
     }
     fun selectRegion(pack: RegionPack?) {
         calculation?.cancel()
+        alignment.reset()
         yawTrim = 0.0
         lastSmoothedHeading = null
         lastGpsPoint = null
@@ -179,11 +221,13 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     fun toggleCompass() { lastSmoothedHeading = null; mutable.update { it.copy(followingCompass = !it.followingCompass, cameraPose = null, compassStatus = null) } }
     fun trimCompass(degrees: Double) {
         Telemetry.log("label nudge $degrees")
+        alignment.reset()
         yawTrim = Geography.wrap180(yawTrim + degrees)
         lastSmoothedHeading = lastSmoothedHeading?.let { Geography.wrap360(it + degrees) }
         mutable.update { it.copy(labelTrim = yawTrim, heading = Geography.wrap360(it.heading + degrees), cameraPose = it.cameraPose?.let { p -> p.copy(heading = Geography.wrap360(p.heading + degrees)) }) }
     }
     fun resetTrim() {
+        alignment.reset()
         val old = yawTrim; yawTrim = 0.0
         lastSmoothedHeading = lastSmoothedHeading?.let { Geography.wrap360(it - old) }
         mutable.update { it.copy(labelTrim = 0.0, heading = Geography.wrap360(it.heading - old), cameraPose = it.cameraPose?.let { p -> p.copy(heading = Geography.wrap360(p.heading - old)) }) }
@@ -251,6 +295,7 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                 val previous = lastGpsPoint
                 if (previous == null || Geography.distance(previous, fix.point) >= maxOf(30.0, gpsAccuracyM)) {
                     lastGpsPoint = fix.point
+                    alignment.reset()  // the prediction was made from the previous position
                     mutable.update { it.copy(point = fix.point, groundOverrideM = null) }
                     recalculate()
                 }
