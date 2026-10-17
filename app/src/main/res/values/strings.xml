@@ -264,4 +264,34 @@
     <string name="nearby_unavailable">There\'s no download for exactly where you are yet. The closest areas are listed first.</string>
     <string name="closest_first">Closest first</string>
     <string name="download_action">Download</string>
+    <!-- Tutorial -->
+    <string name="help">Help</string>
+    <string name="tutorial">Tutorial</string>
+    <string name="tutorial_settings_detail">A one-minute walkthrough with a demo landscape</string>
+    <string name="tutorial_skip">Skip</string>
+    <string name="tutorial_back">Back</string>
+    <string name="tutorial_next">Next</string>
+    <string name="tutorial_done">Done</string>
+    <string name="tutorial_step">Step %1$d of %2$d</string>
+    <string name="tutorial_demo_footage">Demo footage</string>
+    <string name="tutorial_demo_footage_description">Demo camera view of a made-up mountain range with peak names</string>
+    <string name="tutorial_camera_title">Point at the mountains</string>
+    <string name="tutorial_camera_body">Open Camera and hold your phone up. PeakBud puts the names of the peaks you can see over the view, using your location, compass and the downloaded map.</string>
+    <string name="tutorial_align_title">Line labels up with the camera</string>
+    <string name="tutorial_align_body">Compasses drift. Tap Align with camera and PeakBud matches the skyline it sees to the one the map predicts, then snaps the labels onto the real summits. Green rings mean the camera confirmed them.</string>
+    <string name="tutorial_home_title">See the skyline on Home</string>
+    <string name="tutorial_home_body">Home draws the mountains around you from the map. Drag to look around, even indoors or without the camera.</string>
+    <string name="tutorial_peaks_title">Check what is in view</string>
+    <string name="tutorial_peaks_body">Peaks lists every summit nearby with its height and distance. In view means nothing in the landscape blocks it; Maybe means it sits close to the skyline.</string>
+    <string name="tutorial_regions_title">Download before you go</string>
+    <string name="tutorial_regions_body">Regions suggests a small download around where you are and lists hiking areas closest first. Once downloaded, everything works offline on the trail.</string>
+    <string name="tutorial_ready_title">You\'re ready</string>
+    <string name="tutorial_ready_body">You can open this tutorial again any time from Settings.</string>
+    <string name="tutorial_tip_nudge">Labels a little off? Drag the camera view sideways or use Nudge labels.</string>
+    <string name="tutorial_tip_tap">Tap any label for the peak\'s height, distance and why it is visible.</string>
+    <string name="tutorial_tip_demo">Turn on Demo mode in Settings to try PeakBud without a download.</string>
+    <string name="tutorial_example_nearby">Around Demo Valley</string>
+    <string name="tutorial_example_nearby_detail">You\'re here · 32 MB · peaks up to 30 km away</string>
+    <string name="tutorial_example_area">Silver Crown Lookout</string>
+    <string name="tutorial_example_area_detail">12 km away · 18 MB · peaks up to 25 km away</string>
 </resources>

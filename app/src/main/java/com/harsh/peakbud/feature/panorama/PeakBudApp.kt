@@ -93,6 +93,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
     var askedLocation by rememberSaveable { mutableStateOf(false) }
     var manual by rememberSaveable { mutableStateOf(false) }
     var settings by rememberSaveable { mutableStateOf(false) }
+    var tutorial by rememberSaveable { mutableStateOf(false) }
     var selectedPeak by remember { mutableStateOf<PeakView?>(null) }
     var attribution by remember { mutableStateOf<String?>(null) }
     var deletePack by remember { mutableStateOf<RegionPack?>(null) }
@@ -212,7 +213,8 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
         }
     }
     if (manual) ViewpointDialog(state, { manual = false }) { point, ground -> model.manualViewpoint(point, ground); manual = false }
-    if (settings) SettingsDialog(state, model) { settings = false }
+    if (settings) SettingsDialog(state, model, onTutorial = { settings = false; tutorial = true }) { settings = false }
+    if (tutorial) com.harsh.peakbud.feature.tutorial.TutorialScreen(state.preferences) { tutorial = false }
     selectedPeak?.let { peak ->
         AlertDialog(onDismissRequest = { selectedPeak = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text(peak.peak.name) }, text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(TrailSpace.md)) {
@@ -945,7 +947,7 @@ private fun ViewpointDialog(state: PanoramaState, onDismiss: () -> Unit, onApply
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SettingsDialog(state: PanoramaState, model: PanoramaViewModel, onDismiss: () -> Unit) {
+private fun SettingsDialog(state: PanoramaState, model: PanoramaViewModel, onTutorial: () -> Unit, onDismiss: () -> Unit) {
     val strings = rememberTrailStrings()
     var phoneHeight by remember { mutableFloatStateOf(state.preferences.phoneHeightM.toFloat()) }
     val prefs = state.preferences
@@ -984,6 +986,16 @@ private fun SettingsDialog(state: PanoramaState, model: PanoramaViewModel, onDis
                 }
                 HorizontalDivider(Modifier.padding(horizontal = TrailSpace.lg), color = MaterialTheme.colorScheme.outlineVariant)
                 SettingSlider(strings(R.string.look_up_or_down), if (state.pitch.toInt() == 0) strings(R.string.level) else angleText(state.pitch, strings), state.pitch.toFloat(), -20f..20f, { model.setPitch(it.toDouble()) })
+            }
+            SectionLabel(strings(R.string.help))
+            SettingsGroup {
+                Row(Modifier.fillMaxWidth().clickable(onClick = onTutorial).padding(horizontal = TrailSpace.lg, vertical = TrailSpace.md), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(strings(R.string.tutorial), style = MaterialTheme.typography.bodyLarge)
+                        Text(strings(R.string.tutorial_settings_detail), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Icon(painterResource(R.drawable.ic_chevron_right), null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
             SectionLabel(strings(R.string.demo))
             SettingsGroup {
