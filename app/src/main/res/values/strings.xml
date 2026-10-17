@@ -256,4 +256,12 @@
     <string name="align_problem_no_camera">Camera details aren\'t available yet. Try again in a moment.</string>
     <string name="alignment_lost_hint">The view changed. Point at the skyline and retry.</string>
     <string name="peaks_hidden_by_foreground">%1$d hidden by something nearer</string>
+    <!-- Location-aware downloads -->
+    <string name="near_you">Near you</string>
+    <string name="nearby_area_subtitle">Only the terrain and peaks around you</string>
+    <string name="distance_away">%1$s away</string>
+    <string name="you_are_here">You\'re here</string>
+    <string name="nearby_unavailable">There\'s no download for exactly where you are yet. The closest areas are listed first.</string>
+    <string name="closest_first">Closest first</string>
+    <string name="download_action">Download</string>
 </resources>

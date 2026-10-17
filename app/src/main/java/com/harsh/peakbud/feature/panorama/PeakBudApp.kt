@@ -48,6 +48,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import com.harsh.peakbud.R
+import com.harsh.peakbud.data.regions.Vicinity
 import com.harsh.peakbud.core.projection.CameraPose
 import com.harsh.peakbud.feature.camera.AlignmentUi
 import com.harsh.peakbud.core.alignment.AlignmentProblem
@@ -195,9 +196,13 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                     }
                 }
                 2 -> PeakList(state, Modifier.weight(1f), barSpace) { selectedPeak = it }
-                3 -> Regions(state, Modifier.weight(1f), barSpace, model::downloadRegion,
+                3 -> {
+                    val cell = state.gpsFix?.point?.let { (it.latitude * 100).toInt() to (it.longitude * 100).toInt() }
+                    LaunchedEffect(cell, state.catalog.size, state.placeName) { model.planNearby() }
+                    Regions(state, Modifier.weight(1f), barSpace, model::downloadRegion,
                     { model.selectRegion(it); tab = 1 }, { deletePack = it }, { pack -> scope.launch { attribution = runCatching { model.attribution(pack) }.getOrDefault(strings(R.string.credits_couldn_t_be_loaded)) } }, model::cancelImport,
                     model::discardDownload)
+                }
             }
         }
         AnimatedVisibility(!(cameraTab && immersive), Modifier.align(Alignment.BottomCenter),
@@ -483,7 +488,8 @@ private fun GlassPill(modifier: Modifier = Modifier, color: Color = TrailCameraC
 private fun AppHeader(compact: Boolean, context: String, contextIcon: Int? = null, onSettings: () -> Unit) {
     val strings = rememberTrailStrings()
     Row(Modifier.fillMaxWidth().padding(top = if (compact) TrailSpace.xs else TrailSpace.md, bottom = TrailSpace.xxs), verticalAlignment = Alignment.CenterVertically) {
-        Icon(painterResource(R.drawable.ic_logo_mark), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(if (compact) TrailSpace.xxl else TrailSize.chip))
+        // Multicolour artwork: draw as an image, never tinted (a tint flattens it into a solid square).
+        Image(painterResource(R.drawable.ic_logo_mark), contentDescription = null, modifier = Modifier.size(if (compact) TrailSpace.xxl else TrailSize.chip))
         Spacer(Modifier.width(TrailSpace.md))
         Column(Modifier.weight(1f)) {
             Text(strings(R.string.app_name), style = if (compact) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
@@ -770,7 +776,12 @@ private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, o
     fun matches(vararg fields: String?) = words.all { word -> fields.any { it?.lowercase()?.contains(word) == true } }
     fun installedFor(region: CatalogRegion) = state.packs.lastOrNull { it.id == region.id && it.version == region.version }
     val catalog = state.catalog.filter { matches(it.name, it.country, it.description) }
-    val (onDevice, available) = catalog.partition { installedFor(it) != null }
+    val here = state.gpsFix?.point
+    // With a location, list areas closest first and show how far each one is.
+    val distances = here?.let { point -> Vicinity.suggestions(point, catalog, catalog.size).associate { it.region.id to it.distanceM } }.orEmpty()
+    val (onDevice, unsorted) = catalog.partition { installedFor(it) != null }
+    val available = if (distances.isEmpty() || words.isNotEmpty()) unsorted else unsorted.sortedBy { distances[it.id] }
+    val nearby = state.nearby?.takeIf { plan -> words.isEmpty() && state.packs.none { it.id == plan.id } }
     val legacy = state.packs.filter { pack -> state.catalog.none { it.id == pack.id && it.version == pack.version } && matches(pack.name) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
         OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, shape = CircleShape,
@@ -794,6 +805,28 @@ private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, o
                 }
             }
             if (catalog.isEmpty() && legacy.isEmpty()) item { EmptyState(strings(R.string.no_hiking_areas_match , query)) }
+            val nearbyUnavailable = here != null && words.isEmpty() && nearby == null && state.packs.none { it.id.startsWith("nearby-") }
+            if (nearby != null || nearbyUnavailable) item { SectionLabel(strings(R.string.near_you)) }
+            nearby?.let { plan ->
+                item(key = "nearby") {
+                    val downloading = state.downloadingRegionId == plan.id
+                    val saved = state.pendingDownloads.any { transfer -> plan.tiles.any { it.url == transfer.address } }
+                    RegionCard(plan.name, strings(R.string.nearby_area_subtitle),
+                        strings(R.string.region_download_storage_range, storageSize(plan.downloadBytes, strings), storageSize(plan.installedBytes, strings), distance(Vicinity.RADIUS_M, state, strings)),
+                        if (downloading) strings(R.string.downloading) else if (saved) strings(R.string.paused) else strings(R.string.you_are_here), MaterialTheme.colorScheme.primary, highlighted = true) {
+                        when {
+                            downloading -> CircularProgressIndicator(Modifier.padding(TrailSpace.md).size(TrailSize.icon), strokeWidth = TrailStroke.progress)
+                            else -> Button(enabled = state.importing == null, onClick = { onDownload(plan) }, contentPadding = PaddingValues(horizontal = TrailSpace.lg)) {
+                                Text(strings(if (saved) R.string.resume else R.string.download_action))
+                            }
+                        }
+                    }
+                }
+            }
+            if (nearbyUnavailable) item {
+                Text(strings(R.string.nearby_unavailable), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = TrailSpace.xs))
+            }
             if (onDevice.isNotEmpty() || legacy.isNotEmpty()) item { SectionLabel(strings(R.string.downloaded)) }
             items(onDevice, key = { it.id }) { region ->
                 val installed = installedFor(region)!!
@@ -815,14 +848,18 @@ private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, o
                         DropdownMenuItem(text = { Text(strings(R.string.map_credits)) }, leadingIcon = { Icon(painterResource(R.drawable.ic_info), null) }, onClick = { close(); onAttribution(pack) })
                         DropdownMenuItem(text = { Text(strings(R.string.delete_2)) }, leadingIcon = { Icon(painterResource(R.drawable.ic_delete), null) }, enabled = state.importing == null, onClick = { close(); onDelete(pack) })
                     }) {
-                    Button(onClick = { onSelect(pack) }, contentPadding = PaddingValues(horizontal = TrailSpace.lg)) { Text(strings(R.string.use)) }
+                    if (active) FilledTonalButton(onClick = { onSelect(pack) }, contentPadding = PaddingValues(horizontal = TrailSpace.lg)) { Text(strings(R.string.open)) }
+                    else Button(onClick = { onSelect(pack) }, contentPadding = PaddingValues(horizontal = TrailSpace.lg)) { Text(strings(R.string.use)) }
                 }
             }
-            if (available.isNotEmpty()) item { SectionLabel(if (words.isEmpty()) strings.quantity(R.plurals.explore_area_count, available.size, available.size) else strings(R.string.results)) }
+            if (available.isNotEmpty()) item { SectionLabel(if (words.isNotEmpty()) strings(R.string.results)
+                else if (distances.isNotEmpty()) strings.quantity(R.plurals.explore_area_count, available.size, available.size) + " · " + strings(R.string.closest_first)
+                else strings.quantity(R.plurals.explore_area_count, available.size, available.size)) }
             items(available, key = { it.id }) { region ->
                 val saved = state.pendingDownloads.any { transfer -> region.tiles.any { it.url == transfer.address } }
                 val downloading = state.downloadingRegionId == region.id
-                RegionCard(region.name, strings(R.string.region_subtitle, region.country, region.description),
+                val away = distances[region.id]?.let { if (it < 1.0) strings(R.string.you_are_here) else strings(R.string.distance_away, distance(it, state, strings)) }
+                RegionCard(region.name, listOfNotNull(away, strings(R.string.region_subtitle, region.country, region.description)).joinToString(" · "),
                     strings(R.string.region_download_storage_range, storageSize(region.downloadBytes, strings), storageSize(region.installedBytes, strings), distance(region.radiusKm * 1000.0, state, strings)),
                     if (downloading) strings(R.string.downloading) else if (saved) strings(R.string.paused) else null, MaterialTheme.colorScheme.tertiary,
                     menu = if (saved && !downloading) { close -> DropdownMenuItem(text = { Text(strings(R.string.discard_download)) }, leadingIcon = { Icon(painterResource(R.drawable.ic_delete), null) },

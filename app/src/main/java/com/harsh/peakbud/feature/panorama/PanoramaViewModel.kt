@@ -55,6 +55,8 @@ data class PanoramaState(
     val labelTrim: Double = 0.0,
     /** Human-readable name of where the phone is, from the geocoder; null offline or before the first fix. */
     val placeName: String? = null,
+    /** A small download centred on the phone's position, when catalogue terrain covers it. */
+    val nearby: CatalogRegion? = null,
 ) {
     /** Fictional terrain is shown only while demo mode is switched on in Settings. */
     val isDemo: Boolean get() = activePack == null && preferences.demoMode
@@ -321,15 +323,16 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     }
     fun downloadRegion(region: CatalogRegion) {
         if (importJob?.isCompleted == false) return
-        val trusted = mutable.value.catalog.firstOrNull { it.id == region.id } ?: return
+        val trusted = mutable.value.catalog.firstOrNull { it.id == region.id } ?: mutable.value.nearby?.takeIf { it.id == region.id } ?: return
         importJob = viewModelScope.launch {
             mutable.update { it.copy(importing = strings(R.string.starting_download_of , trusted.name), downloadingRegionId = trusted.id, message = null) }
             Telemetry.event("region_download_start", "region" to trusted.id, "size_mb" to trusted.downloadBytes / 1_048_576)
             try {
                 val pack = withContext(Dispatchers.IO) {
                     val context = currentCoroutineContext()
-                    CatalogInstaller(File(getApplication<Application>().noBackupFilesDir, "preparing"), store, downloader) {
-                        getApplication<Application>().assets.open(it)
+                    CatalogInstaller(File(getApplication<Application>().noBackupFilesDir, "preparing"), store, downloader) { path ->
+                        // Around-me packs carry generated peaks/credits; everything else is a bundled asset.
+                        Vicinity.generatedAsset(path)?.inputStream() ?: getApplication<Application>().assets.open(path)
                     }.install(trusted, { context.ensureActive() }) { progress -> mutable.update { it.copy(importing = progressText(progress)) } }
                 }
                 Telemetry.event("region_download_complete", "region" to trusted.id)
@@ -344,6 +347,21 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
                 mutable.update { it.copy(importing = null, downloadingRegionId = null, message = strings(R.string.region_download_failed)) }
                 refreshDownloads()
             }
+        }
+    }
+    private var nearbyJob: Job? = null
+    /** Plan an around-me download for the current position (cheap; reads bundled peak snapshots only). */
+    fun planNearby() {
+        val input = mutable.value
+        val point = input.gpsFix?.point ?: return
+        if (input.catalog.isEmpty()) return
+        nearbyJob?.cancel()
+        nearbyJob = viewModelScope.launch {
+            val plan = withContext(Dispatchers.IO) {
+                runCatching { Vicinity.plan(point, input.catalog, { getApplication<Application>().assets.open(it).bufferedReader().use { r -> r.readText() } }, input.placeName) }
+                    .onFailure { Telemetry.error("plan nearby", it) }.getOrNull()
+            }
+            mutable.update { it.copy(nearby = plan) }
         }
     }
     fun cancelImport() {
