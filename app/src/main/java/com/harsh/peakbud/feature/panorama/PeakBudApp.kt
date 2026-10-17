@@ -11,11 +11,13 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,6 +29,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import com.harsh.peakbud.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -110,30 +119,19 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
     if (fullScreenCamera) {
         FullScreenCamera(state, { fullScreenCamera = false }, { fullScreenCamera = false; tab = 2 }, ::gps,
             model::startCameraTracking, { cameraFov = it }) { selectedPeak = it }
-    } else Scaffold(containerColor = MaterialTheme.colorScheme.background, bottomBar = {
-        NavigationBar(containerColor = MaterialTheme.colorScheme.surface, tonalElevation = 0.dp) {
-            listOf("Camera" to R.drawable.ic_photo_camera, "Peaks" to R.drawable.ic_landscape, "Regions" to R.drawable.ic_map).forEachIndexed { index, (name, icon) ->
-                NavigationBarItem(selected = tab == index, onClick = { tab = index },
-                    icon = { Icon(painterResource(icon), contentDescription = null) }, label = { Text(name) },
-                    colors = NavigationBarItemDefaults.colors(indicatorColor = MaterialTheme.colorScheme.primaryContainer))
-            }
-        }
-    }) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 8.dp)) {
-            Row(Modifier.fillMaxWidth().padding(top = if (compact) 0.dp else 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(when (tab) { 1 -> "Peaks"; 2 -> "Hiking areas"; else -> "PeakBud" }, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
-                    if (!compact) Text(when (tab) {
-                        1 -> if (state.noRegion) "No hiking area selected" else if (state.isDemo) "Fictional peaks · demo" else "Line of sight within ${(state.activePack?.radiusM ?: 0.0).toInt() / 1000} km"
-                        2 -> "Download once · works offline on the trail"
-                        else -> state.activePack?.name?.let { "$it · offline" } ?: if (state.isDemo) "Explorer demo · fictional terrain" else "No hiking area selected"
-                    }, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                IconButton(onClick = { settings = true }) { Icon(painterResource(R.drawable.ic_settings), contentDescription = "Settings", tint = MaterialTheme.colorScheme.onSurfaceVariant) }
-            }
+    } else Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        // Space the floating tab bar occupies above the system navigation bar.
+        val barSpace = 84.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 16.dp).padding(bottom = if (tab == 0) barSpace else 0.dp),
+            verticalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 10.dp)) {
+            AppHeader(compact, when (tab) {
+                1 -> if (state.noRegion) "Peaks · no hiking area selected" else if (state.isDemo) "Peaks · fictional demo" else "Peaks · line of sight within ${(state.activePack?.radiusM ?: 0.0).toInt() / 1000} km"
+                2 -> "Hiking areas · download once, use offline"
+                else -> state.activePack?.name ?: if (state.isDemo) "Explorer demo · fictional terrain" else "No hiking area selected"
+            }) { settings = true }
             state.message?.let { message ->
-                Surface(color = MaterialTheme.colorScheme.errorContainer, shape = RoundedCornerShape(12.dp)) {
-                    Row(Modifier.padding(start = 12.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Surface(color = MaterialTheme.colorScheme.errorContainer, contentColor = MaterialTheme.colorScheme.onErrorContainer, shape = MaterialTheme.shapes.medium) {
+                    Row(Modifier.padding(start = 14.dp, top = 2.dp, bottom = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(message, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
                         TextButton(onClick = model::clearMessage) { Text("Dismiss") }
                     }
@@ -154,21 +152,21 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                     if (cameraMode) {
                         if (compact) {
                             Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                CameraPanel(state, Modifier.weight(1f).fillMaxHeight(), { tab = 2 }, ::gps, model::startCameraTracking, { cameraFov = it }) { selectedPeak = it }
+                                CameraPanel(state, Modifier.weight(1f).fillMaxHeight().clip(MaterialTheme.shapes.large), { tab = 2 }, ::gps, model::startCameraTracking, { cameraFov = it }) { selectedPeak = it }
                                 Column(Modifier.width(300.dp).fillMaxHeight().verticalScroll(rememberScrollState())) {
                                     ObservationStatus(state, true, cameraFov, true, ::gps, model::startCameraTracking)
                                     AlignmentControls(model)
                                 }
                             }
                         } else {
-                            CameraPanel(state, Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(20.dp)), { tab = 2 }, ::gps, model::startCameraTracking, { cameraFov = it }) { selectedPeak = it }
+                            CameraPanel(state, Modifier.weight(1f).fillMaxWidth().clip(MaterialTheme.shapes.large), { tab = 2 }, ::gps, model::startCameraTracking, { cameraFov = it }) { selectedPeak = it }
                             AlignmentControls(model)
                         }
                     } else BoxWithConstraints(Modifier.weight(1f)) {
                         if (maxWidth > maxHeight) {
                             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                                 PanoramaPanel(state, model, Modifier.weight(1f).fillMaxHeight(), { tab = 2 }) { selectedPeak = it }
-                                Column(Modifier.width(270.dp).fillMaxHeight().verticalScroll(rememberScrollState())) {
+                                Column(Modifier.width(320.dp).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     if (compact) ObservationStatus(state, false, null, true, ::gps, model::startCameraTracking)
                                     ViewControls(state, model, { manual = true }, ::gps)
                                 }
@@ -181,40 +179,95 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                         }
                     }
                 }
-                1 -> PeakList(state, Modifier.weight(1f)) { selectedPeak = it }
-                2 -> Regions(state, Modifier.weight(1f), model::downloadRegion,
+                1 -> PeakList(state, Modifier.weight(1f), barSpace) { selectedPeak = it }
+                2 -> Regions(state, Modifier.weight(1f), barSpace, model::downloadRegion,
                     { model.selectRegion(it); if (it == null) cameraMode = false; tab = 0 }, { deletePack = it }, { pack -> scope.launch { attribution = runCatching { model.attribution(pack) }.getOrDefault("Credits unavailable") } }, model::cancelImport,
                     model::discardDownload)
             }
         }
+        FloatingTabBar(tab, { tab = it }, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = 12.dp))
     }
     if (manual) ViewpointDialog(state, { manual = false }) { point, ground -> model.manualViewpoint(point, ground); manual = false }
     if (settings) SettingsDialog(state, model) { settings = false }
     selectedPeak?.let { peak ->
-        AlertDialog(onDismissRequest = { selectedPeak = null }, title = { Text(peak.peak.name) }, text = {
+        AlertDialog(onDismissRequest = { selectedPeak = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text(peak.peak.name) }, text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(peak.peak.publishedHeightM?.let { height(it, state) } ?: "Published elevation unavailable", style = MaterialTheme.typography.headlineSmall)
-                Text("${distance(peak.distanceM, state)} away · ${peak.bearingDeg.toInt()}° ${cardinal(peak.bearingDeg)}")
-                peak.elevationDeg?.let { Text("Elevation angle: ${String.format(Locale.US, "%.1f", it)}° above the horizon") }
-                Text(visibilityName(peak.visibility), fontWeight = FontWeight.Bold)
-                Text(peak.reason)
+                Text(peak.peak.publishedHeightM?.let { height(it, state) } ?: "Published elevation unavailable", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOfNotNull("${distance(peak.distanceM, state)} away", "${peak.bearingDeg.toInt()}° ${cardinal(peak.bearingDeg)}",
+                        peak.elevationDeg?.let { angleText(it) }).forEach {
+                        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+                            Text(it, Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium)
+                        }
+                    }
+                }
+                StatusPill(visibilityName(peak.visibility), when (peak.visibility) {
+                    Visibility.TERRAIN_VISIBLE -> MaterialTheme.colorScheme.primary; Visibility.UNCERTAIN -> MaterialTheme.colorScheme.tertiary
+                    else -> MaterialTheme.colorScheme.onSurfaceVariant })
+                Text(peak.reason, style = MaterialTheme.typography.bodyMedium)
                 Text("${coordinate(peak.peak.point.latitude)}, ${coordinate(peak.peak.point.longitude)}\nSource: ${peak.peak.source}", style = MaterialTheme.typography.bodySmall)
                 peak.geometryHeightM?.let { Text("Terrain height: ${height(it, state)}. Published summit elevation may differ.", style = MaterialTheme.typography.bodySmall) }
             }
         }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; fullScreenCamera = false; cameraMode = false; tab = 0 }) { Text("Look toward peak") } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text("Close") } })
     }
-    attribution?.let { text -> AlertDialog(onDismissRequest = { attribution = null }, title = { Text("Data credits") }, text = { Text(text, Modifier.verticalScroll(rememberScrollState())) }, confirmButton = { TextButton(onClick = { attribution = null }) { Text("Done") } }) }
-    deletePack?.let { pack -> AlertDialog(onDismissRequest = { deletePack = null }, title = { Text("Delete ${pack.name}?") }, text = { Text("Its offline terrain and peak catalogue will be removed from this device.") }, confirmButton = { TextButton(onClick = { model.deleteRegion(pack); deletePack = null }) { Text("Delete") } }, dismissButton = { TextButton(onClick = { deletePack = null }) { Text("Keep") } }) }
+    attribution?.let { text -> AlertDialog(onDismissRequest = { attribution = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text("Data credits") }, text = { Text(text, Modifier.verticalScroll(rememberScrollState())) }, confirmButton = { TextButton(onClick = { attribution = null }) { Text("Done") } }) }
+    deletePack?.let { pack -> AlertDialog(onDismissRequest = { deletePack = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text("Delete ${pack.name}?") }, text = { Text("Its offline terrain and peak catalogue will be removed from this device.") }, confirmButton = { TextButton(onClick = { model.deleteRegion(pack); deletePack = null }) { Text("Delete") } }, dismissButton = { TextButton(onClick = { deletePack = null }) { Text("Keep") } }) }
+}
+
+@Composable
+private fun AppHeader(compact: Boolean, context: String, onSettings: () -> Unit) {
+    Row(Modifier.fillMaxWidth().padding(top = if (compact) 4.dp else 12.dp, bottom = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+        Image(painterResource(R.drawable.ic_logo_mark), contentDescription = null, modifier = Modifier.size(if (compact) 32.dp else 40.dp))
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text("PeakBud", style = if (compact) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
+            Text(context, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        FilledTonalIconButton(onClick = onSettings, colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+            Icon(painterResource(R.drawable.ic_settings), contentDescription = "Settings")
+        }
+    }
+}
+
+/** Pill-shaped bar floating above content. The selected tab expands to show its label. */
+@Composable
+private fun FloatingTabBar(selected: Int, onSelect: (Int) -> Unit, modifier: Modifier) {
+    val tabs = listOf("Camera" to R.drawable.ic_photo_camera, "Peaks" to R.drawable.ic_landscape, "Regions" to R.drawable.ic_map)
+    Surface(modifier, shape = CircleShape, color = Color(0xFF16352A), contentColor = Color.White, shadowElevation = 12.dp) {
+        Row(Modifier.padding(6.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+            tabs.forEachIndexed { index, (label, icon) ->
+                val active = index == selected
+                Row(Modifier.clip(CircleShape)
+                    .background(if (active) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
+                    .clickable { onSelect(index) }
+                    .semantics(mergeDescendants = true) { role = Role.Tab; this.selected = active; contentDescription = label }
+                    .animateContentSize()
+                    .padding(horizontal = if (active) 18.dp else 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Icon(painterResource(icon), contentDescription = null, Modifier.size(22.dp),
+                        tint = if (active) MaterialTheme.colorScheme.onPrimaryContainer else Color.White.copy(alpha = .72f))
+                    if (active) {
+                        Spacer(Modifier.width(8.dp))
+                        Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
 private fun AlignmentControls(model: PanoramaViewModel) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-        Text("Align labels", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.width(8.dp))
-        TextButton(onClick = { model.trimCompass(-1.0) }, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("−1°") }
-        TextButton(onClick = { model.trimCompass(1.0) }, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("+1°") }
-        TextButton(onClick = model::resetTrim, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("Reset") }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+            Row(Modifier.padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text("Label alignment", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.width(4.dp))
+                TextButton(onClick = { model.trimCompass(-1.0) }, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("−1°") }
+                TextButton(onClick = { model.trimCompass(1.0) }, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("+1°") }
+                TextButton(onClick = model::resetTrim, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("Reset") }
+            }
+        }
     }
 }
 
@@ -231,7 +284,7 @@ private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraF
         else -> "Waiting for GPS…"
     }
     val directionSummary = if (state.followingCompass) (if (fix != null || !state.isDemo) "True north" else "Magnetic north") else "Manual direction"
-    Surface(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .6f), shape = RoundedCornerShape(14.dp)) {
+    Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = MaterialTheme.shapes.medium) {
         Column(Modifier.fillMaxWidth().padding(start = 14.dp, end = 4.dp, top = if (compact) 2.dp else 6.dp, bottom = if (compact) 2.dp else 6.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -267,7 +320,7 @@ private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraF
 
 @Composable
 private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifier: Modifier, onRegions: () -> Unit, onPeak: (PeakView) -> Unit) {
-                    Card(modifier, shape = RoundedCornerShape(24.dp)) {
+                    Card(modifier, shape = MaterialTheme.shapes.large) {
                         Box(Modifier.fillMaxSize()) {
                             PanoramaCanvas(state, Modifier.fillMaxSize(), model::pan, onPeak)
                             if (state.calculating) Surface(Modifier.align(Alignment.Center), shape = RoundedCornerShape(16.dp)) {
@@ -295,7 +348,7 @@ private fun ViewControls(state: PanoramaState, model: PanoramaViewModel, onViewp
             FilterChip(selected = state.followingCompass, onClick = model::toggleCompass, label = { Text("Compass") },
                 leadingIcon = { Icon(painterResource(R.drawable.ic_explore), null, Modifier.size(18.dp)) })
             Spacer(Modifier.weight(1f))
-            TextButton(onClick = onViewpoint, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("Viewpoint") }
+            TextButton(onClick = onViewpoint, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("Viewpoint", maxLines = 1, softWrap = false) }
         }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("View", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -310,136 +363,182 @@ private fun ViewControls(state: PanoramaState, model: PanoramaViewModel, onViewp
 }
 
 @Composable
-private fun PeakList(state: PanoramaState, modifier: Modifier, onPeak: (PeakView) -> Unit) {
+private fun PeakList(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, onPeak: (PeakView) -> Unit) {
     val peaks = state.scene?.peaks.orEmpty().sortedWith(compareBy<PeakView> { when (it.visibility) {
         Visibility.TERRAIN_VISIBLE -> 0; Visibility.UNCERTAIN -> 1; Visibility.OCCLUDED -> 2; Visibility.UNKNOWN -> 3
     } }.thenBy { it.distanceM })
-    Surface(modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surface) {
-        LazyColumn(contentPadding = PaddingValues(vertical = 4.dp)) {
-            if (peaks.isEmpty()) item {
-                Text(if (state.calculating) "Calculating nearby peaks…" else if (state.noRegion) "Choose a hiking area in Regions to list its peaks." else "No peaks at this viewpoint.", Modifier.padding(20.dp), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    LazyColumn(modifier, contentPadding = PaddingValues(top = 4.dp, bottom = bottomSpace + 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        if (peaks.isEmpty()) item {
+            EmptyState(if (state.calculating) "Calculating nearby peaks…" else if (state.noRegion) "Choose a hiking area in Regions to list its peaks." else "No peaks at this viewpoint.")
+        }
+        itemsIndexed(peaks, key = { _, it -> it.peak.id }) { index, peak ->
+            val tone = when (peak.visibility) {
+                Visibility.TERRAIN_VISIBLE -> MaterialTheme.colorScheme.primary
+                Visibility.UNCERTAIN -> MaterialTheme.colorScheme.tertiary
+                else -> MaterialTheme.colorScheme.onSurfaceVariant
             }
-            itemsIndexed(peaks, key = { _, it -> it.peak.id }) { index, peak ->
-                val tone = when (peak.visibility) {
-                    Visibility.TERRAIN_VISIBLE -> MaterialTheme.colorScheme.primary
-                    Visibility.UNCERTAIN -> MaterialTheme.colorScheme.secondary
-                    else -> MaterialTheme.colorScheme.onSurfaceVariant
-                }
-                Row(Modifier.fillMaxWidth().clickable { onPeak(peak) }.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            // Rows read as one grouped card: only the first and last get outer corners.
+            val shape = RoundedCornerShape(topStart = if (index == 0) 20.dp else 6.dp, topEnd = if (index == 0) 20.dp else 6.dp,
+                bottomStart = if (index == peaks.lastIndex) 20.dp else 6.dp, bottomEnd = if (index == peaks.lastIndex) 20.dp else 6.dp)
+            Surface(onClick = { onPeak(peak) }, shape = shape, color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxWidth()) {
+                Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(peak.peak.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text(listOfNotNull(
                             peak.peak.publishedHeightM?.let { height(it, state) } ?: peak.geometryHeightM?.let { "~${height(it, state)}" },
                             distance(peak.distanceM, state),
-                            peak.elevationDeg?.let { "${String.format(Locale.US, "%.1f", it)}° up" },
+                            peak.elevationDeg?.let { angleText(it) },
                         ).joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Spacer(Modifier.width(12.dp))
+                    Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text("${peak.bearingDeg.toInt()}° ${cardinal(peak.bearingDeg)}", style = MaterialTheme.typography.labelLarge)
-                        Text(when (peak.visibility) {
+                        StatusPill(when (peak.visibility) {
                             Visibility.TERRAIN_VISIBLE -> "Visible"; Visibility.UNCERTAIN -> "Uncertain"
                             Visibility.OCCLUDED -> "Hidden"; Visibility.UNKNOWN -> "No data"
-                        }, style = MaterialTheme.typography.labelSmall, color = tone)
+                        }, tone)
                     }
                 }
-                if (index < peaks.lastIndex) HorizontalDivider(Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = .35f))
             }
         }
     }
 }
 
 @Composable
-private fun Regions(state: PanoramaState, modifier: Modifier, onDownload: (CatalogRegion) -> Unit, onSelect: (RegionPack?) -> Unit, onDelete: (RegionPack) -> Unit, onAttribution: (RegionPack) -> Unit, onCancel: () -> Unit,
+private fun StatusPill(text: String, tone: Color) {
+    Surface(shape = CircleShape, color = tone.copy(alpha = .12f), contentColor = tone) {
+        Text(text, Modifier.padding(horizontal = 8.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+@Composable
+private fun EmptyState(text: String) {
+    Surface(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surface) {
+        Text(text, Modifier.padding(24.dp), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String, modifier: Modifier = Modifier) {
+    Text(text.uppercase(), modifier.padding(start = 4.dp, top = 8.dp, bottom = 2.dp), style = MaterialTheme.typography.labelMedium,
+        fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+}
+
+@Composable
+private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, onDownload: (CatalogRegion) -> Unit, onSelect: (RegionPack?) -> Unit, onDelete: (RegionPack) -> Unit, onAttribution: (RegionPack) -> Unit, onCancel: () -> Unit,
                     onDiscard: (CatalogRegion) -> Unit) {
     var query by rememberSaveable { mutableStateOf("") }
     val words = query.trim().lowercase().split(Regex("\\s+")).filter { it.isNotEmpty() }
     fun matches(vararg fields: String?) = words.all { word -> fields.any { it?.lowercase()?.contains(word) == true } }
+    fun installedFor(region: CatalogRegion) = state.packs.lastOrNull { it.id == region.id && it.version == region.version }
     val catalog = state.catalog.filter { matches(it.name, it.country, it.description) }
-    val installedOnly = state.packs.filter { pack -> state.catalog.none { it.id == pack.id && it.version == pack.version } && matches(pack.name) }
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-    OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(14.dp),
-        placeholder = { Text("Search by place or country") },
-        leadingIcon = { Icon(painterResource(R.drawable.ic_search), null) },
-        trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(painterResource(R.drawable.ic_close), contentDescription = "Clear search") } })
-    LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(bottom = 16.dp)) {
-        if (catalog.isEmpty() && installedOnly.isEmpty()) item {
-            Text("No hiking areas match \"$query\".", Modifier.padding(vertical = 24.dp), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        state.importing?.let {
-            item {
-                Surface(shape = RoundedCornerShape(14.dp), color = MaterialTheme.colorScheme.primaryContainer) {
-                    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        LinearProgressIndicator(Modifier.fillMaxWidth())
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(it, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
-                            TextButton(onClick = onCancel, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Cancel") }
+    val (onDevice, available) = catalog.partition { installedFor(it) != null }
+    val legacy = state.packs.filter { pack -> state.catalog.none { it.id == pack.id && it.version == pack.version } && matches(pack.name) }
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, shape = CircleShape,
+            placeholder = { Text("Search places, countries or ranges") },
+            leadingIcon = { Icon(painterResource(R.drawable.ic_search), null) },
+            trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(painterResource(R.drawable.ic_close), contentDescription = "Clear search") } },
+            colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant))
+        LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp), contentPadding = PaddingValues(bottom = bottomSpace + 8.dp)) {
+            state.importing?.let {
+                item {
+                    Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.primaryContainer) {
+                        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            LinearProgressIndicator(Modifier.fillMaxWidth())
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(it, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
+                                TextButton(onClick = onCancel, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Cancel") }
+                            }
                         }
                     }
                 }
             }
-        }
-        items(catalog, key = { it.id }) { region ->
-            val installed = state.packs.lastOrNull { it.id == region.id && it.version == region.version }
-            val saved = state.pendingDownloads.any { transfer -> region.tiles.any { it.url == transfer.address } }
-            val active = installed != null && installed.key == state.activePack?.key
-            RegionCard(
-                name = region.name,
-                subtitle = "${region.country} · ${region.description}",
-                meta = "${(region.downloadBytes + 1_048_575) / 1_048_576} MB · ${region.radiusKm} km range",
-                status = if (installed != null) (if (active) "In use" else "Ready offline") else if (saved) "Paused" else null,
-                statusTone = if (installed != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-            ) {
-                if (installed != null) {
-                    if (!active) Button(onClick = { onSelect(installed) }, contentPadding = PaddingValues(horizontal = 18.dp)) { Text("Open") }
-                    else OutlinedButton(onClick = { onSelect(installed) }, contentPadding = PaddingValues(horizontal = 18.dp)) { Text("Show") }
-                    Spacer(Modifier.weight(1f))
-                    IconButton(onClick = { onAttribution(installed) }) { Icon(painterResource(R.drawable.ic_info), contentDescription = "Data credits", tint = MaterialTheme.colorScheme.onSurfaceVariant) }
-                    TextButton(enabled = state.importing == null, onClick = { onDelete(installed) }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Delete") }
-                } else {
-                    Button(enabled = state.importing == null, onClick = { onDownload(region) }, contentPadding = PaddingValues(horizontal = 18.dp)) {
-                        Icon(painterResource(R.drawable.ic_download), null, Modifier.size(18.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text(if (state.downloadingRegionId == region.id) "Downloading…" else if (saved) "Resume" else "Download")
+            if (catalog.isEmpty() && legacy.isEmpty()) item { EmptyState("No hiking areas match \"$query\".") }
+            if (onDevice.isNotEmpty() || legacy.isNotEmpty()) item { SectionLabel("On this device") }
+            items(onDevice, key = { it.id }) { region ->
+                val installed = installedFor(region)!!
+                val active = installed.key == state.activePack?.key
+                RegionCard(region.name, "${region.country} · ${region.description}", "${region.radiusKm} km range", if (active) "In use" else "Offline",
+                    MaterialTheme.colorScheme.primary, highlighted = active,
+                    menu = { close ->
+                        DropdownMenuItem(text = { Text("Data credits") }, leadingIcon = { Icon(painterResource(R.drawable.ic_info), null) }, onClick = { close(); onAttribution(installed) })
+                        DropdownMenuItem(text = { Text("Delete") }, leadingIcon = { Icon(painterResource(R.drawable.ic_delete), null) }, enabled = state.importing == null, onClick = { close(); onDelete(installed) })
+                    }) {
+                    if (active) FilledTonalButton(onClick = { onSelect(installed) }, contentPadding = PaddingValues(horizontal = 16.dp)) { Text("View") }
+                    else Button(onClick = { onSelect(installed) }, contentPadding = PaddingValues(horizontal = 16.dp)) { Text("Open") }
+                }
+            }
+            items(legacy, key = { it.key }) { pack ->
+                val active = pack.key == state.activePack?.key
+                RegionCard(pack.name, null, null, if (active) "In use" else "Offline", MaterialTheme.colorScheme.primary, highlighted = active,
+                    menu = { close ->
+                        DropdownMenuItem(text = { Text("Data credits") }, leadingIcon = { Icon(painterResource(R.drawable.ic_info), null) }, onClick = { close(); onAttribution(pack) })
+                        DropdownMenuItem(text = { Text("Delete") }, leadingIcon = { Icon(painterResource(R.drawable.ic_delete), null) }, enabled = state.importing == null, onClick = { close(); onDelete(pack) })
+                    }) {
+                    Button(onClick = { onSelect(pack) }, contentPadding = PaddingValues(horizontal = 16.dp)) { Text("Open") }
+                }
+            }
+            if (available.isNotEmpty()) item { SectionLabel(if (words.isEmpty()) "Explore ${available.size} areas" else "Results") }
+            items(available, key = { it.id }) { region ->
+                val saved = state.pendingDownloads.any { transfer -> region.tiles.any { it.url == transfer.address } }
+                val downloading = state.downloadingRegionId == region.id
+                RegionCard(region.name, "${region.country} · ${region.description}",
+                    "${(region.downloadBytes + 1_048_575) / 1_048_576} MB · ${region.radiusKm} km range",
+                    if (downloading) "Downloading" else if (saved) "Paused" else null, MaterialTheme.colorScheme.tertiary,
+                    menu = if (saved && !downloading) { close -> DropdownMenuItem(text = { Text("Discard download") }, leadingIcon = { Icon(painterResource(R.drawable.ic_delete), null) },
+                        enabled = state.importing == null, onClick = { close(); onDiscard(region) }) } else null) {
+                    when {
+                        downloading -> CircularProgressIndicator(Modifier.padding(10.dp).size(24.dp), strokeWidth = 2.5.dp)
+                        saved -> FilledTonalButton(enabled = state.importing == null, onClick = { onDownload(region) }, contentPadding = PaddingValues(horizontal = 16.dp)) { Text("Resume") }
+                        else -> FilledTonalIconButton(enabled = state.importing == null, onClick = { onDownload(region) }) {
+                            Icon(painterResource(R.drawable.ic_download), contentDescription = "Download ${region.name}")
+                        }
                     }
-                    if (saved) TextButton(enabled = state.importing == null, onClick = { onDiscard(region) }) { Text("Discard") }
+                }
+            }
+            if (state.preferences.demoMode) item {
+                Surface(onClick = { onSelect(null) }, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surface,
+                    border = if (state.isDemo) androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary) else null, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                        Icon(painterResource(R.drawable.ic_explore), null, tint = MaterialTheme.colorScheme.primary)
+                        Column(Modifier.weight(1f)) {
+                            Text("Explorer demo", style = MaterialTheme.typography.titleSmall)
+                            Text("Fictional panorama for trying the controls", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        if (state.isDemo) StatusPill("In use", MaterialTheme.colorScheme.primary)
+                        else Icon(painterResource(R.drawable.ic_chevron_right), null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
         }
-        // Previously installed custom packs remain usable after upgrading, without exposing import tools.
-        items(installedOnly, key = { it.key }) { pack ->
-            RegionCard(name = pack.name, subtitle = null, meta = null, status = "Ready offline", statusTone = MaterialTheme.colorScheme.primary) {
-                Button(onClick = { onSelect(pack) }, contentPadding = PaddingValues(horizontal = 18.dp)) { Text("Open") }
-                Spacer(Modifier.weight(1f))
-                IconButton(onClick = { onAttribution(pack) }) { Icon(painterResource(R.drawable.ic_info), contentDescription = "Data credits", tint = MaterialTheme.colorScheme.onSurfaceVariant) }
-                TextButton(enabled = state.importing == null, onClick = { onDelete(pack) }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Delete") }
-            }
-        }
-        if (state.preferences.demoMode) item {
-            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).clickable { onSelect(null) }.padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Icon(painterResource(R.drawable.ic_explore), null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                Column(Modifier.weight(1f)) {
-                    Text("Explorer demo", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
-                    Text("Fictional panorama for trying the controls", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Text(if (state.isDemo) "In use" else "Try", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-            }
-        }
-    }
     }
 }
 
 @Composable
-private fun RegionCard(name: String, subtitle: String?, meta: String?, status: String?, statusTone: androidx.compose.ui.graphics.Color, actions: @Composable RowScope.() -> Unit) {
-    Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.surface) {
-        Column(Modifier.padding(start = 16.dp, end = 10.dp, top = 14.dp, bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(name, Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                status?.let { Text(it, style = MaterialTheme.typography.labelMedium, color = statusTone) }
+private fun RegionCard(name: String, subtitle: String?, meta: String?, status: String?, statusTone: Color, highlighted: Boolean = false,
+                       menu: (@Composable ColumnScope.(close: () -> Unit) -> Unit)? = null, action: @Composable () -> Unit) {
+    Surface(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(if (highlighted) 1.5.dp else 1.dp, if (highlighted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant)) {
+        Row(Modifier.padding(start = 16.dp, end = if (menu != null) 4.dp else 12.dp, top = 14.dp, bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Text(name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                subtitle?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+                if (meta != null || status != null) Row(Modifier.padding(top = 2.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    status?.let { StatusPill(it, statusTone) }
+                    meta?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                }
             }
-            subtitle?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-            meta?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-            Spacer(Modifier.height(4.dp))
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp), content = actions)
+            Spacer(Modifier.width(10.dp))
+            action()
+            menu?.let { items ->
+                var open by remember { mutableStateOf(false) }
+                Box {
+                    IconButton(onClick = { open = true }) { Icon(painterResource(R.drawable.ic_more_vert), contentDescription = "More options for $name", tint = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    DropdownMenu(open, { open = false }, shape = MaterialTheme.shapes.medium, containerColor = MaterialTheme.colorScheme.surface) { items { open = false } }
+                }
+            }
         }
     }
 }
@@ -466,29 +565,68 @@ private fun ViewpointDialog(state: PanoramaState, onDismiss: () -> Unit, onApply
     }) { Text("Show panorama") } }, dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } })
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SettingsDialog(state: PanoramaState, model: PanoramaViewModel, onDismiss: () -> Unit) {
     var phoneHeight by remember { mutableFloatStateOf(state.preferences.phoneHeightM.toFloat()) }
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("Settings") }, text = {
-        Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) { Text("Feet and miles", Modifier.weight(1f)); Switch(state.preferences.useFeet, { model.updatePreferences(state.preferences.copy(useFeet = it)) }) }
-            Row(verticalAlignment = Alignment.CenterVertically) { Text("Uncertain peak labels", Modifier.weight(1f)); Switch(state.preferences.showUncertain, { model.updatePreferences(state.preferences.copy(showUncertain = it)) }) }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text("Demo mode")
-                    Text("Fictional terrain for trying the app without a download", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(state.preferences.demoMode, { model.updatePreferences(state.preferences.copy(demoMode = it)) })
+    val prefs = state.preferences
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = MaterialTheme.colorScheme.background) {
+        Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Settings", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(bottom = 4.dp))
+            SectionLabel("Display")
+            SettingsGroup {
+                SettingSwitch("Feet and miles", "Show heights and distances in imperial units", prefs.useFeet) { model.updatePreferences(prefs.copy(useFeet = it)) }
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                SettingSwitch("Uncertain peaks", "Label peaks whose visibility can't be confirmed", prefs.showUncertain) { model.updatePreferences(prefs.copy(showUncertain = it)) }
             }
-            Text("Phone height: ${String.format(Locale.US, "%.1f", phoneHeight)} m")
-            Slider(phoneHeight, { phoneHeight = it }, onValueChangeFinished = { model.updatePreferences(state.preferences.copy(phoneHeightM = phoneHeight.toDouble())) }, valueRange = .5f..3f)
-            Text("Vertical view: ${state.pitch.toInt()}°")
-            Slider(state.pitch.toFloat(), { model.setPitch(it.toDouble()) }, valueRange = -20f..20f)
-            Text("Visibility is an estimate from the terrain model. Clouds, trees, GPS error and compass interference affect what you actually see.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            SectionLabel("Viewing")
+            SettingsGroup {
+                SettingSlider("Phone height", "${String.format(Locale.US, "%.1f", phoneHeight)} m above ground", phoneHeight, .5f..3f, { phoneHeight = it }) {
+                    model.updatePreferences(prefs.copy(phoneHeightM = phoneHeight.toDouble()))
+                }
+                HorizontalDivider(Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                SettingSlider("Vertical view", "${state.pitch.toInt()}° from level", state.pitch.toFloat(), -20f..20f, { model.setPitch(it.toDouble()) })
+            }
+            SectionLabel("Demo")
+            SettingsGroup {
+                SettingSwitch("Demo mode", "Fictional terrain for trying the app without a download", prefs.demoMode) { model.updatePreferences(prefs.copy(demoMode = it)) }
+            }
+            Text("Visibility is an estimate from the terrain model. Clouds, trees, GPS error and compass interference affect what you actually see.",
+                Modifier.padding(start = 4.dp, top = 8.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-    }, confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } })
+    }
 }
 
+@Composable
+private fun SettingsGroup(content: @Composable ColumnScope.() -> Unit) {
+    Surface(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surface) { Column(content = content) }
+}
+
+@Composable
+private fun SettingSwitch(title: String, detail: String, checked: Boolean, onChange: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth().clickable { onChange(!checked) }.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+            Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Spacer(Modifier.width(12.dp))
+        Switch(checked, onChange)
+    }
+}
+
+@Composable
+private fun SettingSlider(title: String, value: String, current: Float, range: ClosedFloatingPointRange<Float>, onChange: (Float) -> Unit, onDone: (() -> Unit)? = null) {
+    Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 4.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(title, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
+            Text(value, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+        }
+        Slider(current, onChange, valueRange = range, onValueChangeFinished = onDone)
+    }
+}
+
+internal fun angleText(degrees: Double) = "${String.format(Locale.US, "%.1f", kotlin.math.abs(degrees))}° ${if (degrees >= 0) "up" else "down"}"
 internal fun coordinate(value: Double) = String.format(Locale.US, "%.5f", value)
 internal fun height(metres: Double, state: PanoramaState) = if (state.preferences.useFeet) "${(metres * 3.28084).toInt()} ft" else "${metres.toInt()} m"
 internal fun distance(metres: Double, state: PanoramaState) = if (state.preferences.useFeet) String.format(Locale.US, "%.1f mi", metres / 1609.344) else String.format(Locale.US, "%.1f km", metres / 1000)

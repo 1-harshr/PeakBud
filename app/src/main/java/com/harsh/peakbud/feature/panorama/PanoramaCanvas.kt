@@ -126,7 +126,7 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         }
         paint.textSize = 10 * density
         paint.color = 0xFF566F60.toInt()
-        val bottom = if (state.isDemo) "FICTIONAL LANDSCAPE · DRAG TO LOOK AROUND" else "TERRAIN MODEL · ${(state.scene?.radiusM ?: 0.0).toInt() / 1000} KM · DRAG TO LOOK AROUND"
+        val bottom = if (state.isDemo) "FICTIONAL LANDSCAPE · DRAG TO LOOK AROUND" else "TERRAIN MODEL · ${(state.scene?.radiusM ?: state.activePack?.radiusM ?: 0.0).toInt() / 1000} KM · DRAG TO LOOK AROUND"
         drawContext.canvas.nativeCanvas.drawText(bottom, 14 * density, h - 14 * density, paint)
     }
 }

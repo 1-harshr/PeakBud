@@ -20,6 +20,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -85,7 +86,7 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
     Box(modifier.onSizeChanged { viewport = it }.clipToBounds().background(Color.Black)) {
         if (permission) CameraPreview(Modifier.fillMaxSize(), { lens = it }, { cameraStatus = it })
         if (notice == null) CameraLabels(state, lens!!, Modifier.fillMaxSize(), onPeak)
-        if (notice != null) Surface(Modifier.align(Alignment.TopCenter).padding(start = 12.dp, end = 12.dp, top = if (fullScreen) 72.dp else 12.dp, bottom = 12.dp), color = Color(0xDD132A24), contentColor = Color.White) {
+        if (notice != null) Surface(Modifier.align(Alignment.TopCenter).padding(start = 12.dp, end = 12.dp, top = if (fullScreen) 72.dp else 12.dp, bottom = 12.dp), shape = RoundedCornerShape(16.dp), color = Color(0xE6132A24), contentColor = Color.White) {
             Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(notice, style = MaterialTheme.typography.bodySmall)
                 when {
@@ -93,13 +94,14 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
                         Button(onClick = { request.launch(Manifest.permission.CAMERA) }) { Text("Enable camera") }
                         if (denied) TextButton(onClick = { context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}"))) }) { Text("Open app settings") }
                     }
-                    state.isDemo || state.noRegion -> Button(onClick = onRegions) { Text("Choose region") }
+                    cameraStatus != null -> Unit
+                    state.isDemo || state.noRegion -> Button(onClick = onRegions, colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color(0xFF16352A))) { Text("Choose region") }
                     !state.followingGps -> Button(onClick = onGps) { Text("Use my location") }
                     !state.followingCompass -> Button(onClick = onTrack) { Text("Track direction") }
                 }
             }
         }
-        if (notice == null && !fullScreen) Surface(Modifier.align(Alignment.BottomCenter).padding(8.dp), color = Color(0xBB132A24), contentColor = Color.White) {
+        if (notice == null && !fullScreen) Surface(Modifier.align(Alignment.BottomCenter).padding(10.dp), shape = RoundedCornerShape(12.dp), color = Color(0xCC132A24), contentColor = Color.White) {
             Text("${state.gpsStatus.orEmpty()}\nSensor alignment · adjust below if labels drift", Modifier.padding(8.dp), style = MaterialTheme.typography.labelSmall)
         }
     }
