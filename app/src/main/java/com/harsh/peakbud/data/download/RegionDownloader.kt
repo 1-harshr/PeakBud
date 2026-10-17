@@ -37,7 +37,7 @@ class RegionDownloader(
         val key = key(address)
         listOf("part", "zip", "properties").forEach { suffix ->
             val file = directory.resolve("$key.$suffix")
-            check(!file.exists() || file.delete()) { "Could not remove saved download" }
+            check(!file.exists() || file.delete()) { "Couldn't remove the paused download." }
         }
     }
 
@@ -72,7 +72,7 @@ class RegionDownloader(
                     url = checkedUrl(URL(url, connection.getHeaderField("Location") ?: error("Missing redirect destination")).toString())
                     return@repeat
                 }
-                if (status == 416) { part.delete(); metadata.delete(); error("Saved download is no longer available. Retry to start a fresh download.") }
+                if (status == 416) { part.delete(); metadata.delete(); error("The paused download expired. Tap the download button to start again.") }
                 require(status == 200 || status == 206) { "Download server returned HTTP $status" }
                 require(connection.getHeaderField("Content-Encoding").let { it == null || it.equals("identity", true) }) { "Unsupported download encoding" }
                 var start = 0L
@@ -84,11 +84,11 @@ class RegionDownloader(
                     start = first.toLong()
                     expected = total.toLong()
                     if (offset <= 0 || start != offset || last.toLong() < start || last.toLong() != expected - 1 || connection.getHeaderField("ETag") != savedEtag) {
-                        part.delete(); metadata.delete(); error("Download changed. Retry to fetch a complete region.")
+                        part.delete(); metadata.delete(); error("The download changed on the server. Tap the download button to start again.")
                     }
                 }
                 require(expected == null || expected in 1..RegionStore.MAX_BYTES) { "Region download exceeds 512 MiB" }
-                require(directory.usableSpace > (expected?.minus(start) ?: 16_000_000) + 16_000_000) { "Not enough storage for download" }
+                require(directory.usableSpace > (expected?.minus(start) ?: 16_000_000) + 16_000_000) { "Not enough space on your phone for this download." }
                 val etag = connection.getHeaderField("ETag")
                 Properties().apply {
                     setProperty("address", address)
@@ -110,11 +110,11 @@ class RegionDownloader(
                             output.write(bytes, 0, n)
                             progress(total, expected)
                         }
-                        require(expected == null || total == expected) { "Download interrupted. Retry to resume it." }
+                        require(expected == null || total == expected) { "Download paused. Tap Resume to continue." }
                     }
                 }
                 checkpoint()
-                check(part.renameTo(complete)) { "Could not finish region download" }
+                check(part.renameTo(complete)) { "Couldn't finish the download. Tap Resume to try again." }
                 return complete
             } finally { connection.disconnect() }
         }

@@ -125,9 +125,9 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
         Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 16.dp).padding(bottom = if (tab == 0) barSpace else 0.dp),
             verticalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 10.dp)) {
             AppHeader(compact, when (tab) {
-                1 -> if (state.noRegion) "Peaks · no hiking area selected" else if (state.isDemo) "Peaks · fictional demo" else "Peaks · line of sight within ${(state.activePack?.radiusM ?: 0.0).toInt() / 1000} km"
-                2 -> "Hiking areas · download once, use offline"
-                else -> state.activePack?.name ?: if (state.isDemo) "Explorer demo · fictional terrain" else "No hiking area selected"
+                1 -> if (state.noRegion) "Peaks · pick a hiking area to start" else if (state.isDemo) "Peaks · demo landscape" else "Peaks within ${(state.activePack?.radiusM ?: 0.0).toInt() / 1000} km of this spot"
+                2 -> "Hiking areas · download once, works offline"
+                else -> state.activePack?.name ?: if (state.isDemo) "Demo · made-up landscape" else "Pick a hiking area to start"
             }) { settings = true }
             state.message?.let { message ->
                 Surface(color = MaterialTheme.colorScheme.errorContainer, contentColor = MaterialTheme.colorScheme.onErrorContainer, shape = MaterialTheme.shapes.medium) {
@@ -181,7 +181,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                 }
                 1 -> PeakList(state, Modifier.weight(1f), barSpace) { selectedPeak = it }
                 2 -> Regions(state, Modifier.weight(1f), barSpace, model::downloadRegion,
-                    { model.selectRegion(it); if (it == null) cameraMode = false; tab = 0 }, { deletePack = it }, { pack -> scope.launch { attribution = runCatching { model.attribution(pack) }.getOrDefault("Credits unavailable") } }, model::cancelImport,
+                    { model.selectRegion(it); if (it == null) cameraMode = false; tab = 0 }, { deletePack = it }, { pack -> scope.launch { attribution = runCatching { model.attribution(pack) }.getOrDefault("Credits couldn't be loaded.") } }, model::cancelImport,
                     model::discardDownload)
             }
         }
@@ -192,7 +192,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
     selectedPeak?.let { peak ->
         AlertDialog(onDismissRequest = { selectedPeak = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text(peak.peak.name) }, text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(peak.peak.publishedHeightM?.let { height(it, state) } ?: "Published elevation unavailable", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
+                Text(peak.peak.publishedHeightM?.let { height(it, state) } ?: "Height unknown", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOfNotNull("${distance(peak.distanceM, state)} away", "${peak.bearingDeg.toInt()}° ${cardinal(peak.bearingDeg)}",
                         peak.elevationDeg?.let { angleText(it) }).forEach {
@@ -206,12 +206,12 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                     else -> MaterialTheme.colorScheme.onSurfaceVariant })
                 Text(peak.reason, style = MaterialTheme.typography.bodyMedium)
                 Text("${coordinate(peak.peak.point.latitude)}, ${coordinate(peak.peak.point.longitude)}\nSource: ${peak.peak.source}", style = MaterialTheme.typography.bodySmall)
-                peak.geometryHeightM?.let { Text("Terrain height: ${height(it, state)}. Published summit elevation may differ.", style = MaterialTheme.typography.bodySmall) }
+                peak.geometryHeightM?.let { Text("The map puts the ground here at ${height(it, state)}. The official summit height may differ.", style = MaterialTheme.typography.bodySmall) }
             }
-        }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; fullScreenCamera = false; cameraMode = false; tab = 0 }) { Text("Look toward peak") } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text("Close") } })
+        }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; fullScreenCamera = false; cameraMode = false; tab = 0 }) { Text("Show in panorama") } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text("Close") } })
     }
-    attribution?.let { text -> AlertDialog(onDismissRequest = { attribution = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text("Data credits") }, text = { Text(text, Modifier.verticalScroll(rememberScrollState())) }, confirmButton = { TextButton(onClick = { attribution = null }) { Text("Done") } }) }
-    deletePack?.let { pack -> AlertDialog(onDismissRequest = { deletePack = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text("Delete ${pack.name}?") }, text = { Text("Its offline terrain and peak catalogue will be removed from this device.") }, confirmButton = { TextButton(onClick = { model.deleteRegion(pack); deletePack = null }) { Text("Delete") } }, dismissButton = { TextButton(onClick = { deletePack = null }) { Text("Keep") } }) }
+    attribution?.let { text -> AlertDialog(onDismissRequest = { attribution = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text("Map and peak credits") }, text = { Text(text, Modifier.verticalScroll(rememberScrollState())) }, confirmButton = { TextButton(onClick = { attribution = null }) { Text("Done") } }) }
+    deletePack?.let { pack -> AlertDialog(onDismissRequest = { deletePack = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text("Delete ${pack.name}?") }, text = { Text("Its maps and peak names will be removed from this phone. You can download it again any time.") }, confirmButton = { TextButton(onClick = { model.deleteRegion(pack); deletePack = null }) { Text("Delete") } }, dismissButton = { TextButton(onClick = { deletePack = null }) { Text("Keep") } }) }
 }
 
 @Composable
@@ -261,10 +261,10 @@ private fun AlignmentControls(model: PanoramaViewModel) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
             Row(Modifier.padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("Label alignment", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Nudge labels", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.width(4.dp))
-                TextButton(onClick = { model.trimCompass(-1.0) }, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("−1°") }
-                TextButton(onClick = { model.trimCompass(1.0) }, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("+1°") }
+                TextButton(onClick = { model.trimCompass(-1.0) }, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("← 1°") }
+                TextButton(onClick = { model.trimCompass(1.0) }, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("1° →") }
                 TextButton(onClick = model::resetTrim, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("Reset") }
             }
         }
@@ -279,11 +279,11 @@ private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraF
     val bearing = heading?.let { "${it.toInt().toString().padStart(3, '0')}° ${cardinal(it)}" } ?: "---°"
     var expanded by rememberSaveable { mutableStateOf(false) }
     val gpsSummary = when {
-        !state.followingGps -> "GPS off"
+        !state.followingGps -> "Location off"
         state.gpsStatus != null -> state.gpsStatus
-        else -> "Waiting for GPS…"
+        else -> "Finding your location…"
     }
-    val directionSummary = if (state.followingCompass) (if (fix != null || !state.isDemo) "True north" else "Magnetic north") else "Manual direction"
+    val directionSummary = if (state.followingCompass) "Following your phone" else "Drag to turn"
     Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = MaterialTheme.shapes.medium) {
         Column(Modifier.fillMaxWidth().padding(start = 14.dp, end = 4.dp, top = if (compact) 2.dp else 6.dp, bottom = if (compact) 2.dp else 6.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -291,7 +291,7 @@ private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraF
                     Text(bearing, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Text(listOfNotNull(directionSummary, gpsSummary).joinToString(" · "), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                if (!state.followingGps) TextButton(onClick = onGps, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("GPS") }
+                if (!state.followingGps) TextButton(onClick = onGps, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Locate") }
                 if (!state.followingCompass) TextButton(onClick = onCompass, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Compass") }
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(painterResource(if (expanded) R.drawable.ic_expand_less else R.drawable.ic_expand_more), contentDescription = if (expanded) "Hide details" else "Show details", tint = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -302,16 +302,16 @@ private fun ObservationStatus(state: PanoramaState, cameraMode: Boolean, cameraF
                 Column(Modifier.padding(end = 10.dp, top = 4.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     val small = MaterialTheme.typography.bodySmall
                     val muted = MaterialTheme.colorScheme.onSurfaceVariant
-                    Text(if (state.followingCompass) "Direction · ${state.compassSource ?: "waiting for compass"}" else "Direction · compass off, set by hand", style = small, color = muted)
+                    Text(if (state.followingCompass) "Direction · from your ${state.compassSource ?: "compass"}" else "Direction · compass off, drag to turn", style = small, color = muted)
                     if (fix != null) {
-                        Text("Position · ${coordinate(fix.point.latitude)}, ${coordinate(fix.point.longitude)}", style = small, color = muted)
+                        Text("Your location · ${coordinate(fix.point.latitude)}, ${coordinate(fix.point.longitude)}", style = small, color = muted)
                         val altitude = fix.seaLevelAltitudeM ?: fix.ellipsoidAltitudeM
-                        Text(altitude?.let { "Altitude · ${height(it, state)} GPS ${if (fix.seaLevelAltitudeM != null) "sea level" else "ellipsoid"}${fix.verticalAccuracyM?.let { a -> " ±${kotlin.math.ceil(a.toDouble()).toInt().coerceAtLeast(1)} m" } ?: ""}" } ?: "Altitude · unavailable", style = small, color = muted)
-                    } else Text("Position · waiting for GPS", style = small, color = muted)
-                    if (!state.isDemo) state.scene?.observer?.let { Text("Ground · ${height(it.groundHeightM, state)} from terrain model", style = small, color = muted) }
-                    if (!cameraMode) Text("Viewpoint · ${coordinate(state.point.latitude)}, ${coordinate(state.point.longitude)} (${if (state.isDemo) "fictional" else if (state.followingGps) "GPS" else "manual"})", style = small, color = muted)
+                        Text(altitude?.let { "Altitude · ${height(it, state)}${fix.verticalAccuracyM?.let { a -> " (±${kotlin.math.ceil(a.toDouble()).toInt().coerceAtLeast(1)} m)" } ?: ""}" } ?: "Altitude · not available", style = small, color = muted)
+                    } else Text("Your location · finding…", style = small, color = muted)
+                    if (!state.isDemo) state.scene?.observer?.let { Text("Ground height · ${height(it.groundHeightM, state)}", style = small, color = muted) }
+                    if (!cameraMode) Text("Viewing from · ${coordinate(state.point.latitude)}, ${coordinate(state.point.longitude)} (${if (state.isDemo) "demo spot" else if (state.followingGps) "your location" else "chosen spot"})", style = small, color = muted)
                     if (cameraMode) cameraFov?.let { Text("Camera view · ${it.first.toInt()}° wide × ${it.second.toInt()}° tall", style = small, color = muted) }
-                    if (state.gpsStatus?.contains("turned off") == true) TextButton(onClick = { context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) }, contentPadding = PaddingValues(0.dp)) { Text("Open location settings") }
+                    if (state.gpsStatus?.startsWith("Location is off") == true) TextButton(onClick = { context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) }, contentPadding = PaddingValues(0.dp)) { Text("Open location settings") }
                 }
             }
         }
@@ -331,9 +331,9 @@ private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifi
                             }
                             if (!state.calculating && state.scene == null) Column(Modifier.align(Alignment.Center).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                 if (state.noRegion) {
-                                    Text("Choose a hiking area to see its skyline", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text("Pick a hiking area to see the mountains around you.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Button(onClick = onRegions) { Text("Choose region") }
-                                } else Text("Choose a covered viewpoint to see the skyline", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                } else Text("This spot is outside the hiking area. Choose a spot inside it.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
@@ -343,21 +343,21 @@ private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifi
 private fun ViewControls(state: PanoramaState, model: PanoramaViewModel, onViewpoint: () -> Unit, onGps: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            FilterChip(selected = state.followingGps, onClick = onGps, label = { Text("GPS") },
+            FilterChip(selected = state.followingGps, onClick = onGps, label = { Text("My location") },
                 leadingIcon = { Icon(painterResource(R.drawable.ic_my_location), null, Modifier.size(18.dp)) })
             FilterChip(selected = state.followingCompass, onClick = model::toggleCompass, label = { Text("Compass") },
                 leadingIcon = { Icon(painterResource(R.drawable.ic_explore), null, Modifier.size(18.dp)) })
             Spacer(Modifier.weight(1f))
-            TextButton(onClick = onViewpoint, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("Viewpoint", maxLines = 1, softWrap = false) }
+            TextButton(onClick = onViewpoint, contentPadding = PaddingValues(horizontal = 10.dp)) { Text("Choose spot", maxLines = 1, softWrap = false) }
         }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("View", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("Width", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Slider(state.fov.toFloat(), { model.setFov(it.toDouble()) }, valueRange = 35f..120f, modifier = Modifier.weight(1f))
             Text("${state.fov.toInt()}°", style = MaterialTheme.typography.labelMedium, modifier = Modifier.width(36.dp))
         }
         listOfNotNull(
             state.compassStatus,
-            state.scene?.horizon?.count { !it.complete }?.takeIf { it > 0 }?.let { "Some directions have missing terrain." },
+            state.scene?.horizon?.count { !it.complete }?.takeIf { it > 0 }?.let { "Some directions have no map data, so peaks there may be missing." },
         ).firstOrNull()?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis) }
     }
 }
@@ -369,7 +369,7 @@ private fun PeakList(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, 
     } }.thenBy { it.distanceM })
     LazyColumn(modifier, contentPadding = PaddingValues(top = 4.dp, bottom = bottomSpace + 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         if (peaks.isEmpty()) item {
-            EmptyState(if (state.calculating) "Calculating nearby peaks…" else if (state.noRegion) "Choose a hiking area in Regions to list its peaks." else "No peaks at this viewpoint.")
+            EmptyState(if (state.calculating) "Finding nearby peaks…" else if (state.noRegion) "Choose a hiking area in Regions to list its peaks." else "No peaks found from this spot.")
         }
         itemsIndexed(peaks, key = { _, it -> it.peak.id }) { index, peak ->
             val tone = when (peak.visibility) {
@@ -394,7 +394,7 @@ private fun PeakList(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, 
                     Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text("${peak.bearingDeg.toInt()}° ${cardinal(peak.bearingDeg)}", style = MaterialTheme.typography.labelLarge)
                         StatusPill(when (peak.visibility) {
-                            Visibility.TERRAIN_VISIBLE -> "Visible"; Visibility.UNCERTAIN -> "Uncertain"
+                            Visibility.TERRAIN_VISIBLE -> "In view"; Visibility.UNCERTAIN -> "Maybe"
                             Visibility.OCCLUDED -> "Hidden"; Visibility.UNKNOWN -> "No data"
                         }, tone)
                     }
@@ -456,28 +456,28 @@ private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, o
                 }
             }
             if (catalog.isEmpty() && legacy.isEmpty()) item { EmptyState("No hiking areas match \"$query\".") }
-            if (onDevice.isNotEmpty() || legacy.isNotEmpty()) item { SectionLabel("On this device") }
+            if (onDevice.isNotEmpty() || legacy.isNotEmpty()) item { SectionLabel("Downloaded") }
             items(onDevice, key = { it.id }) { region ->
                 val installed = installedFor(region)!!
                 val active = installed.key == state.activePack?.key
-                RegionCard(region.name, "${region.country} · ${region.description}", "${region.radiusKm} km range", if (active) "In use" else "Offline",
+                RegionCard(region.name, "${region.country} · ${region.description}", "Peaks up to ${region.radiusKm} km away", if (active) "In use" else "Ready",
                     MaterialTheme.colorScheme.primary, highlighted = active,
                     menu = { close ->
-                        DropdownMenuItem(text = { Text("Data credits") }, leadingIcon = { Icon(painterResource(R.drawable.ic_info), null) }, onClick = { close(); onAttribution(installed) })
+                        DropdownMenuItem(text = { Text("Map credits") }, leadingIcon = { Icon(painterResource(R.drawable.ic_info), null) }, onClick = { close(); onAttribution(installed) })
                         DropdownMenuItem(text = { Text("Delete") }, leadingIcon = { Icon(painterResource(R.drawable.ic_delete), null) }, enabled = state.importing == null, onClick = { close(); onDelete(installed) })
                     }) {
-                    if (active) FilledTonalButton(onClick = { onSelect(installed) }, contentPadding = PaddingValues(horizontal = 16.dp)) { Text("View") }
-                    else Button(onClick = { onSelect(installed) }, contentPadding = PaddingValues(horizontal = 16.dp)) { Text("Open") }
+                    if (active) FilledTonalButton(onClick = { onSelect(installed) }, contentPadding = PaddingValues(horizontal = 16.dp)) { Text("Open") }
+                    else Button(onClick = { onSelect(installed) }, contentPadding = PaddingValues(horizontal = 16.dp)) { Text("Use") }
                 }
             }
             items(legacy, key = { it.key }) { pack ->
                 val active = pack.key == state.activePack?.key
-                RegionCard(pack.name, null, null, if (active) "In use" else "Offline", MaterialTheme.colorScheme.primary, highlighted = active,
+                RegionCard(pack.name, null, null, if (active) "In use" else "Ready", MaterialTheme.colorScheme.primary, highlighted = active,
                     menu = { close ->
-                        DropdownMenuItem(text = { Text("Data credits") }, leadingIcon = { Icon(painterResource(R.drawable.ic_info), null) }, onClick = { close(); onAttribution(pack) })
+                        DropdownMenuItem(text = { Text("Map credits") }, leadingIcon = { Icon(painterResource(R.drawable.ic_info), null) }, onClick = { close(); onAttribution(pack) })
                         DropdownMenuItem(text = { Text("Delete") }, leadingIcon = { Icon(painterResource(R.drawable.ic_delete), null) }, enabled = state.importing == null, onClick = { close(); onDelete(pack) })
                     }) {
-                    Button(onClick = { onSelect(pack) }, contentPadding = PaddingValues(horizontal = 16.dp)) { Text("Open") }
+                    Button(onClick = { onSelect(pack) }, contentPadding = PaddingValues(horizontal = 16.dp)) { Text("Use") }
                 }
             }
             if (available.isNotEmpty()) item { SectionLabel(if (words.isEmpty()) "Explore ${available.size} areas" else "Results") }
@@ -485,7 +485,7 @@ private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, o
                 val saved = state.pendingDownloads.any { transfer -> region.tiles.any { it.url == transfer.address } }
                 val downloading = state.downloadingRegionId == region.id
                 RegionCard(region.name, "${region.country} · ${region.description}",
-                    "${(region.downloadBytes + 1_048_575) / 1_048_576} MB · ${region.radiusKm} km range",
+                    "${(region.downloadBytes + 1_048_575) / 1_048_576} MB · peaks up to ${region.radiusKm} km away",
                     if (downloading) "Downloading" else if (saved) "Paused" else null, MaterialTheme.colorScheme.tertiary,
                     menu = if (saved && !downloading) { close -> DropdownMenuItem(text = { Text("Discard download") }, leadingIcon = { Icon(painterResource(R.drawable.ic_delete), null) },
                         enabled = state.importing == null, onClick = { close(); onDiscard(region) }) } else null) {
@@ -504,8 +504,8 @@ private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, o
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                         Icon(painterResource(R.drawable.ic_explore), null, tint = MaterialTheme.colorScheme.primary)
                         Column(Modifier.weight(1f)) {
-                            Text("Explorer demo", style = MaterialTheme.typography.titleSmall)
-                            Text("Fictional panorama for trying the controls", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("Demo landscape", style = MaterialTheme.typography.titleSmall)
+                            Text("A made-up view for trying the controls", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         if (state.isDemo) StatusPill("In use", MaterialTheme.colorScheme.primary)
                         else Icon(painterResource(R.drawable.ic_chevron_right), null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -549,9 +549,9 @@ private fun ViewpointDialog(state: PanoramaState, onDismiss: () -> Unit, onApply
     var longitude by remember { mutableStateOf(coordinate(state.point.longitude)) }
     var altitude by remember { mutableStateOf(state.groundOverrideM?.toString() ?: "") }
     var error by remember { mutableStateOf<String?>(null) }
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("Choose your viewpoint") }, text = {
+    AlertDialog(onDismissRequest = onDismiss, title = { Text("Choose a spot") }, text = {
         Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Decimal degrees. Leave ground height empty to use the terrain model.", style = MaterialTheme.typography.bodySmall)
+            Text("Enter coordinates as decimals, like 37.7281. Leave height empty and PeakBud will use the map.", style = MaterialTheme.typography.bodySmall)
             OutlinedTextField(latitude, { latitude = it }, label = { Text("Latitude") }, singleLine = true)
             OutlinedTextField(longitude, { longitude = it }, label = { Text("Longitude") }, singleLine = true)
             OutlinedTextField(altitude, { altitude = it }, label = { Text("Ground height in metres (optional)") }, singleLine = true)
@@ -560,9 +560,9 @@ private fun ViewpointDialog(state: PanoramaState, onDismiss: () -> Unit, onApply
     }, confirmButton = { TextButton(onClick = {
         val point = runCatching { GeoPoint(latitude.trim().toDouble(), longitude.trim().toDouble()) }.getOrNull()
         val ground = altitude.trim().takeIf { it.isNotEmpty() }?.toDoubleOrNull()
-        if (point == null || altitude.isNotBlank() && (ground == null || !ground.isFinite() || ground !in -500.0..10_000.0)) error = "Enter valid coordinates and a ground height between −500 and 10,000 m."
+        if (point == null || altitude.isNotBlank() && (ground == null || !ground.isFinite() || ground !in -500.0..10_000.0)) error = "Check the numbers: latitude −90 to 90, longitude −180 to 180, height −500 to 10,000 m."
         else onApply(point, ground)
-    }) { Text("Show panorama") } }, dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } })
+    }) { Text("Show view") } }, dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -578,21 +578,21 @@ private fun SettingsDialog(state: PanoramaState, model: PanoramaViewModel, onDis
             SettingsGroup {
                 SettingSwitch("Feet and miles", "Show heights and distances in imperial units", prefs.useFeet) { model.updatePreferences(prefs.copy(useFeet = it)) }
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
-                SettingSwitch("Uncertain peaks", "Label peaks whose visibility can't be confirmed", prefs.showUncertain) { model.updatePreferences(prefs.copy(showUncertain = it)) }
+                SettingSwitch("Show maybe-visible peaks", "Include peaks that terrain might hide", prefs.showUncertain) { model.updatePreferences(prefs.copy(showUncertain = it)) }
             }
             SectionLabel("Viewing")
             SettingsGroup {
-                SettingSlider("Phone height", "${String.format(Locale.US, "%.1f", phoneHeight)} m above ground", phoneHeight, .5f..3f, { phoneHeight = it }) {
+                SettingSlider("Phone height", "${String.format(Locale.US, "%.1f", phoneHeight)} m", phoneHeight, .5f..3f, { phoneHeight = it }) {
                     model.updatePreferences(prefs.copy(phoneHeightM = phoneHeight.toDouble()))
                 }
                 HorizontalDivider(Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
-                SettingSlider("Vertical view", "${state.pitch.toInt()}° from level", state.pitch.toFloat(), -20f..20f, { model.setPitch(it.toDouble()) })
+                SettingSlider("Look up or down", if (state.pitch.toInt() == 0) "Level" else angleText(state.pitch), state.pitch.toFloat(), -20f..20f, { model.setPitch(it.toDouble()) })
             }
             SectionLabel("Demo")
             SettingsGroup {
-                SettingSwitch("Demo mode", "Fictional terrain for trying the app without a download", prefs.demoMode) { model.updatePreferences(prefs.copy(demoMode = it)) }
+                SettingSwitch("Demo mode", "Adds a made-up landscape so you can try PeakBud without downloading", prefs.demoMode) { model.updatePreferences(prefs.copy(demoMode = it)) }
             }
-            Text("Visibility is an estimate from the terrain model. Clouds, trees, GPS error and compass interference affect what you actually see.",
+            Text("Peak visibility is worked out from maps. Clouds, trees, location errors and nearby metal can change what you actually see.",
                 Modifier.padding(start = 4.dp, top = 8.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
@@ -632,8 +632,8 @@ internal fun height(metres: Double, state: PanoramaState) = if (state.preference
 internal fun distance(metres: Double, state: PanoramaState) = if (state.preferences.useFeet) String.format(Locale.US, "%.1f mi", metres / 1609.344) else String.format(Locale.US, "%.1f km", metres / 1000)
 internal fun cardinal(degrees: Double) = listOf("N", "NE", "E", "SE", "S", "SW", "W", "NW")[(Geography.wrap360(degrees + 22.5) / 45).toInt() % 8]
 internal fun visibilityName(value: Visibility) = when (value) {
-    Visibility.TERRAIN_VISIBLE -> "Terrain-visible"
-    Visibility.OCCLUDED -> "Hidden by a nearer ridge"
-    Visibility.UNCERTAIN -> "Visibility uncertain"
-    Visibility.UNKNOWN -> "Terrain data unavailable"
+    Visibility.TERRAIN_VISIBLE -> "Should be in view"
+    Visibility.OCCLUDED -> "Hidden behind a closer ridge"
+    Visibility.UNCERTAIN -> "Might be hidden"
+    Visibility.UNKNOWN -> "No map data here"
 }

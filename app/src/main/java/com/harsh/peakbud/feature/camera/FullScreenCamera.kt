@@ -54,13 +54,13 @@ fun FullScreenCamera(state: PanoramaState, onExit: () -> Unit, onRegions: () -> 
                     Text(bearing?.let { "${it.toInt().toString().padStart(3, '0')}° ${cardinal(it)} · $reference" } ?: "Direction unavailable",
                         style = MaterialTheme.typography.labelLarge)
                     val fix = state.gpsFix
-                    Text(fix?.let { "Lat ${coordinate(it.point.latitude)} · Lon ${coordinate(it.point.longitude)}" } ?: "Lat / Lon · waiting for GPS",
+                    Text(fix?.let { "Lat ${coordinate(it.point.latitude)} · Lon ${coordinate(it.point.longitude)}" } ?: "Finding your location…",
                         style = MaterialTheme.typography.bodySmall)
                     val altitude = fix?.seaLevelAltitudeM ?: fix?.ellipsoidAltitudeM
-                    Text(altitude?.let { "Altitude ${height(it, state)} · GPS ${if (fix?.seaLevelAltitudeM != null) "sea level" else "ellipsoid"}" } ?: "Altitude · waiting for GPS",
+                    Text(altitude?.let { "Altitude ${height(it, state)}" } ?: "Altitude · finding location…",
                         style = MaterialTheme.typography.bodySmall)
-                    fov?.let { Text("View ${it.first.toInt()}° H × ${it.second.toInt()}° V", style = MaterialTheme.typography.labelSmall) }
-                    Text(if (state.followingGps) state.gpsStatus ?: "Waiting for GPS…" else if (fix != null) "GPS off · last known position" else "GPS off", style = MaterialTheme.typography.labelSmall)
+                    fov?.let { Text("View ${it.first.toInt()}° wide × ${it.second.toInt()}° tall", style = MaterialTheme.typography.labelSmall) }
+                    Text(if (state.followingGps) state.gpsStatus ?: "Finding your location…" else if (fix != null) "Location off · showing last known spot" else "Location off", style = MaterialTheme.typography.labelSmall)
                 }
             }
         }

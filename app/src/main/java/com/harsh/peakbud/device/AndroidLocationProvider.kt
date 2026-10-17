@@ -28,7 +28,7 @@ class AndroidLocationProvider(private val context: Context) {
         val manager = context.getSystemService(LocationManager::class.java)
         val precise = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (!precise) {
-            trySend(LocationStatus.Message("Precise location is needed for peak alignment. You can still choose a manual viewpoint."))
+            trySend(LocationStatus.Message("Turn on precise location so peak labels line up. You can also choose a spot in Panorama."))
             close(); return@callbackFlow
         }
         val listener = object : LocationListener {
@@ -42,19 +42,19 @@ class AndroidLocationProvider(private val context: Context) {
                         if (location.hasMslAltitudeAccuracy()) location.mslAltitudeAccuracyMeters.takeIf { it.isFinite() && it > 0 } else null
                     } else location.verticalAccuracyMeters.takeIf { location.hasVerticalAccuracy() && it.isFinite() && it > 0 })))
             }
-            override fun onProviderDisabled(provider: String) { trySend(LocationStatus.Message("GPS is turned off. Enable location in Android settings.")) }
-            override fun onProviderEnabled(provider: String) { trySend(LocationStatus.Message("Waiting for a satellite fix…")) }
+            override fun onProviderDisabled(provider: String) { trySend(LocationStatus.Message("Location is off. Turn it on in Android settings.")) }
+            override fun onProviderEnabled(provider: String) { trySend(LocationStatus.Message("Finding your location…")) }
             @Deprecated("Legacy Android callback")
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) = Unit
         }
         try {
-            if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) trySend(LocationStatus.Message("GPS is turned off. Enable location in Android settings."))
-            else trySend(LocationStatus.Message("Waiting for a satellite fix. Keep a clear view of the sky."))
+            if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) trySend(LocationStatus.Message("Location is off. Turn it on in Android settings."))
+            else trySend(LocationStatus.Message("Finding your location. Open sky helps."))
             manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 0f, listener, Looper.getMainLooper())
         } catch (_: SecurityException) {
-            trySend(LocationStatus.Message("Location permission was revoked. Choose a manual viewpoint."))
+            trySend(LocationStatus.Message("Location access was turned off. You can still choose a spot in Panorama."))
         } catch (_: IllegalArgumentException) {
-            trySend(LocationStatus.Message("This device has no GPS provider. Choose a manual viewpoint."))
+            trySend(LocationStatus.Message("This phone has no GPS. Choose a spot in Panorama instead."))
         }
         awaitClose { manager.removeUpdates(listener) }
     }

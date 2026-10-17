@@ -13,7 +13,7 @@ class TerrainEngine {
         settings: CalculationSettings = CalculationSettings(),
         checkpoint: () -> Unit = {},
     ): MountainScene {
-        require(observer.datum == terrain.datum) { "Observer and terrain height datums differ" }
+        require(observer.datum == terrain.datum) { "Your height and the map use different references, so this is approximate." }
         require(terrain.resolutionM > 0 && terrain.resolutionM.isFinite())
         val count = ceil(360 / settings.angularStepDeg).toInt()
         val horizon = List(count) { index ->
@@ -48,7 +48,7 @@ class TerrainEngine {
         val distance = Geography.distance(observer.point, peak.point)
         val bearing = Geography.bearing(observer.point, peak.point)
         val summit = terrain.sample(peak.point) as? TerrainSample.Valid
-            ?: return PeakView(peak, distance, bearing, null, null, Visibility.UNKNOWN, reason = "Summit terrain is unavailable")
+            ?: return PeakView(peak, distance, bearing, null, null, Visibility.UNKNOWN, reason = "There's no map data at the summit.")
         val angle = Geography.elevationAngle(observer.heightM, summit.heightM, distance)
         val step = (terrain.resolutionM / 3).coerceAtLeast(1.0)
         var maximum = Double.NEGATIVE_INFINITY
@@ -87,12 +87,12 @@ class TerrainEngine {
         val inconsistentHeight = heightDifference != null && heightDifference > max(100.0, terrain.heightErrorM * 3)
         val state = if (inconsistentHeight && geometricState != Visibility.UNKNOWN) Visibility.UNCERTAIN else geometricState
         val reason = if (inconsistentHeight && state != Visibility.UNKNOWN)
-            "Published height and terrain differ by ${heightDifference!!.toInt()} m; the summit geometry needs verification"
+            "The official height and the map differ by ${heightDifference!!.toInt()} m, so the summit position may be off."
         else when (state) {
-            Visibility.TERRAIN_VISIBLE -> "Clear terrain line of sight; weather and vegetation may obscure the peak"
-            Visibility.OCCLUDED -> "A nearer ridge blocks this summit"
-            Visibility.UNCERTAIN -> "Terrain resolution or position uncertainty could change visibility"
-            Visibility.UNKNOWN -> "Intervening terrain is missing"
+            Visibility.TERRAIN_VISIBLE -> "Nothing in the landscape blocks it, though clouds or trees still might."
+            Visibility.OCCLUDED -> "A closer ridge blocks your view of the summit."
+            Visibility.UNCERTAIN -> "It sits close to the skyline, so small errors could hide it."
+            Visibility.UNKNOWN -> "Map data between you and the peak is missing."
         }
         return PeakView(peak, distance, bearing, angle, summit.heightM, state,
             (angle - maximum).takeIf { it.isFinite() }, blocker, reason)

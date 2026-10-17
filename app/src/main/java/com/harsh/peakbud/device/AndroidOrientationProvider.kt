@@ -8,7 +8,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlin.math.*
 
-data class DevicePose(val magneticHeading: Double, val pitch: Double, val reliable: Boolean, val message: String? = null, val available: Boolean = true, val roll: Double = 0.0, val cameraUsable: Boolean = true, val source: String = "Orientation sensors")
+data class DevicePose(val magneticHeading: Double, val pitch: Double, val reliable: Boolean, val message: String? = null, val available: Boolean = true, val roll: Double = 0.0, val cameraUsable: Boolean = true, val source: String = "phone sensors")
 
 class AndroidOrientationProvider(context: Context) {
     private val manager = context.getSystemService(SensorManager::class.java)
@@ -17,7 +17,7 @@ class AndroidOrientationProvider(context: Context) {
         val acceleration = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         val magnetic = manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         if (rotation == null && (acceleration == null || magnetic == null)) {
-            trySend(DevicePose(0.0, 0.0, false, "Compass unavailable. Drag the panorama to look around.", available = false))
+            trySend(DevicePose(0.0, 0.0, false, "This phone has no compass. Drag the panorama to look around.", available = false))
             close(); return@callbackFlow
         }
         var gravity: FloatArray? = null
@@ -53,7 +53,7 @@ class AndroidOrientationProvider(context: Context) {
                 val heading = Geography.wrap360(Math.toDegrees(atan2(east, north)))
                 val pitch = if (flat) 0.0 else Math.toDegrees(asin((-remapped[8]).toDouble().coerceIn(-1.0, 1.0)))
                 trySend(DevicePose(heading, pitch, accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM,
-                    if (accuracy < SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) "Compass needs calibration. Move the phone in a figure eight, away from metal." else null, roll = Math.toDegrees(atan2(remapped[6].toDouble(), remapped[7].toDouble())), cameraUsable = !flat, source = if (rotation != null) "Rotation vector (magnetometer + motion sensors)" else "Magnetometer + accelerometer"))
+                    if (accuracy < SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) "Compass is unsteady. Wave your phone in a figure eight, away from metal." else null, roll = Math.toDegrees(atan2(remapped[6].toDouble(), remapped[7].toDouble())), cameraUsable = !flat, source = if (rotation != null) "compass and motion sensors" else "compass and tilt sensor"))
             }
         }
         val registered = if (rotation != null) manager.registerListener(listener, rotation, SensorManager.SENSOR_DELAY_GAME)
@@ -63,7 +63,7 @@ class AndroidOrientationProvider(context: Context) {
             accelerometerRegistered && magnetometerRegistered
         }
         if (!registered) {
-            trySend(DevicePose(0.0, 0.0, false, "Orientation sensor could not start. Drag to explore manually.", available = false))
+            trySend(DevicePose(0.0, 0.0, false, "Couldn't start the compass. Drag the panorama to look around.", available = false))
             manager.unregisterListener(listener)
             close(); return@callbackFlow
         }

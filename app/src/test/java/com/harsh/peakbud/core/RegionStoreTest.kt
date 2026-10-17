@@ -86,6 +86,6 @@ class RegionStoreTest {
         val restarted = RegionStore(root.resolve("installed"))
         val failure = runCatching { restarted.verify(restarted.installed().single()) }.exceptionOrNull()
         assertNotNull(failure)
-        assertTrue(failure!!.message!!.contains("verification failed"))
+        assertTrue(failure!!.message!!.contains("damaged"))
     }
 }

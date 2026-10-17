@@ -47,7 +47,7 @@ class CatalogInstaller(private val workRoot: File, private val store: RegionStor
                        private val openAsset: (String) -> InputStream) {
     fun install(region: CatalogRegion, checkpoint: () -> Unit = {}, progress: (String) -> Unit = {}): RegionPack {
         workRoot.mkdirs()
-        require(workRoot.usableSpace > region.installedBytes * 4 + region.downloadBytes + 16_000_000) { "Not enough storage to prepare this region. Free some space and retry." }
+        require(workRoot.usableSpace > region.installedBytes * 4 + region.downloadBytes + 16_000_000) { "Not enough space on your phone. Free up some storage and try again." }
         val work = workRoot.resolve(region.id)
         work.deleteRecursively(); check(work.mkdirs())
         try {
@@ -56,12 +56,12 @@ class CatalogInstaller(private val workRoot: File, private val store: RegionStor
             region.tiles.forEachIndexed { index, tile ->
                 checkpoint()
                 val compressed = downloader.download(tile.url, checkpoint) { received, total ->
-                    progress("Downloading ${region.name} · ${index + 1}/${region.tiles.size} · ${received / 1_048_576}/${(total ?: tile.downloadBytes) / 1_048_576} MB")
+                    progress("Downloading ${region.name} · ${received / 1_048_576} of ${(total ?: tile.downloadBytes) / 1_048_576} MB" + if (region.tiles.size > 1) " (part ${index + 1} of ${region.tiles.size})" else "")
                 }
-                progress("Checking terrain ${index + 1}/${region.tiles.size}…")
+                progress("Checking the download…")
                 if (compressed.length() != tile.downloadBytes || hash(compressed, checkpoint) != tile.downloadSha256) {
                     downloader.discard(tile.url)
-                    error("The terrain source has changed or was damaged. Please try again later.")
+                    error("The download didn't match what we expected. Please try again later.")
                 }
                 val output = work.resolve(tile.path)
                 output.parentFile!!.mkdirs()
@@ -80,7 +80,7 @@ class CatalogInstaller(private val workRoot: File, private val store: RegionStor
                 checkpoint()
                 openAsset("${region.assetDirectory}/$name").use { input -> work.resolve(name).outputStream().use { input.copyTo(it) } }
             }
-            progress("Preparing ${region.name} for offline use…")
+            progress("Getting ${region.name} ready to use offline…")
             val archive = work.resolve("region.zip")
             ZipOutputStream(archive.outputStream().buffered()).use { zip ->
                 zip.setLevel(0) // Already compressed on the wire; avoid expensive mobile recompression.

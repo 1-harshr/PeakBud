@@ -69,18 +69,18 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
     DisposableEffect(Unit) { onDispose { onFov(null) } }
     var cameraStatus by remember { mutableStateOf<String?>("Starting camera…") }
     val notice = when {
-        !permission -> "Enable the camera to see peak labels over your surroundings."
+        !permission -> "Turn on the camera to see peak names over the view in front of you."
         cameraStatus != null -> cameraStatus
-        state.noRegion -> "Choose a hiking area in Regions and download it to identify peaks around you."
-        state.isDemo -> "Choose a hiking area in Regions and download it to identify real peaks. The panorama demo is fictional."
-        !state.followingGps -> "Use your GPS location to place peaks in the camera view."
-        !state.gpsFresh -> state.gpsStatus ?: "Waiting for a fresh GPS position…"
-        !state.followingCompass -> "Enable direction tracking to align the peak labels."
+        state.noRegion -> "Download a hiking area to see the names of peaks around you."
+        state.isDemo -> "This is a made-up demo landscape. Download a hiking area to name real peaks."
+        !state.followingGps -> "Share your location so peaks appear in the right place."
+        !state.gpsFresh -> state.gpsStatus ?: "Finding your location…"
+        !state.followingCompass -> "Turn on the compass so labels follow where you point."
         state.cameraPose == null -> "Point the back of your phone toward the mountains."
-        !state.poseReliable -> state.compassStatus ?: "Calibrate the compass away from metal before aligning peaks."
-        state.calculating -> "Checking which peaks are visible…"
-        state.scene == null -> "No terrain at this location. Choose a region covering your GPS position."
-        lens == null -> "Camera calibration unavailable on this device. Panorama is still available."
+        !state.poseReliable -> state.compassStatus ?: "Compass is unsteady. Move away from metal and wave your phone in a figure eight."
+        state.calculating -> "Finding the peaks you can see…"
+        state.scene == null -> "This hiking area doesn't cover where you are. Pick one that does."
+        lens == null -> "This phone's camera can't place labels accurately. Try Panorama instead."
         else -> null
     }
     Box(modifier.onSizeChanged { viewport = it }.clipToBounds().background(Color.Black)) {
@@ -91,18 +91,18 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
                 Text(notice, style = MaterialTheme.typography.bodySmall)
                 when {
                     !permission -> {
-                        Button(onClick = { request.launch(Manifest.permission.CAMERA) }) { Text("Enable camera") }
+                        Button(onClick = { request.launch(Manifest.permission.CAMERA) }) { Text("Turn on camera") }
                         if (denied) TextButton(onClick = { context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}"))) }) { Text("Open app settings") }
                     }
                     cameraStatus != null -> Unit
                     state.isDemo || state.noRegion -> Button(onClick = onRegions, colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color(0xFF16352A))) { Text("Choose region") }
                     !state.followingGps -> Button(onClick = onGps) { Text("Use my location") }
-                    !state.followingCompass -> Button(onClick = onTrack) { Text("Track direction") }
+                    !state.followingCompass -> Button(onClick = onTrack) { Text("Turn on compass") }
                 }
             }
         }
         if (notice == null && !fullScreen) Surface(Modifier.align(Alignment.BottomCenter).padding(10.dp), shape = RoundedCornerShape(12.dp), color = Color(0xCC132A24), contentColor = Color.White) {
-            Text("${state.gpsStatus.orEmpty()}\nSensor alignment · adjust below if labels drift", Modifier.padding(8.dp), style = MaterialTheme.typography.labelSmall)
+            Text("Labels off? Use Nudge labels to line them up.", Modifier.padding(8.dp), style = MaterialTheme.typography.labelSmall)
         }
     }
 }
@@ -148,7 +148,7 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
         future.addListener({
             if (!disposed) try {
                 provider = future.get()
-                check(provider!!.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) { "No rear camera available. Use Panorama on this device." }
+                check(provider!!.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) { "This phone has no rear camera. Try Panorama instead." }
                 preview.setSurfaceProvider(view.surfaceProvider)
                 val camera = provider!!.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview)
                 val info = Camera2CameraInfo.from(camera.cameraInfo)
@@ -160,11 +160,11 @@ private fun CameraPreview(modifier: Modifier, onLens: (CameraLens?) -> Unit, onS
                         active.exactCenterX() to active.exactCenterY()) else null
                 camera.cameraInfo.cameraState.observe(owner, object : Observer<androidx.camera.core.CameraState> {
                     override fun onChanged(value: androidx.camera.core.CameraState) {
-                        if (!disposed && value.error != null) { streaming = false; statusCallback("Camera interrupted. Switch to Panorama and back to retry.") }
+                        if (!disposed && value.error != null) { streaming = false; statusCallback("The camera stopped. Switch to Panorama and back to restart it.") }
                     }
                 }.also { cameraObserver = it; observedCamera = camera })
             } catch (error: Exception) {
-                statusCallback(error.message ?: "Camera could not start. Use Panorama or check camera access in Android settings.")
+                statusCallback(error.message ?: "Couldn't start the camera. Check camera access in Android settings, or try Panorama.")
             }
         }, ContextCompat.getMainExecutor(context))
         onDispose {
@@ -212,7 +212,7 @@ private fun CameraLabels(state: PanoramaState, lens: CameraLens, modifier: Modif
             val point = CameraProjector.project(peak.bearingDeg, peak.elevationDeg ?: continue, pose, lens) ?: continue
             if (point.x !in 0f..size.width || point.y !in 0f..size.height) continue
             val label = peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else ""
-            val detail = "${peak.peak.publishedHeightM?.let { height(it, state) } ?: peak.geometryHeightM?.let { "~${height(it, state)} terrain" } ?: "Height unknown"} · ${distance(peak.distanceM, state)}"
+            val detail = "${peak.peak.publishedHeightM?.let { height(it, state) } ?: peak.geometryHeightM?.let { "~${height(it, state)}" } ?: "Height unknown"} · ${distance(peak.distanceM, state)}"
             val width = maxOf(paint.measureText(label), paint.measureText(detail)).coerceAtMost(size.width - 32 * density) + 16 * density
             val left = (point.x - width / 2).coerceIn(8 * density, maxOf(8 * density, size.width - width - 8 * density))
             val boxHeight = 44 * density

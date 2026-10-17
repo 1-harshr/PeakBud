@@ -48,7 +48,7 @@ class RegionStore(private val root: File) {
             checkpoint()
             val target = pack.directory.resolve(file.path)
             require(target.isFile && target.length() == file.size && sha256(target, checkpoint) == file.sha256) {
-                "Offline region verification failed: ${file.path}. Delete this region and download it again."
+                "This hiking area's files are damaged. Delete it and download it again."
             }
         }
         verifiedKeys += pack.key
@@ -75,7 +75,7 @@ class RegionStore(private val root: File) {
         val archive = root.resolve(".$token.zip")
         val staging = root.resolve(".$token.staging")
         try {
-            progress("Saving offline region…")
+            progress("Saving…")
             archive.outputStream().use { output -> copyBounded(stream, output, MAX_BYTES, checkpoint) }
             check(staging.mkdir())
             val parsed = ZipFile(archive).use { zip ->
@@ -90,12 +90,12 @@ class RegionStore(private val root: File) {
                 }
                 val pack = parse(text, staging)
                 require(pack.files.sumOf { it.size } <= MAX_BYTES) { "Region exceeds 512 MiB" }
-                require(root.usableSpace > pack.files.sumOf { it.size } + 16_000_000) { "Not enough free storage for this region" }
+                require(root.usableSpace > pack.files.sumOf { it.size } + 16_000_000) { "Not enough space on your phone. Free up some storage and try again." }
                 val expected = pack.files.associateBy { it.path }
                 require(entries.all { it.isDirectory || it.name == "manifest.json" || it.name in expected }) { "Archive contains unlisted files" }
                 pack.files.forEachIndexed { index, file ->
                     checkpoint()
-                    progress("Checking file ${index + 1} of ${pack.files.size}…")
+                    progress("Checking files (${index + 1} of ${pack.files.size})…")
                     val entry = zip.getEntry(file.path) ?: error("Missing ${file.path}")
                     require(!entry.isDirectory && entry.size == file.size) { "Size mismatch: ${file.path}" }
                     val target = staging.resolve(file.path)
