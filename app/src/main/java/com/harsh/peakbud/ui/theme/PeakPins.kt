@@ -21,7 +21,8 @@ class PlacedPin<T>(val item: T, val x: Float, val y: Float, val hit: RectF)
 /**
  * Still, simple peak markers: a dot on the summit, a vertical stick of fixed length, and a pill tilted up and to the
  * right carrying the name and height. Nothing slides between rows; when two pins would collide, the less important one
- * is simply not labelled. Near the right edge the pill tilts up and to the left instead so it stays on screen.
+ * is simply not labelled. Every pill rises left to right, so parallel pills never cross; near the right edge a pill
+ * runs off the screen rather than flipping.
  */
 object PeakPins {
     private val stickLength = 56.dp
@@ -57,14 +58,9 @@ object PeakPins {
         drawCircle(style.dot, 4.dp.toPx(), Offset(x, y))
         style.ring?.let { drawCircle(it, 6.dp.toPx(), Offset(x, y), style = androidx.compose.ui.graphics.drawscope.Stroke(2.dp.toPx())) }
 
-        val flip = x + length * cos(angle).toFloat() > size.width - 4.dp.toPx()
         val canvas = drawContext.canvas.nativeCanvas
         canvas.save()
-        if (!flip) { canvas.translate(x, stickTop); canvas.rotate(-TILT) }
-        else {
-            // Pill points up-left; text still reads left to right, ending at the stick.
-            canvas.translate(x - length * cos(angle).toFloat(), stickTop - length * sin(angle).toFloat()); canvas.rotate(TILT)
-        }
+        canvas.translate(x, stickTop); canvas.rotate(-TILT)
         val r = thick / 2
         val fill = Paint(Paint.ANTI_ALIAS_FLAG)
         // Name half then height half, as one rounded pill.
@@ -80,7 +76,6 @@ object PeakPins {
 
         // Axis-aligned bounds of the tilted pill plus the dot, for taps.
         val dx = (length * cos(angle)).toFloat(); val dy = (length * sin(angle)).toFloat()
-        val left = if (flip) x - dx else x; val right = if (flip) x else x + dx
-        return RectF(left - r, stickTop - dy - r, right + r, y + 8.dp.toPx())
+        return RectF(x - r, stickTop - dy - r, x + dx + r, y + 8.dp.toPx())
     }
 }
