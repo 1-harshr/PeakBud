@@ -28,6 +28,14 @@
     <string name="nsource">%1$s, %2$s\nSource: %3$s</string>
     <string name="the_map_puts_the_ground_here_at_the_official_summit_height_may_differ">The map puts the ground here at %1$s. The official summit height may differ.</string>
     <string name="show_on_home">Show on Home</string>
+    <string name="find_in_camera">Find in camera</string>
+    <string name="stop_showing">Stop showing</string>
+    <string name="share_view">Share this view</string>
+    <string name="place_with_height">%1$s · %2$s</string>
+    <string name="sun_sets_behind_ridge">Sun goes behind the ridges at %1$s</string>
+    <string name="sun_clears_ridge">Sun clears the ridges at %1$s</string>
+    <string name="turn_to_peak">%1$s · %2$d°</string>
+    <string name="peak_hidden">%1$s · hidden</string>
     <string name="close">Close</string>
     <string name="map_and_peak_credits">Map and peak credits</string>
     <string name="done">Done</string>
@@ -92,6 +100,9 @@
     <string name="choose_spot">Choose spot</string>
     <string name="width">Width</string>
     <string name="angle_degrees">%1$s°</string>
+    <string name="level_horizon">Horizon · 0°</string>
+    <string name="peak_off_skyline">%1$s · off skyline</string>
+    <string name="level_horizon_description">Eye-level horizon, 0° elevation</string>
     <string name="some_directions_have_no_map_data_so_peaks_there_may_be_missing">Some directions have no map data, so peaks there may be missing.</string>
     <string name="finding_nearby_peaks">Finding nearby peaks…</string>
     <string name="choose_a_hiking_area_in_regions_to_list_its_peaks">Choose a hiking area in Regions to list its peaks.</string>
@@ -100,7 +111,7 @@
     <string name="maybe">Maybe</string>
     <string name="hidden">Hidden</string>
     <string name="no_data">No data</string>
-    <string name="search_places_countries_or_ranges">Search places, countries or ranges</string>
+    <string name="search_keywords">Search keywords</string>
     <string name="clear_search">Clear search</string>
     <string name="cancel">Cancel</string>
     <string name="no_hiking_areas_match">No hiking areas match \"%1$s\".</string>
@@ -136,6 +147,13 @@
     <string name="demo_mode">Demo mode</string>
     <string name="adds_a_made_up_landscape_so_you_can_try_peakbud_without_downloading">Try PeakBud anywhere with a made-up mountain range. Uses demo camera footage and a demo spot instead of your camera and location.</string>
     <string name="privacy">Privacy</string>
+    <string name="about">About</string>
+    <string name="developed_by">Developed by Harsh Ranjan</string>
+    <string name="app_version">Version %1$s</string>
+    <string name="report_an_issue">Report an issue</string>
+    <string name="report_an_issue_detail">Email %1$s</string>
+    <string name="support_email" translatable="false">theharsh68@gmail.com</string>
+    <string name="support_subject">PeakBud feedback</string>
     <string name="send_crash_reports_and_usage">Send crash reports and usage</string>
     <string name="helps_fix_problems_your_location_is_never_sent">Helps fix problems. Your location is never sent.</string>
     <string name="peak_visibility_is_worked_out_from_maps_clouds_trees_location_errors_and_nea">Peak visibility is worked out from maps. Clouds, trees, location errors and nearby metal can change what you actually see.</string>
@@ -173,7 +191,7 @@
     <string name="the_camera_stopped_switch_to_home_and_back_to_restart_it">The camera stopped. Switch to Home and back to restart it.</string>
     <string name="couldn_t_start_the_camera_check_camera_access_in_android_settings_or_use_hom">Couldn\'t start the camera. Check camera access in Android settings, or use Home.</string>
     <string name="live_mountain_peak_labels_details_are_also_available_in_peaks">Live mountain peak labels. Details are also available in Peaks.</string>
-    <string name="mountain_panorama_drag_horizontally_to_look_around_peak_details_are_also_ava">Mountain panorama. Drag horizontally to look around. Peak details are also available in the Peaks tab.</string>
+    <string name="mountain_panorama_drag_horizontally_to_look_around_peak_details_are_also_ava">Mountain panorama. Drag sideways to look around, drag up or down to move the view, and pinch to zoom in or out. Peak details are also available in the Peaks tab.</string>
     <string name="demo_landscape_drag_to_look_around">Demo landscape · drag to look around</string>
     <string name="showing_peaks_up_to_km_drag_to_look_around">Peaks up to %1$s · drag to look around</string>
     <string name="turn_on_precise_location_so_peak_labels_line_up_you_can_also_choose_a_spot_o">Turn on precise location so peak labels line up. You can also choose a spot on Home.</string>
@@ -305,7 +323,7 @@
     <string name="home_info_labels_title">Peak labels</string>
     <string name="home_info_labels">Name, height and distance. A ? means a nearer ridge might hide it. Tap a label for details.</string>
     <string name="home_info_controls_title">Controls</string>
-    <string name="home_info_controls">Drag sideways to look around and pinch to zoom. The round buttons: locate puts you at your GPS position, the compass turns the view as you turn your phone, and the pin lets you look from another spot in the area. A filled button is on.</string>
+    <string name="home_info_controls">Drag sideways to look around, drag up or down to move the view, and pinch to zoom in or out. The round buttons: locate puts you at your GPS position, the compass turns the view as you turn your phone, and the pin lets you look from another spot in the area. A filled button is on.</string>
     <string name="got_it">Got it</string>
     <string name="use_my_location_chip">Use my location</string>
     <string name="follow_phone">Follow phone</string>

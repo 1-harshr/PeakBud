@@ -3,6 +3,7 @@ package com.harsh.peakbud
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.*
@@ -34,7 +35,7 @@ class PanoramaRenderingTest {
         val terrain = compose.onNodeWithTag("panorama").captureToImage().toPixelMap()
         compose.runOnIdle { showTerrain = false }
         val sky = compose.onNodeWithTag("panorama").captureToImage().toPixelMap()
-        val y = (terrain.height * .75).toInt()
+        val y = (terrain.height * .84).toInt() // below the eye-level reference, above the footer
         val gapX = terrain.width / 2
         val ridgeX = terrain.width / 4
         assertEquals("Unknown middle sector must remain sky", sky[gapX, y], terrain[gapX, y])
@@ -55,5 +56,82 @@ class PanoramaRenderingTest {
         compose.runOnIdle { expanded = true }
         compose.onNodeWithTag("resized").assertIsDisplayed()
         assertTrue(compose.onNodeWithTag("resized").captureToImage().width > 0)
+    }
+
+    @Test fun summitDotTouchesTheDrawnCrestAndLowUncertainDotIsNotDrawnInsideTheFill() {
+        fun peak(id: String, bearing: Double, elevation: Double) = PeakView(
+            Peak(id, id, GeoPoint(0.0, 0.0), 300.0, "synthetic regression"), 10_000.0, bearing, elevation, 300.0,
+            Visibility.UNCERTAIN, reason = PeakReason.BORDERLINE)
+        val scene = scene.copy(horizon = List(720) { HorizonSample(it * .5, 1.5, 5000.0, true) },
+            peaks = listOf(peak("Low hill", 350.0, .4), peak("Summit", 10.0, 2.7)))
+        compose.setContent {
+            PeakBudTheme {
+                PanoramaCanvas(PanoramaState(scene = scene, heading = 0.0, fov = 60.0),
+                    Modifier.size(320.dp, 280.dp).testTag("pins"), {}, {})
+            }
+        }
+        val image = compose.onNodeWithTag("pins").captureToImage().toPixelMap()
+        val summitX = (image.width * (0.5 + 10.0 / 60)).toInt()
+        val summitY = (image.height * (.6 - .15 * 100.0 / 60.0)).toInt()
+        assertTrue("The actual summit must have a visible dot at its crest", image[summitX, summitY].red > .7f)
+        val lowX = (image.width * (0.5 - 10.0 / 60)).toInt()
+        val lowY = (image.height * (.6 - (.4 - 1.35) * .3 / 2.7 * 100.0 / 60.0)).toInt()
+        val background = image[lowX - 15, lowY]
+        val anchor = image[lowX, lowY]
+        // GPU gradient dithering can vary a neighbouring pixel by a colour step; a summit dot is much brighter.
+        assertEquals("No misleading dot under the ridge", background.red, anchor.red, .02f)
+        assertEquals(background.green, anchor.green, .02f)
+        assertEquals(background.blue, anchor.blue, .02f)
+    }
+
+    @Test fun verticalDragMovesTerrainAndReverseDragBringsItBack() {
+        compose.setContent {
+            PeakBudTheme {
+                PanoramaCanvas(PanoramaState(scene = scene, heading = 0.0),
+                    Modifier.size(280.dp).testTag("panorama"), {}, {})
+            }
+        }
+        val canvas = compose.onNodeWithTag("panorama")
+        val before = canvas.captureToImage().toPixelMap()
+        val x = (before.width * .35).toInt()
+        val y = (before.height * .60).toInt()
+        canvas.performTouchInput {
+            swipe(Offset(width * .35f, height * .45f), Offset(width * .35f, height * .70f))
+        }
+        val moved = canvas.captureToImage().toPixelMap()
+        assertNotEquals("Dragging down must move the ridge below this point", before[x, y], moved[x, y])
+        canvas.performTouchInput {
+            swipe(Offset(width * .35f, height * .70f), Offset(width * .35f, height * .45f))
+        }
+        val restored = canvas.captureToImage().toPixelMap()
+        assertEquals("Dragging back must restore the terrain", before[x, y], restored[x, y])
+    }
+
+    @Test fun pinchZoomsInAndOutWithoutTurningTheView() {
+        var fov by mutableDoubleStateOf(100.0)
+        var headingChange = 0.0
+        compose.setContent {
+            PeakBudTheme {
+                PanoramaCanvas(PanoramaState(scene = scene, heading = 0.0, fov = fov),
+                    Modifier.size(280.dp).testTag("panorama"), { headingChange += it }, {},
+                    onZoom = { fov = (fov / it).coerceIn(35.0, 120.0) })
+            }
+        }
+        val canvas = compose.onNodeWithTag("panorama")
+        canvas.performTouchInput {
+            pinch(start0 = Offset(width * .4f, centerY), start1 = Offset(width * .6f, centerY),
+                end0 = Offset(width * .2f, centerY), end1 = Offset(width * .8f, centerY))
+        }
+        var zoomedFov = 100.0
+        compose.runOnIdle {
+            zoomedFov = fov
+            assertTrue("Spreading fingers must zoom in", fov < 100.0)
+            assertEquals(0.0, headingChange, .01)
+        }
+        canvas.performTouchInput {
+            pinch(start0 = Offset(width * .2f, centerY), start1 = Offset(width * .8f, centerY),
+                end0 = Offset(width * .4f, centerY), end1 = Offset(width * .6f, centerY))
+        }
+        compose.runOnIdle { assertTrue("Bringing fingers together must zoom out", fov > zoomedFov) }
     }
 }

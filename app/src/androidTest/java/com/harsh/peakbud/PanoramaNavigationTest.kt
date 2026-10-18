@@ -67,7 +67,7 @@ class PanoramaNavigationTest {
         compose.onNodeWithText("Choose a spot").assertIsDisplayed()
         compose.onNodeWithText("Cancel").performClick()
         tab(R.string.regions)
-        compose.onNodeWithText("Search places, countries or ranges").assertIsDisplayed()
+        compose.onNodeWithText("Search keywords").assertIsDisplayed()
         // Search the current small-area catalogue; broad legacy packs are shown only when installed.
         for (name in listOf("Mussoorie · Lal Tibba", "Parasnath · Shikharji", "Poon Hill · Annapurna")) {
             compose.onNode(hasSetTextAction()).performTextReplacement(name)

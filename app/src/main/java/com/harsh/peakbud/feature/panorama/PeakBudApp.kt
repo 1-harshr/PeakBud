@@ -27,6 +27,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.layer.drawLayer
 import kotlin.math.roundToInt
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -249,7 +251,16 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                 Text(strings(R.string.nsource , coordinate(peak.peak.point.latitude), coordinate(peak.peak.point.longitude), peak.peak.source), style = MaterialTheme.typography.bodySmall)
                 peak.geometryHeightM?.let { Text(strings(R.string.the_map_puts_the_ground_here_at_the_official_summit_height_may_differ , height(it, state, strings)), style = MaterialTheme.typography.bodySmall) }
             }
-        }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; tab = 1 }) { Text(strings(R.string.show_on_home)) } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text(strings(R.string.close)) } })
+        }, confirmButton = {
+            Row {
+                TextButton(onClick = { model.focus(peak.peak.id); selectedPeak = null; tab = 0 }) { Text(strings(R.string.find_in_camera)) }
+                TextButton(onClick = { model.focus(peak.peak.id); model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; tab = 1 }) { Text(strings(R.string.show_on_home)) }
+            }
+        }, dismissButton = {
+            // The focused peak stays ringed until it is closed here.
+            if (state.focusedPeakId == peak.peak.id) TextButton(onClick = { model.focus(null); selectedPeak = null }) { Text(strings(R.string.stop_showing)) }
+            else TextButton(onClick = { selectedPeak = null }) { Text(strings(R.string.close)) }
+        })
     }
     attribution?.let { text -> AlertDialog(onDismissRequest = { attribution = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text(strings(R.string.map_and_peak_credits)) }, text = { Text(text, Modifier.verticalScroll(rememberScrollState())) }, confirmButton = { TextButton(onClick = { attribution = null }) { Text(strings(R.string.done)) } }) }
     deletePack?.let { pack -> AlertDialog(onDismissRequest = { deletePack = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text(strings(R.string.delete , pack.name)) }, text = { Text(strings(R.string.its_maps_and_peak_names_will_be_removed_from_this_phone_you_can_download_it)) }, confirmButton = { TextButton(onClick = { model.deleteRegion(pack); deletePack = null }) { Text(strings(R.string.delete_2)) } }, dismissButton = { TextButton(onClick = { deletePack = null }) { Text(strings(R.string.keep)) } }) }
@@ -730,10 +741,14 @@ private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifi
                           onViewpoint: () -> Unit, onPeak: (PeakView) -> Unit) {
     val strings = rememberTrailStrings()
     var info by rememberSaveable { mutableStateOf(false) }
+    // The canvas is recorded into a layer so Share can save exactly what is on screen.
+    val layer = androidx.compose.ui.graphics.rememberGraphicsLayer()
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     Card(modifier, shape = MaterialTheme.shapes.large) {
         Box(Modifier.fillMaxSize()) {
             // Drag turns the view, pinch zooms (replaces the old Width slider).
-            PanoramaCanvas(state, Modifier.fillMaxSize(), model::pan, onPeak, onZoom = { zoom -> model.setFov(state.fov / zoom) },
+            PanoramaCanvas(state, Modifier.fillMaxSize().drawWithContent { layer.record { this@drawWithContent.drawContent() }; drawLayer(layer) }, model::pan, onPeak, onZoom = model::zoomBy,
                 compassStartInset = if (state.scene != null) TrailSize.touchTarget else TrailSpace.none)
             // Small, quiet "what am I looking at?" in the top-left corner, beside the direction strip.
             if (state.scene != null) IconButton(onClick = { info = true }, modifier = Modifier.align(Alignment.TopStart).size(TrailSize.touchTarget)) {
@@ -741,11 +756,17 @@ private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifi
                     modifier = Modifier.size(TrailSize.iconSmall), tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .8f))
             }
             // Map-style round buttons instead of chips: locate me, follow the phone's direction, look from another spot.
-            if (!state.isDemo && (state.scene != null || !state.noRegion)) Column(Modifier.align(Alignment.BottomEnd).padding(end = TrailSpace.sm, bottom = TrailCanvas.footerClearance + TrailSpace.xs),
+            if (state.scene != null || !state.isDemo && !state.noRegion) Column(Modifier.align(Alignment.BottomEnd).padding(end = TrailSpace.sm, bottom = TrailCanvas.footerClearance + TrailSpace.xs),
                 verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
-                MapButton(R.drawable.ic_pin_drop, strings(R.string.choose_spot), active = !state.followingGps && !state.isDemo, onClick = onViewpoint)
-                MapButton(R.drawable.ic_explore, strings(R.string.follow_phone), active = state.followingCompass, onClick = model::toggleCompass)
-                MapButton(R.drawable.ic_my_location, strings(R.string.use_my_location_chip), active = state.followingGps, onClick = onGps)
+                if (state.scene != null) MapButton(R.drawable.ic_share, strings(R.string.share_view), active = false) {
+                    Telemetry.event("share_view")
+                    val caption = listOf(strings(R.string.app_name), currentPlace(state, strings), strings(R.string.bearing_with_cardinal, state.heading.toInt(), cardinal(state.heading, strings)),
+                        java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM).format(java.util.Date())).joinToString(" · ")
+                    scope.launch { runCatching { shareView(context, layer.toImageBitmap(), caption) }.onFailure { Telemetry.error("share view", it) } }
+                }
+                if (!state.isDemo) MapButton(R.drawable.ic_pin_drop, strings(R.string.choose_spot), active = !state.followingGps && !state.isDemo, onClick = onViewpoint)
+                if (!state.isDemo) MapButton(R.drawable.ic_explore, strings(R.string.follow_phone), active = state.followingCompass, onClick = model::toggleCompass)
+                if (!state.isDemo) MapButton(R.drawable.ic_my_location, strings(R.string.use_my_location_chip), active = state.followingGps, onClick = onGps)
             }
             if (state.calculating && state.scene == null) Surface(Modifier.align(Alignment.Center), shape = MaterialTheme.shapes.medium) {
                 Row(Modifier.padding(TrailSpace.lg), horizontalArrangement = Arrangement.spacedBy(TrailSpace.md), verticalAlignment = Alignment.CenterVertically) {
@@ -801,9 +822,22 @@ private fun MapButton(icon: Int, description: String, active: Boolean, onClick: 
 @Composable
 private fun HomeNotes(state: PanoramaState) {
     val strings = rememberTrailStrings()
+    val now = rememberMinuteClock()
+    val context = LocalContext.current
+    val timeFormat = remember(context) { android.text.format.DateFormat.getTimeFormat(context) }  // follows the phone's 12/24-hour setting
+    // Terrain-aware: when the sun actually drops behind (or clears) the ridges around this spot, not the flat horizon.
+    val sunNote = remember(state.scene, now / 300_000) {
+        val scene = state.scene ?: return@remember null
+        val skyline = com.harsh.peakbud.core.alignment.TerrainSkyline(scene.horizon)
+        com.harsh.peakbud.core.sky.Sun.nextTerrainEvent(scene.observer.point, now, skyline::elevation)?.let { event ->
+            val time = timeFormat.format(java.util.Date(event.atMs))
+            strings(if (event.kind == com.harsh.peakbud.core.sky.SunEvent.Kind.SET) R.string.sun_sets_behind_ridge else R.string.sun_clears_ridge, time)
+        }
+    }
     listOfNotNull(
         state.compassStatus,
         state.scene?.horizon?.count { !it.complete }?.takeIf { it > 0 }?.let { strings(R.string.some_directions_have_no_map_data_so_peaks_there_may_be_missing) },
+        sunNote,
     ).firstOrNull()?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary, maxLines = 2, overflow = TextOverflow.Ellipsis) }
 }
 
@@ -892,7 +926,7 @@ private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, o
     val legacy = state.packs.filter { pack -> state.catalog.none { it.id == pack.id && it.version == pack.version } && matches(pack.name) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
         OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, shape = CircleShape,
-            placeholder = { Text(strings(R.string.search_places_countries_or_ranges)) },
+            placeholder = { Text(strings(R.string.search_keywords)) },
             leadingIcon = { Icon(painterResource(R.drawable.ic_search), null) },
             trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(painterResource(R.drawable.ic_close), contentDescription = strings(R.string.clear_search)) } },
             colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -1118,6 +1152,29 @@ private fun SettingsDialog(state: PanoramaState, model: PanoramaViewModel, onTut
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
+            SectionLabel(strings(R.string.about), Modifier.padding(top = TrailSpace.sm))
+            SettingsGroup {
+                val context = LocalContext.current
+                val email = strings(R.string.support_email)
+                Column(Modifier.padding(horizontal = TrailSpace.lg, vertical = TrailSpace.lg)) {
+                    Text(strings(R.string.developed_by), style = MaterialTheme.typography.bodyLarge)
+                    val version = remember { runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() }
+                    version?.let { Text(strings(R.string.app_version, it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                }
+                HorizontalDivider(Modifier.padding(horizontal = TrailSpace.lg), color = MaterialTheme.colorScheme.outlineVariant)
+                Row(Modifier.fillMaxWidth().clickable {
+                    val intent = Intent(Intent.ACTION_SENDTO, android.net.Uri.parse("mailto:")).apply {
+                        putExtra(Intent.EXTRA_EMAIL, arrayOf(email)); putExtra(Intent.EXTRA_SUBJECT, strings(R.string.support_subject))
+                    }
+                    runCatching { context.startActivity(intent) }
+                }.padding(horizontal = TrailSpace.lg, vertical = TrailSpace.md), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(strings(R.string.report_an_issue), style = MaterialTheme.typography.bodyLarge)
+                        Text(strings(R.string.report_an_issue_detail, email), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Icon(painterResource(R.drawable.ic_chevron_right), null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
             Text(strings(R.string.peak_visibility_is_worked_out_from_maps_clouds_trees_location_errors_and_nea),
                 Modifier.padding(start = TrailSpace.xs, top = TrailSpace.sm), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
@@ -1158,7 +1215,10 @@ internal fun currentPlace(state: PanoramaState, strings: TrailStrings): String {
     val fix = state.gpsFix ?: return if (state.followingGps) strings(R.string.finding_your_location) else strings(R.string.location_off)
     val where = state.placeName ?: strings(R.string.place_coordinates, kotlin.math.abs(fix.point.latitude),
         strings(if (fix.point.latitude >= 0) R.string.n else R.string.s), kotlin.math.abs(fix.point.longitude), strings(if (fix.point.longitude >= 0) R.string.e else R.string.w))
-    return if (state.followingGps) where else strings(R.string.last_known_place, where)
+    if (!state.followingGps) return strings(R.string.last_known_place, where)
+    // Height of the ground the view is worked out from, so the subtitle reads like a trail sign: "Dhanaulti · 2245 m".
+    val ground = state.scene?.observer?.takeIf { Geography.distance(it.point, fix.point) < 500 }?.groundHeightM
+    return ground?.let { strings(R.string.place_with_height, where, height(it, state, strings)) } ?: where
 }
 internal fun angleText(degrees: Double, strings: TrailStrings) = strings(if (degrees >= 0) R.string.angle_up else R.string.angle_down, kotlin.math.abs(degrees))
 /** Decimal degrees are also editable input; keep an unambiguous decimal point for parsing. */

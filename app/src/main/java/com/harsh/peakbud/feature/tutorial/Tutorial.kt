@@ -164,6 +164,7 @@ internal fun DemoCamera(scene: MountainScene?, modifier: Modifier, mode: CameraD
     Box(modifier) {
         Canvas(modifier.fillMaxSize().semantics { contentDescription = strings(R.string.tutorial_demo_footage_description) }) {
             val w = size.width; val h = size.height
+            if (w <= 0 || h <= 0) return@Canvas
             // A telephoto-like view and a horizon below centre make the range fill the frame like a real photo.
             val hfov = 56.0; val vfov = hfov * h / w; val pitch = 2.5
             val heading = centre + swing
@@ -185,6 +186,11 @@ internal fun DemoCamera(scene: MountainScene?, modifier: Modifier, mode: CameraD
             ridge(1.0, 0.0, 1.0, Color(0xFF8FA4B8), Color(0xFF55697A))       // distant range
             ridge(.45, -2.6, 1.6, Color(0xFF4F6B4E), Color(0xFF243A2B))      // nearer forested ridge, moves faster
             drawRect(Brush.verticalGradient(listOf(Color.Transparent, Color.White.copy(alpha = .10f), Color.Transparent), startY = h * .4f, endY = h * .62f))
+            val horizonY = y(0.0)
+            if (horizonY in 0f..h) drawLevelHorizon(
+                com.harsh.peakbud.core.projection.ScreenLine(com.harsh.peakbud.core.projection.ScreenPoint(0f, horizonY),
+                    com.harsh.peakbud.core.projection.ScreenPoint(w, horizonY)), Color.White, TrailCameraColors.scrim,
+                strings(R.string.level_horizon), labelType.axisPx)
             scan?.let { f ->
                 var px = 0f
                 while (px <= w * f) {
