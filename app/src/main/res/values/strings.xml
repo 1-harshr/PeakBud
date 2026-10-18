@@ -109,7 +109,7 @@
     <string name="maybe">Maybe</string>
     <string name="hidden">Hidden</string>
     <string name="no_data">No data</string>
-    <string name="search_places_countries_or_ranges">Search places, countries or ranges</string>
+    <string name="search_keywords">Search keywords</string>
     <string name="clear_search">Clear search</string>
     <string name="cancel">Cancel</string>
     <string name="no_hiking_areas_match">No hiking areas match \"%1$s\".</string>

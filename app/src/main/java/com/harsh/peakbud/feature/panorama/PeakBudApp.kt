@@ -926,7 +926,7 @@ private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, o
     val legacy = state.packs.filter { pack -> state.catalog.none { it.id == pack.id && it.version == pack.version } && matches(pack.name) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
         OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, shape = CircleShape,
-            placeholder = { Text(strings(R.string.search_places_countries_or_ranges)) },
+            placeholder = { Text(strings(R.string.search_keywords)) },
             leadingIcon = { Icon(painterResource(R.drawable.ic_search), null) },
             trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(painterResource(R.drawable.ic_close), contentDescription = strings(R.string.clear_search)) } },
             colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface,
