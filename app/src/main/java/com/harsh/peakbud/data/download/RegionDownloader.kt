@@ -41,17 +41,17 @@ class RegionDownloader(
         }
     }
 
-    fun download(address: String, checkpoint: () -> Unit = {}, progress: (Long, Long?) -> Unit = { _, _ -> }): File {
+    fun download(address: String, checkpoint: () -> Unit = {}, maxBytes: Long = RegionStore.MAX_BYTES, progress: (Long, Long?) -> Unit = { _, _ -> }): File {
         var url = checkedUrl(address)
         check(directory.isDirectory || directory.mkdirs())
         val key = key(address)
         val part = directory.resolve("$key.part")
         val metadata = directory.resolve("$key.properties")
         val complete = directory.resolve("$key.zip")
-        if (complete.isFile) return complete
+        if (complete.isFile) { require(complete.length() <= maxBytes); return complete }
         val saved = Properties().apply { if (metadata.isFile) metadata.inputStream().use { load(it) } }
         val savedEtag = saved.getProperty("etag")
-        val resumable = part.isFile && part.length() > 0 && part.length() < RegionStore.MAX_BYTES &&
+        val resumable = part.isFile && part.length() > 0 && part.length() < maxBytes &&
             strongEtag(savedEtag)
         repeat(6) { redirectCount ->
             checkpoint()
@@ -87,7 +87,7 @@ class RegionDownloader(
                         part.delete(); metadata.delete(); error("The download changed on the server. Tap the download button to start again.")
                     }
                 }
-                require(expected == null || expected in 1..RegionStore.MAX_BYTES) { "Region download exceeds the permitted size" }
+                require(expected == null || expected in 1..maxBytes) { "Region download exceeds the permitted size" }
                 require(directory.usableSpace > (expected?.minus(start) ?: 16_000_000) + 16_000_000) { "Not enough space on your phone for this download." }
                 val etag = connection.getHeaderField("ETag")
                 Properties().apply {
@@ -106,7 +106,7 @@ class RegionDownloader(
                             val n = input.read(bytes)
                             if (n < 0) break
                             total += n
-                            require(total <= RegionStore.MAX_BYTES && (expected == null || total <= expected)) { "Download exceeded expected size" }
+                            require(total <= maxBytes && (expected == null || total <= expected)) { "Download exceeded expected size" }
                             output.write(bytes, 0, n)
                             progress(total, expected)
                         }

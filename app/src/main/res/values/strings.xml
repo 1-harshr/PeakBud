@@ -329,4 +329,21 @@
     <string name="follow_phone">Follow phone</string>
     <string name="heights_stretched_caption">%1$s · heights ×%2$s</string>
     <string name="demo_viewpoint">Demo viewpoint · your real location isn\'t used</string>
+    <string name="limited_area_coverage">Our ready-made areas cover selected places. Download your own area for anywhere else we support.</string>
+    <string name="download_an_area">Download an area</string>
+    <string name="area_search_intro">Search for your destination or enter latitude, longitude. PeakBud fetches terrain and available peak names for a 30 km view, then saves the area for offline use.</string>
+    <string name="area_place_query">Place or coordinates</string>
+    <string name="area_search_action">Search places</string>
+    <string name="area_use_location">My location</string>
+    <string name="area_at_my_location">Around my location</string>
+    <string name="area_search_empty">No places found. Try adding a country, or enter coordinates such as 28.5, 83.5.</string>
+    <string name="area_search_failed">Place search is unavailable. Check your connection, or enter latitude, longitude.</string>
+    <string name="area_outside_support">This spot is outside our current coverage limits. Choose a place between 55° south and 59° north, away from the date line.</string>
+    <string name="area_preview">Peaks up to 30 km away · %1$d terrain tiles · about %2$d MB stored, plus peak names. Transfer size varies.</string>
+    <string name="area_sources_notice">Requires internet for setup. Terrain comes from Mapzen/Tilezen and names from OpenStreetMap; coverage varies. Your chosen area is sent to the search and data services. Missing tiles or service limits may prevent a download.</string>
+    <string name="area_download_use">Download and use</string>
+    <string name="area_download_failed">Couldn\'t prepare this area. Check your connection and free storage, then try again. Terrain may be unavailable here, or the data service may be busy. Completed tile transfers are kept for retry.</string>
+    <string name="area_no_named_peaks">Your terrain is ready, but OpenStreetMap has no named peaks for this area. You can still explore its skyline.</string>
+    <string name="progress_download_unknown">Downloading %1$s · %2$d MB received · tile %3$d of %4$d</string>
+    <string name="area_names_unavailable">Your terrain is saved, but the peak-name service was unavailable. You can explore the skyline now; download this area again later to retry the names.</string>
 </resources>

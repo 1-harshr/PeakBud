@@ -94,6 +94,8 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
     BackHandler(enabled = !immersive && tab != 1) { tab = 1 }
     var cameraFov by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     var askedLocation by rememberSaveable { mutableStateOf(false) }
+    var downloadArea by rememberSaveable { mutableStateOf(false) }
+    if (downloadArea) DownloadAreaDialog({ downloadArea = false }, { area -> downloadArea = false; model.downloadArea(area) }, state.gpsFix?.point)
     var manual by rememberSaveable { mutableStateOf(false) }
     var settings by rememberSaveable { mutableStateOf(false) }
     var tutorial by rememberSaveable { mutableStateOf(false) }
@@ -213,7 +215,7 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                     LaunchedEffect(cell, state.catalog.size, state.placeName) { model.planNearby() }
                     Regions(state, Modifier.weight(1f), barSpace, model::downloadRegion,
                     { model.selectRegion(it); tab = 1 }, { deletePack = it }, { pack -> scope.launch { attribution = runCatching { model.attribution(pack) }.getOrDefault(strings(R.string.credits_couldn_t_be_loaded)) } }, model::cancelImport,
-                    model::discardDownload)
+                    model::discardDownload, { downloadArea = true })
                 }
             }
         }
@@ -909,7 +911,7 @@ private fun SectionLabel(text: String, modifier: Modifier = Modifier) {
 
 @Composable
 private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, onDownload: (CatalogRegion) -> Unit, onSelect: (RegionPack?) -> Unit, onDelete: (RegionPack) -> Unit, onAttribution: (RegionPack) -> Unit, onCancel: () -> Unit,
-                    onDiscard: (CatalogRegion) -> Unit) {
+                    onDiscard: (CatalogRegion) -> Unit, onFindArea: () -> Unit) {
     val strings = rememberTrailStrings()
     var query by rememberSaveable { mutableStateOf("") }
     val words = query.trim().lowercase().split(Regex("\\s+")).filter { it.isNotEmpty() }
@@ -925,6 +927,10 @@ private fun Regions(state: PanoramaState, modifier: Modifier, bottomSpace: Dp, o
     val nearby = state.nearby?.takeIf { plan -> words.isEmpty() && state.packs.none { it.id == plan.id } }
     val legacy = state.packs.filter { pack -> state.catalog.none { it.id == pack.id && it.version == pack.version } && matches(pack.name) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
+            Text(strings(R.string.limited_area_coverage), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            FilledTonalButton(enabled = state.importing == null, onClick = onFindArea) { Text(strings(R.string.download_an_area)) }
+        }
         OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, shape = CircleShape,
             placeholder = { Text(strings(R.string.search_keywords)) },
             leadingIcon = { Icon(painterResource(R.drawable.ic_search), null) },

@@ -23,10 +23,19 @@ no internet is needed on the trail once an area is downloaded.
 | **Camera** | Full-screen camera with peak names. **Align with camera** matches the skyline the camera sees to the one the map predicts and corrects compass drift; manual nudge stays as a fallback. |
 | **Home** | A drawing of the skyline around you, made from the map. Drag to look around, pinch to zoom, tap ⓘ for a key. Works indoors. |
 | **Peaks** | Every nearby summit with height, distance, bearing and whether terrain blocks it. |
-| **Regions** | Hiking areas to download (92 built in, mostly India), sorted by distance, plus a small **Near you** download. |
+| **Regions** | Selected ready-made hiking areas, sorted by distance, plus **Near you** and **Download an area**: search a destination or enter coordinates to prepare your own offline area. |
 
 Also: a first-run tutorial (Settings → Help), **Demo mode** that runs everything on a made-up landscape and demo
 camera footage, light/dark themes, metric or imperial units, landscape layout, and optional crash reporting.
+
+**Download your own area.** In Regions, choose **Download an area**, search for a place (or enter latitude,
+longitude), select the result, review its storage needs, then choose **Download and use**. PeakBud fetches the
+terrain for a 30 km view from Mapzen/Tilezen Skadi and named peaks from OpenStreetMap through Overpass, validates
+and installs the area, and makes it available offline. Curated areas remain a limited selection; custom areas
+are fetched on demand rather than bundled in the APK. Place search and setup require internet; named-peak and
+terrain coverage vary. The current pack format supports viewpoints between 55° S and 59° N, away from the date
+line. Custom downloads record hashes of HTTPS-fetched data; curated downloads retain their bundled source hashes.
+If the public peak-name service is unavailable, the terrain is still saved and a message explains how to retry the names. Completed terrain transfers are retained for retries.
 
 Labels are estimates. Compass interference, GPS error, clouds and trees affect what you actually see.
 

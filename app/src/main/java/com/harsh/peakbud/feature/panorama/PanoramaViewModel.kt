@@ -342,7 +342,8 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     fun clearMessage() { mutable.update { it.copy(message = null) } }
 
     private fun progressText(value: InstallProgress): String = when (value.stage) {
-        InstallStage.DOWNLOAD -> strings(R.string.progress_download, value.name, value.receivedBytes / 1_048_576, value.downloadBytes / 1_048_576, value.current, value.total)
+        InstallStage.DOWNLOAD -> if (value.downloadBytes > 0) strings(R.string.progress_download, value.name, value.receivedBytes / 1_048_576, value.downloadBytes / 1_048_576, value.current, value.total)
+            else strings(R.string.progress_download_unknown, value.name, value.receivedBytes / 1_048_576, value.current, value.total)
         InstallStage.REUSE_TERRAIN -> strings(R.string.progress_reuse_terrain, value.current, value.total)
         InstallStage.CHECK_TERRAIN -> strings(R.string.progress_check_terrain, value.current, value.total)
         InstallStage.PREPARE -> strings(R.string.progress_prepare, value.name)
@@ -378,6 +379,30 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         }
     }
     private var nearbyJob: Job? = null
+    fun downloadArea(area: DownloadArea) {
+        if (importJob?.isCompleted == false) return
+        importJob = viewModelScope.launch {
+            mutable.update { it.copy(importing = strings(R.string.starting_download_of, area.name), message = null) }
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    val context = currentCoroutineContext()
+                    AreaInstaller(File(getApplication<Application>().noBackupFilesDir, "preparing"), store, downloader)
+                        .install(area, { context.ensureActive() }) { progress -> mutable.update { it.copy(importing = progressText(progress)) } }
+                }
+                val pack = result.pack
+                mutable.update { it.copy(packs = (it.packs + pack).sortedBy { p -> p.name }, importing = null) }
+                refreshDownloads()
+                selectRegion(pack)
+                val empty = withContext(Dispatchers.IO) { store.peaks(pack).isEmpty() }
+                if (!result.peakNamesAvailable) mutable.update { it.copy(message = strings(R.string.area_names_unavailable)) }
+                else if (empty) mutable.update { it.copy(message = strings(R.string.area_no_named_peaks)) }
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (_: Exception) {
+                mutable.update { it.copy(importing = null, message = strings(R.string.area_download_failed)) }
+                refreshDownloads()
+            }
+        }
+    }
     /** Plan an around-me download for the current position (cheap; reads bundled peak snapshots only). */
     fun planNearby() {
         val input = mutable.value

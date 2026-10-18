@@ -54,6 +54,11 @@ class RegionDownloaderTest {
         assertTrue(runCatching { downloader.download("https://example.test/region.zip") }.isFailure)
         assertTrue(directory.listFiles().orEmpty().none { it.extension == "zip" })
     }
+    @Test fun tileSpecificLimitRejectsTransfersSmallerThanTheGeneralRegionLimit() = withDirectory { directory ->
+        val downloader = RegionDownloader(directory) { Response(200, mapOf("Content-Length" to "100"), byteArrayOf()) }
+        assertTrue(runCatching { downloader.download("https://example.test/tile.gz", maxBytes = 50) }.isFailure)
+        assertTrue(directory.listFiles().orEmpty().none { it.extension == "zip" || it.extension == "part" })
+    }
     @Test fun unfinishedTransferIsDiscoverableAfterProcessRecreation() = withDirectory { directory ->
         val address = "https://example.test/region.zip"
         val initial = RegionDownloader(directory) { Response(200, mapOf("Content-Length" to "10", "ETag" to "\"v1\""), "01234".toByteArray()) }

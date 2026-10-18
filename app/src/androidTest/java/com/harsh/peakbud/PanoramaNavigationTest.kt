@@ -1,5 +1,6 @@
 package com.harsh.peakbud
 
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -60,6 +61,16 @@ class PanoramaNavigationTest {
         compose.onNodeWithContentDescription("Full screen").assertIsDisplayed()
         tab(R.string.home)
         compose.onNodeWithContentDescription(compose.activity.getString(R.string.choose_spot)).assertIsDisplayed()
+    }
+
+    @Test fun regionsOfferAnAreaDownloadBeyondTheCuratedList() {
+        tab(R.string.regions)
+        compose.onNodeWithText(compose.activity.getString(R.string.limited_area_coverage)).assertIsDisplayed()
+        compose.onNodeWithText(compose.activity.getString(R.string.download_an_area)).performClick()
+        compose.onNodeWithText(compose.activity.getString(R.string.area_place_query)).assertIsDisplayed()
+        compose.onNodeWithText(compose.activity.getString(R.string.area_download_use)).assertIsNotEnabled()
+        compose.onNodeWithText(compose.activity.getString(R.string.cancel)).performClick()
+        compose.onNodeWithText(compose.activity.getString(R.string.download_an_area)).assertIsDisplayed()
     }
 
     @Test fun manualViewpointAndCuratedRegionEntryPointsRemainAvailable() {
