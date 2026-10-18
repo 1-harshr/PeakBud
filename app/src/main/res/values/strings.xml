@@ -142,6 +142,13 @@
     <string name="demo_mode">Demo mode</string>
     <string name="adds_a_made_up_landscape_so_you_can_try_peakbud_without_downloading">Try PeakBud anywhere with a made-up mountain range. Uses demo camera footage and a demo spot instead of your camera and location.</string>
     <string name="privacy">Privacy</string>
+    <string name="about">About</string>
+    <string name="developed_by">Developed by Harsh Ranjan</string>
+    <string name="app_version">Version %1$s</string>
+    <string name="report_an_issue">Report an issue</string>
+    <string name="report_an_issue_detail">Email %1$s</string>
+    <string name="support_email" translatable="false">theharsh68@gmail.com</string>
+    <string name="support_subject">PeakBud feedback</string>
     <string name="send_crash_reports_and_usage">Send crash reports and usage</string>
     <string name="helps_fix_problems_your_location_is_never_sent">Helps fix problems. Your location is never sent.</string>
     <string name="peak_visibility_is_worked_out_from_maps_clouds_trees_location_errors_and_nea">Peak visibility is worked out from maps. Clouds, trees, location errors and nearby metal can change what you actually see.</string>

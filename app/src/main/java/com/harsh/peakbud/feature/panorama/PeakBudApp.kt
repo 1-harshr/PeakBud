@@ -1152,6 +1152,29 @@ private fun SettingsDialog(state: PanoramaState, model: PanoramaViewModel, onTut
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
+            SectionLabel(strings(R.string.about), Modifier.padding(top = TrailSpace.sm))
+            SettingsGroup {
+                val context = LocalContext.current
+                val email = strings(R.string.support_email)
+                Column(Modifier.padding(horizontal = TrailSpace.lg, vertical = TrailSpace.lg)) {
+                    Text(strings(R.string.developed_by), style = MaterialTheme.typography.bodyLarge)
+                    val version = remember { runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() }
+                    version?.let { Text(strings(R.string.app_version, it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                }
+                HorizontalDivider(Modifier.padding(horizontal = TrailSpace.lg), color = MaterialTheme.colorScheme.outlineVariant)
+                Row(Modifier.fillMaxWidth().clickable {
+                    val intent = Intent(Intent.ACTION_SENDTO, android.net.Uri.parse("mailto:")).apply {
+                        putExtra(Intent.EXTRA_EMAIL, arrayOf(email)); putExtra(Intent.EXTRA_SUBJECT, strings(R.string.support_subject))
+                    }
+                    runCatching { context.startActivity(intent) }
+                }.padding(horizontal = TrailSpace.lg, vertical = TrailSpace.md), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(strings(R.string.report_an_issue), style = MaterialTheme.typography.bodyLarge)
+                        Text(strings(R.string.report_an_issue_detail, email), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Icon(painterResource(R.drawable.ic_chevron_right), null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
             Text(strings(R.string.peak_visibility_is_worked_out_from_maps_clouds_trees_location_errors_and_nea),
                 Modifier.padding(start = TrailSpace.xs, top = TrailSpace.sm), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
