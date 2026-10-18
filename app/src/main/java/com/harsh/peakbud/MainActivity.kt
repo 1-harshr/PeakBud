@@ -67,8 +67,8 @@ class MainActivity : ComponentActivity() {
 private fun SplashCredits() {
     Box(Modifier.fillMaxSize().background(colorResource(R.color.peakbud_forest)).systemBarsPadding()) {
         Image(painterResource(R.drawable.ic_splash), null, Modifier.size(240.dp).align(Alignment.Center))
-        Column(Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = 24.dp), horizontalAlignment = Alignment.End) {
-            Text(stringResource(R.string.splash_made_by), color = Color.White, fontSize = 14.sp, textAlign = TextAlign.End)
+        Column(Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(stringResource(R.string.splash_made_by), color = Color.White, fontSize = 14.sp, textAlign = TextAlign.Center)
             Text(stringResource(R.string.splash_version, BuildConfig.VERSION_NAME), color = Color.White.copy(alpha = .7f), fontSize = 12.sp,
                 modifier = Modifier.padding(top = 4.dp))
         }
