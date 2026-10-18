@@ -28,6 +28,7 @@
     <string name="show_on_home">Show on Home</string>
     <string name="find_in_camera">Find in camera</string>
     <string name="stop_showing">Stop showing</string>
+    <string name="share_view">Share this view</string>
     <string name="place_with_height">%1$s · %2$s</string>
     <string name="sun_sets_behind_ridge">Sun goes behind the ridges at %1$s</string>
     <string name="sun_clears_ridge">Sun clears the ridges at %1$s</string>

@@ -27,6 +27,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.layer.drawLayer
 import kotlin.math.roundToInt
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -739,10 +741,14 @@ private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifi
                           onViewpoint: () -> Unit, onPeak: (PeakView) -> Unit) {
     val strings = rememberTrailStrings()
     var info by rememberSaveable { mutableStateOf(false) }
+    // The canvas is recorded into a layer so Share can save exactly what is on screen.
+    val layer = androidx.compose.ui.graphics.rememberGraphicsLayer()
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     Card(modifier, shape = MaterialTheme.shapes.large) {
         Box(Modifier.fillMaxSize()) {
             // Drag turns the view, pinch zooms (replaces the old Width slider).
-            PanoramaCanvas(state, Modifier.fillMaxSize(), model::pan, onPeak, onZoom = { zoom -> model.setFov(state.fov / zoom) },
+            PanoramaCanvas(state, Modifier.fillMaxSize().drawWithContent { layer.record { this@drawWithContent.drawContent() }; drawLayer(layer) }, model::pan, onPeak, onZoom = { zoom -> model.setFov(state.fov / zoom) },
                 compassStartInset = if (state.scene != null) TrailSize.touchTarget else TrailSpace.none)
             // Small, quiet "what am I looking at?" in the top-left corner, beside the direction strip.
             if (state.scene != null) IconButton(onClick = { info = true }, modifier = Modifier.align(Alignment.TopStart).size(TrailSize.touchTarget)) {
@@ -750,11 +756,17 @@ private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifi
                     modifier = Modifier.size(TrailSize.iconSmall), tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .8f))
             }
             // Map-style round buttons instead of chips: locate me, follow the phone's direction, look from another spot.
-            if (!state.isDemo && (state.scene != null || !state.noRegion)) Column(Modifier.align(Alignment.BottomEnd).padding(end = TrailSpace.sm, bottom = TrailCanvas.footerClearance + TrailSpace.xs),
+            if (state.scene != null || !state.isDemo && !state.noRegion) Column(Modifier.align(Alignment.BottomEnd).padding(end = TrailSpace.sm, bottom = TrailCanvas.footerClearance + TrailSpace.xs),
                 verticalArrangement = Arrangement.spacedBy(TrailSpace.sm)) {
-                MapButton(R.drawable.ic_pin_drop, strings(R.string.choose_spot), active = !state.followingGps && !state.isDemo, onClick = onViewpoint)
-                MapButton(R.drawable.ic_explore, strings(R.string.follow_phone), active = state.followingCompass, onClick = model::toggleCompass)
-                MapButton(R.drawable.ic_my_location, strings(R.string.use_my_location_chip), active = state.followingGps, onClick = onGps)
+                if (state.scene != null) MapButton(R.drawable.ic_share, strings(R.string.share_view), active = false) {
+                    Telemetry.event("share_view")
+                    val caption = listOf(strings(R.string.app_name), currentPlace(state, strings), strings(R.string.bearing_with_cardinal, state.heading.toInt(), cardinal(state.heading, strings)),
+                        java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM).format(java.util.Date())).joinToString(" · ")
+                    scope.launch { runCatching { shareView(context, layer.toImageBitmap(), caption) }.onFailure { Telemetry.error("share view", it) } }
+                }
+                if (!state.isDemo) MapButton(R.drawable.ic_pin_drop, strings(R.string.choose_spot), active = !state.followingGps && !state.isDemo, onClick = onViewpoint)
+                if (!state.isDemo) MapButton(R.drawable.ic_explore, strings(R.string.follow_phone), active = state.followingCompass, onClick = model::toggleCompass)
+                if (!state.isDemo) MapButton(R.drawable.ic_my_location, strings(R.string.use_my_location_chip), active = state.followingGps, onClick = onGps)
             }
             if (state.calculating && state.scene == null) Surface(Modifier.align(Alignment.Center), shape = MaterialTheme.shapes.medium) {
                 Row(Modifier.padding(TrailSpace.lg), horizontalArrangement = Arrangement.spacedBy(TrailSpace.md), verticalAlignment = Alignment.CenterVertically) {
