@@ -38,27 +38,30 @@ object PanoramaProjector {
         )
     }
 
-    /** Lowest and highest angles worth fitting on screen: the skyline in view and the peaks that may be labelled. */
+    /** Lowest and highest terrain/peak angles in view; optionally extend the fit to include eye level. */
     data class VerticalWindow(val lowDeg: Double, val highDeg: Double)
 
-    fun window(samples: List<HorizonSample>, peakAngles: List<Pair<Double, Double>>, heading: Double, horizontalFov: Double): VerticalWindow? {
+    fun window(samples: List<HorizonSample>, peakAngles: List<Pair<Double, Double>>, heading: Double, horizontalFov: Double,
+               includeHorizon: Boolean = false): VerticalWindow? {
         val inView = { bearing: Double -> abs(Geography.wrap180(bearing - heading)) <= horizontalFov / 2 }
         val skyline = samples.filter { it.complete && inView(it.bearingDeg) }.mapNotNull { it.elevationDeg?.takeIf(Double::isFinite) }
         if (skyline.size < 3) return null
         val peaks = peakAngles.filter { inView(it.first) && it.second.isFinite() }.map { it.second }
         // A labelled peak can sit below the lowest skyline point (a low hill in front of a higher range), so it bounds
         // the window from below as well as above.
-        return VerticalWindow(minOf(skyline.min(), peaks.minOrNull() ?: Double.POSITIVE_INFINITY),
-            maxOf(skyline.max(), peaks.maxOrNull() ?: Double.NEGATIVE_INFINITY))
+        return VerticalWindow(minOf(skyline.min(), peaks.minOrNull() ?: Double.POSITIVE_INFINITY, if (includeHorizon) 0.0 else Double.POSITIVE_INFINITY),
+            maxOf(skyline.max(), peaks.maxOrNull() ?: Double.NEGATIVE_INFINITY, if (includeHorizon) 0.0 else Double.NEGATIVE_INFINITY))
     }
 
     /**
      * Vertical scale (pixels per degree) that fits [window] between [topY] and [bottomY], never flatter than true angles
-     * and at most [maxStretch] times steeper.
+     * and at most [maxStretch] times steeper. [fitEntireWindow] also allows compression so eye level
+     * and a steep ridge can both remain visible in a short landscape viewport.
      */
-    fun fittedPxPerDeg(window: VerticalWindow, topY: Float, bottomY: Float, horizontalFov: Double, width: Float, maxStretch: Double = 8.0): Double {
+    fun fittedPxPerDeg(window: VerticalWindow, topY: Float, bottomY: Float, horizontalFov: Double, width: Float, maxStretch: Double = 8.0,
+                       fitEntireWindow: Boolean = false): Double {
         val truePx = width / horizontalFov
         val relief = (window.highDeg - window.lowDeg).coerceAtLeast(.05)
-        return ((bottomY - topY) / relief).coerceIn(truePx, truePx * maxStretch)
+        return ((bottomY - topY) / relief).coerceIn(if (fitEntireWindow) 0.0 else truePx, truePx * maxStretch)
     }
 }

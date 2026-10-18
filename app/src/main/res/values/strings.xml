@@ -98,6 +98,9 @@
     <string name="choose_spot">Choose spot</string>
     <string name="width">Width</string>
     <string name="angle_degrees">%1$s°</string>
+    <string name="level_horizon">Horizon · 0°</string>
+    <string name="peak_off_skyline">%1$s · off skyline</string>
+    <string name="level_horizon_description">Eye-level horizon, 0° elevation</string>
     <string name="some_directions_have_no_map_data_so_peaks_there_may_be_missing">Some directions have no map data, so peaks there may be missing.</string>
     <string name="finding_nearby_peaks">Finding nearby peaks…</string>
     <string name="choose_a_hiking_area_in_regions_to_list_its_peaks">Choose a hiking area in Regions to list its peaks.</string>

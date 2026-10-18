@@ -99,6 +99,8 @@ fun CameraPanel(state: PanoramaState, modifier: Modifier, onRegions: () -> Unit,
     }
     Box(modifier.onSizeChanged { viewport = it }.clipToBounds().background(Color.Black)) {
         if (permission) CameraPreview(Modifier.fillMaxSize(), { lens = it }, { cameraStatus = it }, alignment, rawPose) { state.scene?.peaks.orEmpty() }
+        if (permission && cameraStatus == null && state.followingCompass && pose != null && lens != null)
+            CameraHorizon(pose, lens!!, Modifier.fillMaxSize())
         if (notice == null) CameraLabels(state, pose!!, aligned, hiddenPeaks, lens!!, Modifier.fillMaxSize(), safeTop, safeBottom, onBackgroundTap, onDragNudge, onDragEnd, onPeak)
         else if (fullScreen) Box(Modifier.fillMaxSize().pointerInput(Unit) { detectTapGestures { onBackgroundTap() } }
             .pointerInput(Unit) { detectHorizontalDragGestures { change, _ -> change.consume() } })  // a swipe is not a tap

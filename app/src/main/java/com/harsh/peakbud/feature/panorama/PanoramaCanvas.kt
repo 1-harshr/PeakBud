@@ -22,6 +22,7 @@ import androidx.compose.ui.semantics.semantics
 import com.harsh.peakbud.core.geo.Geography
 import com.harsh.peakbud.core.model.*
 import com.harsh.peakbud.core.projection.PanoramaProjector
+import com.harsh.peakbud.core.projection.PanoramaOutline
 import com.harsh.peakbud.core.projection.toLabel
 import com.harsh.peakbud.core.sky.Sun
 import kotlin.math.*
@@ -37,12 +38,15 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
     val pan by rememberUpdatedState(onPan)
     val select by rememberUpdatedState(onPeak)
     val zoom by rememberUpdatedState(onZoom)
-    // The vertical axis follows the terrain in view: the lowest and highest skyline points (and labelled peaks) are
-    // fitted to the frame, easing as you pan so the view never jumps.
-    val target = remember(state.scene, state.heading, state.fov, state.preferences.showUncertain, state.focusedPeakId) {
-        PanoramaProjector.window(state.scene?.horizon.orEmpty(),
-            state.scene?.peaks.orEmpty().toLabel(state.preferences.showUncertain, state.focusedPeakId)
-                .mapNotNull { p -> p.elevationDeg?.let { p.bearingDeg to it } }, state.heading, state.fov)
+    val outline = remember(state.scene, state.preferences.showUncertain, state.focusedPeakId) {
+        PanoramaOutline.build(state.scene?.horizon.orEmpty(),
+            state.scene?.peaks.orEmpty().toLabel(state.preferences.showUncertain, state.focusedPeakId), state.focusedPeakId)
+    }
+    // Fit the terrain, labelled peaks and eye-level horizon together, easing as you pan.
+    val target = remember(outline, state.heading, state.fov) {
+        PanoramaProjector.window(outline.horizon,
+            outline.peaks
+                .mapNotNull { p -> p.elevationDeg?.let { p.bearingDeg to it } }, state.heading, state.fov, includeHorizon = true)
     }
     val now = rememberMinuteClock()
     val sun = remember(state.scene?.observer?.point, now) { state.scene?.observer?.point?.let { Sun.position(it, now) } }
@@ -69,7 +73,7 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         // Highest point in view sits at 45% of the height (room above for pins), lowest at 75% (ground below).
         val window = PanoramaProjector.VerticalWindow(windowLow.toDouble(), windowHigh.toDouble())
         val topY = h * .45f; val bottomY = h * .75f
-        val pxPerDeg = PanoramaProjector.fittedPxPerDeg(window, topY, bottomY, state.fov, w)
+        val pxPerDeg = PanoramaProjector.fittedPxPerDeg(window, topY, bottomY, state.fov, w, fitEntireWindow = true)
         val verticalScale = pxPerDeg / (w / state.fov)
         val centreDeg = (window.lowDeg + window.highDeg) / 2
         fun project(b: Double, e: Double) = PanoramaProjector.project(b, 0.0, heading, 0.0, w, h, state.fov).let {
@@ -90,6 +94,7 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         var angleIndex = (-20 / stepDeg).toInt()
         while (angleIndex * stepDeg <= 40) {
             val angle = angleIndex * stepDeg; angleIndex++
+            if (angle == 0.0) continue // Eye level has its own distinct reference above the terrain layer.
             val y = project(heading, angle).y
             if (y in (compassBand + (TrailSpace.md).toPx())..(h - footerClearance)) {
                 drawLine(palette.grid, Offset(0f, y), Offset(w, y), 1f)
@@ -108,7 +113,7 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
             compassLabels += RectF(bounds).apply { inset(-TrailSpace.xs.toPx(), 0f) }
             drawContext.canvas.nativeCanvas.drawText(label, x - half, axisBaseline, paint)
         }
-        val segments = PanoramaProjector.horizonSegments(state.scene?.horizon.orEmpty(), heading, state.fov)
+        val segments = PanoramaProjector.horizonSegments(outline.horizon, heading, state.fov)
             .map { segment -> segment.map { sample -> sample to project(sample.bearingDeg, sample.elevationDeg!!) } }
         // The sun sits behind the terrain layer, so a ridge covers it exactly as it would outside.
         sun?.takeIf { it.elevationDeg > -1 }?.let { s ->
@@ -127,12 +132,20 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
             path.lineTo(segment.last().second.x, h); path.lineTo(segment.first().second.x, h); path.close()
             drawPath(path, Brush.verticalGradient(listOf(palette.ridgeTop, palette.ridgeBottom), startY = h * .3f, endY = h))
         }
+        if (state.scene != null) {
+            val horizonY = project(heading, 0.0).y
+            if (horizonY in compassBand..(h - footerClearance)) drawLevelHorizon(
+                com.harsh.peakbud.core.projection.ScreenLine(com.harsh.peakbud.core.projection.ScreenPoint(0f, horizonY),
+                    com.harsh.peakbud.core.projection.ScreenPoint(w, horizonY)), palette.axis, palette.labelSurface,
+                strings(R.string.level_horizon), type.axisPx)
+        }
         if (w <= TrailCanvas.labelPadding.toPx() * 2) return@Canvas
         drawLine(palette.axis, Offset(w / 2, (TrailSpace.xxl).toPx()), Offset(w / 2, (TrailCanvas.compassBand + TrailSpace.sm).toPx()), (TrailSpace.xxs).toPx())
         val occupied = mutableListOf<RectF>()
-        val candidates = state.scene?.peaks.orEmpty().toLabel(state.preferences.showUncertain, state.focusedPeakId)
+        val candidates = outline.peaks
             .mapNotNull { peak -> peak.elevationDeg?.let { e -> project(peak.bearingDeg, e).let { p ->
-            PinCandidate(peak, p.x, p.y, pinName(peak, strings),
+            PinCandidate(peak, p.x, p.y, if (outline.focusedOffSkyline && peak.peak.id == state.focusedPeakId && peak.visibility == Visibility.UNCERTAIN)
+                strings(R.string.peak_off_skyline, peak.peak.name) else pinName(peak, strings),
                 peak.peak.publishedHeightM?.let { height(it, state, strings) } ?: peak.geometryHeightM?.let { strings(R.string.approximate_height, height(it, state, strings)) })
         } } }.filter { it.x in TrailCanvas.labelMargin.toPx()..(w - TrailCanvas.labelMargin.toPx()) && it.y in compassBand..(h - footerClearance) }
         // Same still pins as the camera: dot on the summit, vertical stick, tilted name/height pill.

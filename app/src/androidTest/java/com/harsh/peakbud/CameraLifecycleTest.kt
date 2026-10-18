@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.lifecycle.Lifecycle
 import androidx.test.platform.app.InstrumentationRegistry
 import com.harsh.peakbud.core.alignment.*
+import com.harsh.peakbud.core.projection.CameraPose
 import com.harsh.peakbud.feature.camera.*
 import com.harsh.peakbud.feature.panorama.PanoramaState
 import com.harsh.peakbud.ui.theme.PeakBudTheme
@@ -29,6 +30,20 @@ class CameraLifecycleTest {
         }
     }
     @get:Rule(order = 1) val compose = createAndroidComposeRule<MainActivity>()
+
+    @Test fun levelHorizonWorksBeforeLocationAndTerrainAreAvailable() {
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            compose.activity.setContent {
+                PeakBudTheme {
+                    CameraPanel(PanoramaState(followingCompass = true, cameraPose = CameraPose(0.0, 0.0, 0.0)),
+                        Modifier.fillMaxSize(), {}, {}, {}, {}, onPeak = {})
+                }
+            }
+        }
+        val horizon = compose.activity.getString(R.string.level_horizon_description)
+        compose.waitUntil(15_000) { compose.onAllNodesWithContentDescription(horizon).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithContentDescription(horizon).assertIsDisplayed()
+    }
 
     @Test fun stoppedCameraClearsAlignmentAndPreviewCanResume() {
         val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
