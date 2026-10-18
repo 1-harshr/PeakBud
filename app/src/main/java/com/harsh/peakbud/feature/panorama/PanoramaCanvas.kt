@@ -7,10 +7,10 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
@@ -38,6 +38,8 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
     val pan by rememberUpdatedState(onPan)
     val select by rememberUpdatedState(onPeak)
     val zoom by rememberUpdatedState(onZoom)
+    // A viewport fraction preserves the framing across layout and orientation changes.
+    var verticalOffset by rememberSaveable(state.activePack?.key, state.isDemo) { mutableFloatStateOf(0f) }
     val outline = remember(state.scene, state.preferences.showUncertain, state.focusedPeakId) {
         PanoramaOutline.build(state.scene?.horizon.orEmpty(),
             state.scene?.peaks.orEmpty().toLabel(state.preferences.showUncertain, state.focusedPeakId), state.focusedPeakId)
@@ -54,9 +56,12 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
     val windowHigh by androidx.compose.animation.core.animateFloatAsState((target?.highDeg ?: 10.0).toFloat(), androidx.compose.animation.core.tween(450), label = "high")
     Canvas(modifier.clipToBounds()
         .semantics { contentDescription = strings(R.string.mountain_panorama_drag_horizontally_to_look_around_peak_details_are_also_ava) }
-        // One finger turns the view; two fingers pinch to zoom.
+        // Drag in either direction; two fingers can pan and pinch together.
         .pointerInput(Unit) { detectTransformGestures { _, panBy, zoomBy, _ ->
             if (panBy.x != 0f && size.width > 0) pan(-panBy.x / size.width * currentState.fov)
+            if (panBy.y != 0f && size.height > 0) {
+                verticalOffset = (verticalOffset + panBy.y / size.height).coerceIn(-.75f, .75f)
+            }
             if (zoomBy != 1f) zoom(zoomBy)
         } }
         .pointerInput(Unit) { detectTapGestures { point -> hits.lastOrNull { it.first.contains(point.x, point.y) }?.let { select(it.second) } } }
@@ -73,11 +78,13 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         // Highest point in view sits at 45% of the height (room above for pins), lowest at 75% (ground below).
         val window = PanoramaProjector.VerticalWindow(windowLow.toDouble(), windowHigh.toDouble())
         val topY = h * .45f; val bottomY = h * .75f
-        val pxPerDeg = PanoramaProjector.fittedPxPerDeg(window, topY, bottomY, state.fov, w, fitEntireWindow = true)
+        // Fit at the default field of view, then magnify both axes together. Refitting at
+        // the current zoom would shrink the terrain and cancel vertical magnification.
+        val pxPerDeg = PanoramaProjector.fittedPxPerDeg(window, topY, bottomY, 100.0, w, fitEntireWindow = true) * (100.0 / state.fov)
         val verticalScale = pxPerDeg / (w / state.fov)
         val centreDeg = (window.lowDeg + window.highDeg) / 2
         fun project(b: Double, e: Double) = PanoramaProjector.project(b, 0.0, heading, 0.0, w, h, state.fov).let {
-            com.harsh.peakbud.core.projection.ScreenPoint(it.x, ((topY + bottomY) / 2 - (e - centreDeg) * pxPerDeg).toFloat())
+            com.harsh.peakbud.core.projection.ScreenPoint(it.x, ((topY + bottomY) / 2 + verticalOffset * h - (e - centreDeg) * pxPerDeg).toFloat())
         }
         val axisMetrics = paint.fontMetrics
         val axisHeight = axisMetrics.descent - axisMetrics.ascent

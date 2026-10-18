@@ -748,7 +748,7 @@ private fun PanoramaPanel(state: PanoramaState, model: PanoramaViewModel, modifi
     Card(modifier, shape = MaterialTheme.shapes.large) {
         Box(Modifier.fillMaxSize()) {
             // Drag turns the view, pinch zooms (replaces the old Width slider).
-            PanoramaCanvas(state, Modifier.fillMaxSize().drawWithContent { layer.record { this@drawWithContent.drawContent() }; drawLayer(layer) }, model::pan, onPeak, onZoom = { zoom -> model.setFov(state.fov / zoom) },
+            PanoramaCanvas(state, Modifier.fillMaxSize().drawWithContent { layer.record { this@drawWithContent.drawContent() }; drawLayer(layer) }, model::pan, onPeak, onZoom = model::zoomBy,
                 compassStartInset = if (state.scene != null) TrailSize.touchTarget else TrailSpace.none)
             // Small, quiet "what am I looking at?" in the top-left corner, beside the direction strip.
             if (state.scene != null) IconButton(onClick = { info = true }, modifier = Modifier.align(Alignment.TopStart).size(TrailSize.touchTarget)) {

@@ -237,6 +237,9 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
     }
     fun setPitch(value: Double) { mutable.update { it.copy(pitch = value.coerceIn(-30.0, 30.0)) } }
     fun setFov(value: Double) { mutable.update { it.copy(fov = value.coerceIn(35.0, 120.0)) } }
+    fun zoomBy(factor: Float) {
+        if (factor.isFinite() && factor > 0f) mutable.update { it.copy(fov = (it.fov / factor).coerceIn(35.0, 120.0)) }
+    }
     fun toggleCompass() { alignment.reset(); lastSmoothedHeading = null; mutable.update { it.copy(followingCompass = !it.followingCompass, cameraPose = null, compassStatus = null) } }
     fun trimCompass(degrees: Double) {
         Telemetry.log("label nudge $degrees")
