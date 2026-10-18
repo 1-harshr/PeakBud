@@ -26,3 +26,9 @@ object TrailCameraColors {
     val pinHeight = Color(0xFF2E8B6A)
     val uncertain = Color(0xFFFFC078)
 }
+
+/** The sun on the drawn skyline. */
+object TrailSun {
+    val disc = Color(0xFFFFC94D)
+    val glow = Color(0x33FFC94D)
+}

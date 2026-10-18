@@ -810,9 +810,22 @@ private fun MapButton(icon: Int, description: String, active: Boolean, onClick: 
 @Composable
 private fun HomeNotes(state: PanoramaState) {
     val strings = rememberTrailStrings()
+    val now = rememberMinuteClock()
+    val context = LocalContext.current
+    val timeFormat = remember(context) { android.text.format.DateFormat.getTimeFormat(context) }  // follows the phone's 12/24-hour setting
+    // Terrain-aware: when the sun actually drops behind (or clears) the ridges around this spot, not the flat horizon.
+    val sunNote = remember(state.scene, now / 300_000) {
+        val scene = state.scene ?: return@remember null
+        val skyline = com.harsh.peakbud.core.alignment.TerrainSkyline(scene.horizon)
+        com.harsh.peakbud.core.sky.Sun.nextTerrainEvent(scene.observer.point, now, skyline::elevation)?.let { event ->
+            val time = timeFormat.format(java.util.Date(event.atMs))
+            strings(if (event.kind == com.harsh.peakbud.core.sky.SunEvent.Kind.SET) R.string.sun_sets_behind_ridge else R.string.sun_clears_ridge, time)
+        }
+    }
     listOfNotNull(
         state.compassStatus,
         state.scene?.horizon?.count { !it.complete }?.takeIf { it > 0 }?.let { strings(R.string.some_directions_have_no_map_data_so_peaks_there_may_be_missing) },
+        sunNote,
     ).firstOrNull()?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary, maxLines = 2, overflow = TextOverflow.Ellipsis) }
 }
 

@@ -23,6 +23,7 @@ import com.harsh.peakbud.core.geo.Geography
 import com.harsh.peakbud.core.model.*
 import com.harsh.peakbud.core.projection.PanoramaProjector
 import com.harsh.peakbud.core.projection.toLabel
+import com.harsh.peakbud.core.sky.Sun
 import kotlin.math.*
 
 @Composable
@@ -43,6 +44,8 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
             state.scene?.peaks.orEmpty().toLabel(state.preferences.showUncertain, state.focusedPeakId)
                 .mapNotNull { p -> p.elevationDeg?.let { p.bearingDeg to it } }, state.heading, state.fov)
     }
+    val now = rememberMinuteClock()
+    val sun = remember(state.scene?.observer?.point, now) { state.scene?.observer?.point?.let { Sun.position(it, now) } }
     val windowLow by androidx.compose.animation.core.animateFloatAsState((target?.lowDeg ?: 0.0).toFloat(), androidx.compose.animation.core.tween(450), label = "low")
     val windowHigh by androidx.compose.animation.core.animateFloatAsState((target?.highDeg ?: 10.0).toFloat(), androidx.compose.animation.core.tween(450), label = "high")
     Canvas(modifier.clipToBounds()
@@ -107,6 +110,15 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         }
         val segments = PanoramaProjector.horizonSegments(state.scene?.horizon.orEmpty(), heading, state.fov)
             .map { segment -> segment.map { sample -> sample to project(sample.bearingDeg, sample.elevationDeg!!) } }
+        // The sun sits behind the terrain layer, so a ridge covers it exactly as it would outside.
+        sun?.takeIf { it.elevationDeg > -1 }?.let { s ->
+            val p = project(s.azimuthDeg, s.elevationDeg)
+            val r = TrailSpace.md.toPx()
+            if (p.x in -r..w + r && p.y in compassBand..h) {
+                drawCircle(TrailSun.glow, r * 2.2f, Offset(p.x, p.y))
+                drawCircle(TrailSun.disc, r, Offset(p.x, p.y))
+            }
+        }
         for (segment in segments) {
             if (segment.size < 2) continue
             val path = Path()
@@ -162,4 +174,12 @@ internal fun pinName(peak: PeakView, strings: TrailStrings): String = when (peak
     Visibility.UNCERTAIN -> peak.peak.name + " ?"
     Visibility.OCCLUDED, Visibility.UNKNOWN -> strings(R.string.peak_hidden, peak.peak.name)
     else -> peak.peak.name
+}
+
+/** Wall-clock time, refreshed every minute while shown. */
+@Composable
+internal fun rememberMinuteClock(): Long {
+    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(Unit) { while (true) { kotlinx.coroutines.delay(60_000 - System.currentTimeMillis() % 60_000); now = System.currentTimeMillis() } }
+    return now
 }
