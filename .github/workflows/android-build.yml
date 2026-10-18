@@ -1,0 +1,145 @@
+# Manual build pipeline: unit tests → instrumented tests on an emulator → debug + release builds.
+# Start it from GitHub: Actions → "Android build" → Run workflow.
+#
+# Optional repository secrets (Settings → Secrets and variables → Actions):
+#   GOOGLE_SERVICES_JSON_BASE64   base64 of app/google-services.json (Firebase; also uploads the R8 mapping to Crashlytics)
+#   RELEASE_KEYSTORE_BASE64       base64 of the upload keystore (.jks)
+#   RELEASE_KEYSTORE_PASSWORD
+#   RELEASE_KEY_ALIAS
+#   RELEASE_KEY_PASSWORD
+# Without the keystore secrets the release build is signed with a throwaway debug key: fine for testing, not for Play.
+name: Android build
+
+on:
+  workflow_dispatch:
+    inputs:
+      instrumented_tests:
+        description: Run instrumented tests on an emulator (slower)
+        type: boolean
+        default: true
+
+concurrency:
+  group: android-build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: "21"
+  COMPILE_SDK_PACKAGE: "platforms;android-37.0"
+
+jobs:
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Install compile SDK
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "$COMPILE_SDK_PACKAGE" > /dev/null
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-reports
+          path: app/build/reports/tests/
+
+  instrumented-tests:
+    name: Instrumented tests
+    if: ${{ inputs.instrumented_tests }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Install compile SDK
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "$COMPILE_SDK_PACKAGE" > /dev/null
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run instrumented tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back emulated
+          script: ./gradlew connectedDebugAndroidTest
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: instrumented-test-reports
+          path: app/build/reports/androidTests/
+
+  build:
+    name: Debug and release builds
+    needs: [unit-tests, instrumented-tests]
+    # Runs when unit tests pass and instrumented tests passed or were switched off.
+    if: ${{ !cancelled() && needs.unit-tests.result == 'success' && contains(fromJSON('["success","skipped"]'), needs.instrumented-tests.result) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Secrets can't be read in step conditions, so record which ones are set.
+      HAS_FIREBASE: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 != '' }}
+      HAS_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Install compile SDK
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "$COMPILE_SDK_PACKAGE" > /dev/null
+      - name: Add Firebase config
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+        if: ${{ env.HAS_FIREBASE == 'true' }}
+        run: echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
+      - name: Add release signing key
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        if: ${{ env.HAS_KEYSTORE == 'true' }}
+        run: |
+          echo "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+          cat > keystore.properties <<PROPS
+          storeFile=$RUNNER_TEMP/upload.jks
+          storePassword=$RELEASE_KEYSTORE_PASSWORD
+          keyAlias=$RELEASE_KEY_ALIAS
+          keyPassword=$RELEASE_KEY_PASSWORD
+          PROPS
+      - name: Build debug APK, release APK and release bundle
+        run: ./gradlew assembleDebug assembleRelease bundleRelease
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: peakbud-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+      - name: Upload release APK and bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: peakbud-release
+          path: |
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/bundle/release/*.aab
+      - name: Upload R8 mapping
+        uses: actions/upload-artifact@v4
+        with:
+          name: peakbud-release-mapping
+          path: app/build/outputs/mapping/release/mapping.txt
