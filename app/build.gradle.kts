@@ -54,8 +54,10 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+            // R8: shrinks, optimises and obfuscates the code, and drops unused resources.
             optimization {
-                enable = false
+                enable = true
+                keepRules { files.add(file("proguard-rules.pro")) }
             }
         }
     }
