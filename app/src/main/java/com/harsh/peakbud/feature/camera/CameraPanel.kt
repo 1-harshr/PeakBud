@@ -51,6 +51,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.harsh.peakbud.core.model.*
 import com.harsh.peakbud.core.projection.*
+import com.harsh.peakbud.core.geo.Geography
 import com.harsh.peakbud.feature.panorama.*
 import com.harsh.peakbud.telemetry.Telemetry
 import com.harsh.peakbud.core.alignment.UprightFrame
@@ -300,23 +301,41 @@ private fun CameraLabels(state: PanoramaState, pose: CameraPose, aligned: Boolea
         .pointerInput(lens) { detectHorizontalDragGestures(onDragEnd = { dragEnd() }) { change, dx -> change.consume(); nudge(-Math.toDegrees(kotlin.math.atan(dx / lens.fx))) } }) {
         hits.clear()
         if (size.width <= TrailSpace.lg.toPx() * 2 || size.height <= 0) return@Canvas
-        val peaks = state.scene?.peaks.orEmpty().filter { it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN }
+        val peaks = state.scene?.peaks.orEmpty().toLabel(state.preferences.showUncertain, state.focusedPeakId)
         // Overlays cover the top and bottom; dots stay inside the clear area.
         val clearTop = safeTop.toPx() + TrailCanvas.labelMargin.toPx()
         val clearBottom = size.height - safeBottom.toPx()
-        val candidates = peaks.inLabelPriority().mapNotNull { peak ->
+        val candidates = peaks.mapNotNull { peak ->
             if (peak.peak.id in hiddenPeaks) return@mapNotNull null  // the camera shows something nearer covering this summit
             val point = CameraProjector.project(peak.bearingDeg, peak.elevationDeg ?: return@mapNotNull null, pose, lens) ?: return@mapNotNull null
             if (point.x !in 0f..size.width || point.y !in clearTop..clearBottom) return@mapNotNull null
-            PinCandidate(peak, point.x, point.y, peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else "",
+            PinCandidate(peak, point.x, point.y, pinName(peak, strings),
                 peak.peak.publishedHeightM?.let { height(it, state, strings) } ?: peak.geometryHeightM?.let { strings(R.string.approximate_height, height(it, state, strings)) })
         }
         // Still pins: dot on the summit, vertical stick, tilted name/height pill. Camera-aligned pins get a green ring.
         val style = PinStyle(stick = Color.White, dot = Color.White, nameSurface = Color.White, nameText = Color(0xFF1B2B25),
             heightSurface = TrailCameraColors.pinHeight, heightText = Color.White, ring = if (aligned) TrailCameraColors.alignedRing else null)
         val textSize = type.detailPx * 1.05f
+        val focusStyle = style.copy(ring = TrailCameraColors.uncertain)
         for (pin in PeakPins.place(this, candidates, textSize, clearTop)) {
-            hits += PeakPins.draw(this, pin.x, pin.y, pin.name, pin.height, style, textSize, clearTop) to pin.item
+            hits += PeakPins.draw(this, pin.x, pin.y, pin.name, pin.height, if (pin.item.peak.id == state.focusedPeakId) focusStyle else style, textSize, clearTop) to pin.item
+        }
+        // The focused peak is out of frame: an arrow at the edge shows which way to turn.
+        state.focusedPeak?.takeIf { f -> candidates.none { it.item.peak.id == f.peak.id } }?.let { focus ->
+            val turnRight = Geography.wrap180(focus.bearingDeg - pose.heading) > 0
+            val y = (clearTop + clearBottom) / 2
+            val radius = TrailSpace.lg.toPx()
+            val cx = if (turnRight) size.width - TrailSpace.md.toPx() - radius else TrailSpace.md.toPx() + radius
+            drawCircle(TrailCameraColors.scrim, radius, Offset(cx, y))
+            val dir = if (turnRight) 1f else -1f
+            val arm = radius * .45f
+            drawLine(Color.White, Offset(cx - dir * arm * .5f, y - arm), Offset(cx + dir * arm * .5f, y), TrailSpace.xxs.toPx() * 1.5f, androidx.compose.ui.graphics.StrokeCap.Round)
+            drawLine(Color.White, Offset(cx + dir * arm * .5f, y), Offset(cx - dir * arm * .5f, y + arm), TrailSpace.xxs.toPx() * 1.5f, androidx.compose.ui.graphics.StrokeCap.Round)
+            val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.WHITE; this.textSize = type.detailPx; setShadowLayer(4f, 0f, 1f, android.graphics.Color.BLACK) }
+            val label = strings(R.string.turn_to_peak, focus.peak.name, kotlin.math.abs(Geography.wrap180(focus.bearingDeg - pose.heading)).toInt())
+            val tw = paint.measureText(label)
+            val tx = if (turnRight) cx - radius - TrailSpace.sm.toPx() - tw else cx + radius + TrailSpace.sm.toPx()
+            drawContext.canvas.nativeCanvas.drawText(label, tx, y - (paint.ascent() + paint.descent()) / 2, paint)
         }
     }
 }

@@ -22,7 +22,7 @@ import androidx.compose.ui.semantics.semantics
 import com.harsh.peakbud.core.geo.Geography
 import com.harsh.peakbud.core.model.*
 import com.harsh.peakbud.core.projection.PanoramaProjector
-import com.harsh.peakbud.core.projection.inLabelPriority
+import com.harsh.peakbud.core.projection.toLabel
 import kotlin.math.*
 
 @Composable
@@ -38,9 +38,9 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
     val zoom by rememberUpdatedState(onZoom)
     // The vertical axis follows the terrain in view: the lowest and highest skyline points (and labelled peaks) are
     // fitted to the frame, easing as you pan so the view never jumps.
-    val target = remember(state.scene, state.heading, state.fov, state.preferences.showUncertain) {
+    val target = remember(state.scene, state.heading, state.fov, state.preferences.showUncertain, state.focusedPeakId) {
         PanoramaProjector.window(state.scene?.horizon.orEmpty(),
-            state.scene?.peaks.orEmpty().filter { it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN }
+            state.scene?.peaks.orEmpty().toLabel(state.preferences.showUncertain, state.focusedPeakId)
                 .mapNotNull { p -> p.elevationDeg?.let { p.bearingDeg to it } }, state.heading, state.fov)
     }
     val windowLow by androidx.compose.animation.core.animateFloatAsState((target?.lowDeg ?: 0.0).toFloat(), androidx.compose.animation.core.tween(450), label = "low")
@@ -118,18 +118,18 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
         if (w <= TrailCanvas.labelPadding.toPx() * 2) return@Canvas
         drawLine(palette.axis, Offset(w / 2, (TrailSpace.xxl).toPx()), Offset(w / 2, (TrailCanvas.compassBand + TrailSpace.sm).toPx()), (TrailSpace.xxs).toPx())
         val occupied = mutableListOf<RectF>()
-        val candidates = state.scene?.peaks.orEmpty().filter {
-            it.visibility == Visibility.TERRAIN_VISIBLE || state.preferences.showUncertain && it.visibility == Visibility.UNCERTAIN
-        }.inLabelPriority().mapNotNull { peak -> peak.elevationDeg?.let { e -> project(peak.bearingDeg, e).let { p ->
-            PinCandidate(peak, p.x, p.y, peak.peak.name + if (peak.visibility == Visibility.UNCERTAIN) " ?" else "",
+        val candidates = state.scene?.peaks.orEmpty().toLabel(state.preferences.showUncertain, state.focusedPeakId)
+            .mapNotNull { peak -> peak.elevationDeg?.let { e -> project(peak.bearingDeg, e).let { p ->
+            PinCandidate(peak, p.x, p.y, pinName(peak, strings),
                 peak.peak.publishedHeightM?.let { height(it, state, strings) } ?: peak.geometryHeightM?.let { strings(R.string.approximate_height, height(it, state, strings)) })
         } } }.filter { it.x in TrailCanvas.labelMargin.toPx()..(w - TrailCanvas.labelMargin.toPx()) && it.y in compassBand..(h - footerClearance) }
         // Same still pins as the camera: dot on the summit, vertical stick, tilted name/height pill.
         val style = PinStyle(stick = palette.leader, dot = palette.marker, nameSurface = palette.labelSurface, nameText = palette.labelText,
             heightSurface = TrailCameraColors.pinHeight, heightText = Color.White)
         val textSize = type.detailPx * 1.05f; val pinTop = compassBand + TrailSpace.xs.toPx()
+        val focusStyle = style.copy(ring = TrailCameraColors.pinHeight)
         for (pin in PeakPins.place(this, candidates, textSize, pinTop)) {
-            val hit = PeakPins.draw(this, pin.x, pin.y, pin.name, pin.height, style, textSize, pinTop)
+            val hit = PeakPins.draw(this, pin.x, pin.y, pin.name, pin.height, if (pin.item.peak.id == state.focusedPeakId) focusStyle else style, textSize, pinTop)
             occupied += hit
             hits += hit to pin.item
         }
@@ -155,4 +155,11 @@ fun PanoramaCanvas(state: PanoramaState, modifier: Modifier, onPan: (Double) -> 
             androidx.compose.ui.geometry.Size(w - TrailSpace.lg.toPx(), footerHeight), androidx.compose.ui.geometry.CornerRadius(TrailRadius.small.toPx()))
         drawContext.canvas.nativeCanvas.drawText(footer, TrailSpace.lg.toPx(), footerTop + TrailSpace.sm.toPx() - axisMetrics.ascent, paint)
     }
+}
+
+/** Pin name: "?" when the view is borderline, "· hidden" for a focused peak behind a ridge. */
+internal fun pinName(peak: PeakView, strings: TrailStrings): String = when (peak.visibility) {
+    Visibility.UNCERTAIN -> peak.peak.name + " ?"
+    Visibility.OCCLUDED, Visibility.UNKNOWN -> strings(R.string.peak_hidden, peak.peak.name)
+    else -> peak.peak.name
 }

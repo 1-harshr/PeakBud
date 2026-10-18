@@ -13,3 +13,13 @@ fun Iterable<PeakView>.inLabelPriority(): List<PeakView> = sortedWith(
         .thenByDescending { it.elevationDeg ?: -90.0 }
         .thenBy { it.distanceM }
 )
+
+/**
+ * Peaks to label, most important first: the focused peak always leads (even when hidden, so it can be found), then the
+ * visible ones and, if wanted, the uncertain ones.
+ */
+fun Iterable<PeakView>.toLabel(showUncertain: Boolean, focusedId: String?): List<PeakView> {
+    val focused = firstOrNull { it.peak.id == focusedId && it.elevationDeg != null }
+    val rest = filter { it.peak.id != focusedId && (it.visibility == Visibility.TERRAIN_VISIBLE || showUncertain && it.visibility == Visibility.UNCERTAIN) }
+    return listOfNotNull(focused) + rest.inLabelPriority()
+}

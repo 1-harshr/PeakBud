@@ -249,7 +249,16 @@ fun PeakBudApp(model: PanoramaViewModel = viewModel(), readings: DeviceReadings?
                 Text(strings(R.string.nsource , coordinate(peak.peak.point.latitude), coordinate(peak.peak.point.longitude), peak.peak.source), style = MaterialTheme.typography.bodySmall)
                 peak.geometryHeightM?.let { Text(strings(R.string.the_map_puts_the_ground_here_at_the_official_summit_height_may_differ , height(it, state, strings)), style = MaterialTheme.typography.bodySmall) }
             }
-        }, confirmButton = { TextButton(onClick = { model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; tab = 1 }) { Text(strings(R.string.show_on_home)) } }, dismissButton = { TextButton(onClick = { selectedPeak = null }) { Text(strings(R.string.close)) } })
+        }, confirmButton = {
+            Row {
+                TextButton(onClick = { model.focus(peak.peak.id); selectedPeak = null; tab = 0 }) { Text(strings(R.string.find_in_camera)) }
+                TextButton(onClick = { model.focus(peak.peak.id); model.pan(Geography.wrap180(peak.bearingDeg - state.heading)); selectedPeak = null; tab = 1 }) { Text(strings(R.string.show_on_home)) }
+            }
+        }, dismissButton = {
+            // The focused peak stays ringed until it is closed here.
+            if (state.focusedPeakId == peak.peak.id) TextButton(onClick = { model.focus(null); selectedPeak = null }) { Text(strings(R.string.stop_showing)) }
+            else TextButton(onClick = { selectedPeak = null }) { Text(strings(R.string.close)) }
+        })
     }
     attribution?.let { text -> AlertDialog(onDismissRequest = { attribution = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text(strings(R.string.map_and_peak_credits)) }, text = { Text(text, Modifier.verticalScroll(rememberScrollState())) }, confirmButton = { TextButton(onClick = { attribution = null }) { Text(strings(R.string.done)) } }) }
     deletePack?.let { pack -> AlertDialog(onDismissRequest = { deletePack = null }, containerColor = MaterialTheme.colorScheme.surface, title = { Text(strings(R.string.delete , pack.name)) }, text = { Text(strings(R.string.its_maps_and_peak_names_will_be_removed_from_this_phone_you_can_download_it)) }, confirmButton = { TextButton(onClick = { model.deleteRegion(pack); deletePack = null }) { Text(strings(R.string.delete_2)) } }, dismissButton = { TextButton(onClick = { deletePack = null }) { Text(strings(R.string.keep)) } }) }

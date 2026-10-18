@@ -59,7 +59,10 @@ data class PanoramaState(
     val nearby: CatalogRegion? = null,
     /** Null until DataStore has been read, so the first-run tutorial never flashes for returning users. */
     val tutorialSeen: Boolean? = null,
+    /** Peak chosen with "Show on Home" or "Find in camera": always labelled, ringed, and guided to on the camera. */
+    val focusedPeakId: String? = null,
 ) {
+    val focusedPeak: PeakView? get() = focusedPeakId?.let { id -> scene?.peaks?.firstOrNull { it.peak.id == id } }
     /** Fictional terrain is shown only while demo mode is switched on in Settings. */
     val isDemo: Boolean get() = activePack == null && preferences.demoMode
     /** Nothing to show: no region selected and demo mode is off. */
@@ -224,10 +227,11 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
         Telemetry.key("region", pack?.id ?: "none")
         mutable.update { it.copy(activePack = pack, point = pack?.viewpoint ?: DemoTerrain.VIEWPOINT,
             heading = pack?.headingDeg ?: 350.0, groundOverrideM = null, followingGps = false, followingCompass = false,
-            gpsStatus = null, gpsFresh = false, cameraPose = null, compassStatus = null, message = null, labelTrim = 0.0) }
+            gpsStatus = null, gpsFresh = false, cameraPose = null, compassStatus = null, message = null, labelTrim = 0.0, focusedPeakId = null) }
         recalculate()
         viewModelScope.launch { runCatching { settings.selectRegion(pack?.key) } }
     }
+    fun focus(peakId: String?) { mutable.update { it.copy(focusedPeakId = peakId) } }
     fun pan(degrees: Double) {
         mutable.update { it.copy(heading = Geography.wrap360(it.heading + degrees), followingCompass = false) }
     }
