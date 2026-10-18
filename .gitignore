@@ -22,3 +22,8 @@ __pycache__/
 
 # Firebase config: project-specific, keep out of the public repo (see docs/firebase.md)
 app/google-services.json
+
+# Release signing: never commit the keystore or its passwords
+keystore.properties
+*.jks
+*.keystore

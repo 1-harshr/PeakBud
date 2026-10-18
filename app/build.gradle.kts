@@ -1,14 +1,27 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 // Firebase is configured by dropping app/google-services.json in place (see docs/firebase.md).
-// Without it the app still builds and logs to Logcat only.
-if (file("google-services.json").exists()) {
-    apply(plugin = "com.google.gms.google-services")
-    apply(plugin = "com.google.firebase.crashlytics")
+// Without it the app still builds (with a warning) and logs to Logcat only.
+googleServices {
+    missingGoogleServicesStrategy = com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy.WARN
+}
+
+// Release signing comes from keystore.properties at the project root (kept out of git):
+//   storeFile=/absolute/path/to/peakbud-upload.jks
+//   storePassword=...
+//   keyAlias=upload
+//   keyPassword=...
+// Without it, release builds are signed with the debug key so they still install locally, but can't go to Play.
+val keystoreProperties = Properties().apply {
+    rootProject.file("keystore.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
 }
 
 android {
@@ -29,10 +42,22 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        if (keystoreProperties.isNotEmpty()) create("release") {
+            storeFile = file(keystoreProperties.getProperty("storeFile"))
+            storePassword = keystoreProperties.getProperty("storePassword")
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+            // R8: shrinks, optimises and obfuscates the code, and drops unused resources.
             optimization {
-                enable = false
+                enable = true
+                keepRules { files.add(file("proguard-rules.pro")) }
             }
         }
     }
