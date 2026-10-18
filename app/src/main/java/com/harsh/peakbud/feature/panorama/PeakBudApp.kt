@@ -1180,7 +1180,10 @@ internal fun currentPlace(state: PanoramaState, strings: TrailStrings): String {
     val fix = state.gpsFix ?: return if (state.followingGps) strings(R.string.finding_your_location) else strings(R.string.location_off)
     val where = state.placeName ?: strings(R.string.place_coordinates, kotlin.math.abs(fix.point.latitude),
         strings(if (fix.point.latitude >= 0) R.string.n else R.string.s), kotlin.math.abs(fix.point.longitude), strings(if (fix.point.longitude >= 0) R.string.e else R.string.w))
-    return if (state.followingGps) where else strings(R.string.last_known_place, where)
+    if (!state.followingGps) return strings(R.string.last_known_place, where)
+    // Height of the ground the view is worked out from, so the subtitle reads like a trail sign: "Dhanaulti · 2245 m".
+    val ground = state.scene?.observer?.takeIf { Geography.distance(it.point, fix.point) < 500 }?.groundHeightM
+    return ground?.let { strings(R.string.place_with_height, where, height(it, state, strings)) } ?: where
 }
 internal fun angleText(degrees: Double, strings: TrailStrings) = strings(if (degrees >= 0) R.string.angle_up else R.string.angle_down, kotlin.math.abs(degrees))
 /** Decimal degrees are also editable input; keep an unambiguous decimal point for parsing. */
