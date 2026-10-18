@@ -14,6 +14,8 @@
     <string name="camera_last_known_location">Last known location</string>
     <string name="camera_altitude">Altitude %1$s</string>
     <string name="app_name">PeakBud</string>
+    <string name="splash_made_by">Made with ❤️ by musa_fir</string>
+    <string name="splash_version">Version %1$s</string>
     <string name="peaks_pick_a_hiking_area_to_start">Peaks · pick a hiking area to start</string>
     <string name="peaks_demo_landscape">Peaks · demo landscape</string>
     <string name="peaks_within_km_of_this_spot">Peaks within %1$s of this spot</string>
